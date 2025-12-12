@@ -3837,7 +3837,7 @@
             }
             
             .btn-primary {
-                background: linear-gradient(135deg, #FF9800, #FF5722);
+                background: linear-gradient(135deg, #2E7D32, #2E7D32);
             }
             
             .btn-secondary {

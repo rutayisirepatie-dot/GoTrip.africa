@@ -884,7 +884,7 @@ p {
 
 /* Price Tag */
 .price-tag {
-    background: linear-gradient(135deg, var(--secondary-color), #FF5722);
+    background: linear-gradient(#6c757d, #6c757d, #6c757d);
     color: white;
     padding: 8px 20px;
     border-radius: 30px;
