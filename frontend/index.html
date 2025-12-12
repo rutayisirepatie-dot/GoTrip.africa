@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Adventure HillBound - Discover Rwanda, the Land of a Thousand Hills. Experience unforgettable adventures, culture, and natural beauty.">
+    <meta name="keywords" content="Rwanda tourism, adventure travel, tour guides, translators, accommodation, gorilla trekking">
+    <meta name="author" content="Adventure HillBound">
+    
+    <title>Adventure HillBound - Discover the Land of a Thousand Hills</title>
+    
+    <!-- Preload Font Awesome CDN-->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" as="style">
+    
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Adventure HillBound - Discover Rwanda">
+    <meta property="og:description" content="Experience unforgettable adventures in the Land of a Thousand Hills">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://adventurehillbound.com">
+    <meta property="og:image" content="https://adventurehillbound.com/images/og-image.jpg">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TravelAgency",
+        "name": "Adventure HillBound",
+        "description": "Discover Rwanda - The Land of a Thousand Hills",
+        "url": "https://adventurehillbound.com",
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "Rwanda"
+        }
+    }
+    </script>
+</head>
+<body>
+    <!-- Enhanced Skip to main content button -->
+    <a href="#main-content" class="skip-to-content" id="skip-to-main">
+        <i class="fas fa-arrow-right"></i> Skip to Main Content
+    </a>
+    
+    <!-- Notification Area -->
+    <div id="notification-area" class="notification-area" role="alert" aria-live="polite"></div>
+
+    <!-- Navigation -->
+    <header>
+        <nav class="main-nav" aria-label="Main Navigation">
+            <div class="container nav-container">
+                <a href="#home" class="logo" aria-label="Adventure HillBound Home">
+                    <span>Adventure</span> <span>HillBound</span>
+                </a>
+                
+                <button class="mobile-menu-btn" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="nav-links">
+                    <span class="hamburger-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Menu</span>
+                </button>
+                
+                <div class="nav-links" id="nav-links">
+                    <ul role="menubar">
+                        <li role="none"><a href="#home" class="nav-link active" role="menuitem" data-page="home">Home</a></li>
+                        <li role="none"><a href="#destinations" class="nav-link" role="menuitem" data-page="destinations">Destinations</a></li>
+                        <li role="none"><a href="#guides" class="nav-link" role="menuitem" data-page="guides">Tour Guides</a></li>
+                        <li role="none"><a href="#translators" class="nav-link" role="menuitem" data-page="translators">Translators</a></li>
+                        <li role="none"><a href="#accommodations" class="nav-link" role="menuitem" data-page="accommodations">Accommodations</a></li>
+                        <li role="none"><a href="#blog" class="nav-link" role="menuitem" data-page="blog">Blog</a></li>
+                        <li role="none"><a href="#contact" class="nav-link" role="menuitem" data-page="contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="nav-buttons">
+                    <div class="auth-dropdown">
+                        <button class="btn btn-ghost auth-toggle" id="auth-toggle" 
+                                aria-label="Account menu" 
+                                aria-expanded="false" 
+                                aria-controls="auth-dropdown-menu">
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                            <span>Account</span>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="auth-dropdown-menu" id="auth-dropdown-menu" aria-labelledby="auth-toggle">
+                            <a href="#" class="auth-option sign-in-btn" role="menuitem">
+                                <i class="fas fa-sign-in-alt"></i> Sign In
+                            </a>
+                            <a href="#" class="auth-option signup-btn" role="menuitem">
+                                <i class="fas fa-user-plus"></i> Sign Up
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <!-- Hero Section -->
+            <div class="hero" aria-label="Hero Section">
+                <div class="hero-content animate-fade-in">
+                    <h1>Discover Rwanda</h1>
+                    <p class="hero-subtitle">The Land of a Thousand Hills awaits. Experience unforgettable adventures, culture, and natural beauty.</p>
+                    <div class="hero-buttons">
+                        <a href="#destinations" class="btn btn-primary" data-page="destinations">Explore Destinations</a>
+                        <button class="btn btn-outline plan-trip-btn" type="button" data-modal="plan-trip">Plan Your Trip</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Section -->
+            <section class="section" id="services" aria-labelledby="services-heading">
+                <div class="container">
+                    <header class="section-header">
+                        <h2 id="services-heading">Our Services</h2>
+                        <p>Everything you need for a perfect Rwanda adventure</p>
+                    </header>
+                    <div class="services-grid" role="list">
+                        <div class="service-card" role="listitem">
+                            <i class="fas fa-language service-icon" aria-hidden="true"></i>
+                            <h3>Professional Translators</h3>
+                            <p>Connect with experienced translators speaking multiple languages. Prices from $50-$150/day</p>
+                            <a href="#translators" class="service-link" data-page="translators">Learn more</a>
+                        </div>
+                        <div class="service-card" role="listitem">
+                            <i class="fas fa-user-tie service-icon" aria-hidden="true"></i>
+                            <h3>Expert Tour Guides</h3>
+                            <p>Discover Rwanda with certified local and international tour guides. Prices from $80-$200/day</p>
+                            <a href="#guides" class="service-link" data-page="guides">Learn more</a>
+                        </div>
+                        <div class="service-card" role="listitem">
+                            <i class="fas fa-hotel service-icon" aria-hidden="true"></i>
+                            <h3>Accommodation</h3>
+                            <p>From luxury hotels to cozy guesthouses and eco-lodges. Various price ranges available</p>
+                            <a href="#accommodations" class="service-link" data-page="accommodations">Learn more</a>
+                        </div>
+                        <div class="service-card" role="listitem">
+                            <i class="fas fa-map-marked-alt service-icon" aria-hidden="true"></i>
+                            <h3>Destinations</h3>
+                            <p>Must-visit locations across Rwanda with custom itineraries</p>
+                            <a href="#destinations" class="service-link" data-page="destinations">Learn more</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Featured Destinations -->
+            <section class="section destinations-section" id="preview-destinations" aria-labelledby="destinations-heading">
+                <div class="container">
+                    <header class="section-header">
+                        <h2 id="destinations-heading">Featured Destinations</h2>
+                        <p>Must-visit locations across Rwanda</p>
+                    </header>
+                    <div class="destinations-grid" role="list" aria-label="List of destinations">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                    <div class="section-footer">
+                        <a href="#destinations" class="btn btn-primary btn-large" data-page="destinations">
+                            <i class="fas fa-map-marked-alt"></i> View All Destinations
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Blog Preview -->
+            <section class="section" id="preview-blog" aria-labelledby="blog-heading">
+                <div class="container">
+                    <header class="section-header">
+                        <h2 id="blog-heading">Latest Travel News</h2>
+                        <p>Tips, stories, and insights to help you plan the perfect Rwanda adventure</p>
+                    </header>
+                    <div class="blog-grid" role="list" aria-label="Latest blog posts">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                    <div class="section-footer">
+                        <a href="#blog" class="btn btn-primary btn-large" data-page="blog">
+                            <i class="fas fa-newspaper"></i> Read More Stories
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Newsletter -->
+            <section class="section" id="newsletter" aria-labelledby="newsletter-heading">
+                <div class="container">
+                    <div class="newsletter-card">
+                        <h2 id="newsletter-heading">Stay Updated</h2>
+                        <p>Subscribe to our newsletter for travel tips, news and special offers.</p>
+                        <form id="newsletter-form" class="newsletter-form" method="POST" action="/api/newsletter/subscribe" novalidate>
+                            <div class="form-group newsletter-group">
+                                <label for="newsletter-email" class="sr-only">Your email address</label>
+                                <input type="email" id="newsletter-email" name="email" class="newsletter-input" 
+                                       placeholder="Enter your email address" required
+                                       aria-label="Enter your email for newsletter subscription">
+                                <button type="submit" class="btn btn-primary subscribe-btn">
+                                    <i class="fas fa-paper-plane"></i> Subscribe
+                                </button>
+                            </div>
+                            <div class="error-message" id="newsletter-error" aria-live="polite"></div>
+                        </form>
+                        <p class="newsletter-note">Join 5,000+ travelers who get our weekly updates</p>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- Destinations Page -->
+        <section id="destinations" class="page">
+            <div class="page-header">
+                <div class="container">
+                    <h1><i class="fas fa-map-marked-alt"></i> Destinations in Rwanda</h1>
+                    <p>Explore the most beautiful places in the Land of a Thousand Hills</p>
+                </div>
+            </div>
+            <div class="container">
+                <div class="destinations-grid-full" role="list" aria-label="All destinations">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Guides Page -->
+        <section id="guides" class="page">
+            <div class="page-header">
+                <div class="container">
+                    <h1><i class="fas fa-user-tie"></i> Tour Guides</h1>
+                    <p>Meet our certified local and international experts.</p>
+                </div>
+            </div>
+            <div class="container">
+                <div class="guides-section">
+                    <div class="guides-grid-full" role="list" aria-label="All tour guides">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Translators Page -->
+        <section id="translators" class="page">
+            <div class="page-header">
+                <div class="container">
+                    <h1><i class="fas fa-language"></i> Professional Translators</h1>
+                    <p>Connect with experienced translators speaking multiple languages.</p>
+                </div>
+            </div>
+            <div class="container">
+                <div class="translators-section">
+                    <div class="translators-grid-full" role="list" aria-label="All translators">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accommodations Page -->
+        <section id="accommodations" class="page">
+            <div class="page-header">
+                <div class="container">
+                    <h1><i class="fas fa-hotel"></i> Premium Accommodation</h1>
+                    <p>From luxury hotels to cozy guesthouses and eco-lodges</p>
+                </div>
+            </div>
+            <div class="container">
+                <div class="accommodations-grid-full" role="list" aria-label="All accommodations">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Blog Page -->
+        <section id="blog" class="page">
+            <div class="page-header">
+                <div class="container">
+                    <h1><i class="fas fa-newspaper"></i> Travel Blog</h1>
+                    <p>Latest stories, tips, and insights about Rwanda</p>
+                </div>
+            </div>
+            <div class="container">
+                <div class="blog-grid-full" role="list" aria-label="All blog posts">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Page -->
+        <section id="contact" class="page">
+            <div class="page-header">
+                <div class="container">
+                    <h1><i class="fas fa-envelope"></i> Contact Us</h1>
+                    <p>We'd love to hear from you! Reach out with your questions or inquiries</p>
+                </div>
+            </div>
+            <div class="container">
+                <div class="contact-container">
+                    <div class="contact-info">
+                        <h2>Get in Touch</h2>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <h3>Address</h3>
+                                <p>KG 7 Ave<br>Kigali, Rwanda</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <h3>Phone</h3>
+                                <p>+250 787 407 051<br>+250 727 514 970</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h3>Email</h3>
+                                <p>info@adventurehillbound.com<br>rutayisirepatie@gmail.com</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <h3>Working Hours</h3>
+                                <p>Monday - Friday: 8am - 6pm<br>Saturday: 9am - 4pm</p>
+                            </div>
+                        </div>
+                        
+                        <h3 class="social-title">Connect With Us</h3>
+                        <div class="contact-social">
+                            <a href="https://www.linkedin.com/in/patience-rutayisire/" class="social-icon linkedin" aria-label="LinkedIn">
+                                <i class="fab fa-linkedin-in"></i>
+                                <span>LinkedIn</span>
+                            </a>
+                            <a href="https://web.facebook.com/patience.rutayisire/" class="social-icon facebook" aria-label="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                                <span>Facebook</span>
+                            </a>
+                            <a href="https://x.com/0011111olen" class="social-icon twitter" aria-label="Twitter">
+                                <i class="fab fa-twitter"></i>
+                                <span>X</span>
+                            </a>
+                            <a href="https://www.instagram.com/patierutayisire/" class="social-icon instagram" aria-label="Instagram">
+                                <i class="fab fa-instagram"></i>
+                                <span>Instagram</span>
+                            </a>
+                            <a href="https://www.youtube.com/@adventurehillbound" class="social-icon youtube" aria-label="YouTube">
+                                <i class="fab fa-youtube"></i>
+                                <span>YouTube</span>
+                            </a>
+                            <a href="https://wa.me/250788123456" class="social-icon whatsapp" aria-label="WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="contact-form-wrapper">
+                        <h2>Send us a Message</h2>
+                        <form id="contact-form" method="POST" action="/api/contact/submit" novalidate>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="contact-name">Your Name *</label>
+                                    <input type="text" id="contact-name" name="name" placeholder="Enter your full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contact-email">Your Email *</label>
+                                    <input type="email" id="contact-email" name="email" placeholder="Enter your email address" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-subject">Subject *</label>
+                                <input type="text" id="contact-subject" name="subject" placeholder="What is this regarding?" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-message">Your Message *</label>
+                                <textarea id="contact-message" name="message" placeholder="Tell us about your inquiry or request..." rows="6" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-large">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Enhanced Footer -->
+    <footer class="main-footer" aria-label="Footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3 class="footer-logo">
+                        <span>Adventure</span> <span>HillBound</span>
+                    </h3>
+                    <p>Discover the Land of a Thousand Hills. Your gateway to unforgettable experiences in Rwanda.</p>
+                    <div class="footer-social">
+                        <h4>Connect With Us</h4>
+                        <div class="social-links">
+                            <a href="https://www.linkedin.com/in/patience-rutayisire/" class="social-link linkedin" aria-label="LinkedIn profile">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="https://web.facebook.com/patience.rutayisire/" class="social-link facebook" aria-label="Facebook page">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://x.com/0011111olen" class="social-link twitter" aria-label="Twitter profile">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="https://www.instagram.com/patierutayisire/" class="social-link instagram" aria-label="Instagram profile">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://www.youtube.com/@adventurehillbound" class="social-link youtube" aria-label="YouTube channel">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            <a href="https://wa.me/250788123456" class="social-link whatsapp" aria-label="WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links" role="list">
+                        <li><a href="#home" data-page="home"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="#destinations" data-page="destinations"><i class="fas fa-map-marked-alt"></i> Destinations</a></li>
+                        <li><a href="#guides" data-page="guides"><i class="fas fa-user-tie"></i> Tour Guides</a></li>
+                        <li><a href="#translators" data-page="translators"><i class="fas fa-language"></i> Translators</a></li>
+                        <li><a href="#accommodations" data-page="accommodations"><i class="fas fa-hotel"></i> Accommodations</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Our Services</h4>
+                    <ul class="footer-links" role="list">
+                        <li><a href="#guides" data-page="guides"><i class="fas fa-user-tie"></i> Tour Guides</a></li>
+                        <li><a href="#translators" data-page="translators"><i class="fas fa-language"></i> Translators</a></li>
+                        <li><a href="#accommodations" data-page="accommodations"><i class="fas fa-hotel"></i> Accommodation</a></li>
+                        <li><a href="#" class="plan-trip-btn"><i class="fas fa-map-marked-alt"></i> Custom Tours</a></li>
+                        <li><a href="#contact" data-page="contact"><i class="fas fa-headset"></i> Travel Support</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Stay Updated</h4>
+                    <p>Subscribe to our newsletter for travel tips, news and special offers.</p>
+                    <form class="footer-newsletter-form" method="POST" action="/api/newsletter/subscribe" novalidate>
+                        <div class="form-group footer-newsletter-group">
+                            <label for="footer-newsletter-email" class="sr-only">Your email address</label>
+                            <input type="email" id="footer-newsletter-email" name="email" 
+                                   placeholder="Your email address" required
+                                   aria-label="Enter your email for newsletter subscription">
+                            <button type="submit" class="btn btn-outline footer-subscribe-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <p class="footer-newsletter-note">Join 5,000+ travelers</p>
+                    <div class="footer-contact">
+                        <p><i class="fas fa-envelope"></i> info@adventurehillbound.com</p>
+                        <p><i class="fas fa-phone"></i> +250 787 407 051</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; <span id="current-year">2025</span> Adventure HillBound.</p>
+                <ul class="footer-legal" role="list">
+                    <li><a href="/privacy-policy" target="_blank">Privacy Policy</a></li>
+                    <li><a href="/terms" target="_blank">Terms of Service</a></li>
+                    <li><a href="/cookies" target="_blank">Cookie Policy</a></li>
+                    <li><a href="/sitemap" target="_blank">Sitemap</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Container -->
+    <div id="modal-container" class="modal-container">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Hidden Forms Templates -->
+    <div id="modals-templates" style="display: none;">
+        <!-- Plan Your Trip Modal -->
+        <form id="plan-trip-form" class="modal-form" method="POST" action="/api/trip/plan" novalidate>
+            <h2>Plan Your Trip</h2>
+            <div class="form-group">
+                <label for="trip-name">Full Name *</label>
+                <input type="text" id="trip-name" name="name" placeholder="Your full name" required>
+            </div>
+            <div class="form-group">
+                <label for="trip-email">Email Address *</label>
+                <input type="email" id="trip-email" name="email" placeholder="Your email address" required>
+            </div>
+            <div class="form-group">
+                <label for="trip-phone">Phone Number *</label>
+                <input type="tel" id="trip-phone" name="phone" placeholder="Your phone number" required>
+            </div>
+            <div class="form-group">
+                <label for="trip-destination">Destination *</label>
+                <select id="trip-destination" name="destination" required>
+                    <option value="" disabled selected>Select a destination</option>
+                    <option value="kigali">Kigali</option>
+                    <option value="volcanoes_national_park">Volcanoes National Park</option>
+                    <option value="akagera_national_park">Akagera National Park</option>
+                    <option value="nyungwe_forest">Nyungwe Forest</option>
+                    <option value="lake_kivu">Lake Kivu</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="trip-arrival">Arrival Date *</label>
+                    <input type="date" id="trip-arrival" name="arrival" required>
+                </div>
+                <div class="form-group">
+                    <label for="trip-departure">Departure Date *</label>
+                    <input type="date" id="trip-departure" name="departure" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="trip-travelers">Number of Travelers *</label>
+                <input type="number" id="trip-travelers" name="travelers" min="1" max="20" value="1" required>
+            </div>
+            <div class="form-group">
+                <label>Services Needed *</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="services[]" value="tour-guide">
+                        Tour Guide
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="services[]" value="translator">
+                        Translator
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="services[]" value="accommodation">
+                        Accommodation
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="services[]" value="transportation">
+                        Transportation
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="trip-budget">Estimated Budget ($)</label>
+                <select id="trip-budget" name="budget">
+                    <option value="" selected>Select budget range</option>
+                    <option value="500-1000">$500 - $1,000</option>
+                    <option value="1000-3000">$1,000 - $3,000</option>
+                    <option value="3000-5000">$3,000 - $5,000</option>
+                    <option value="5000+">$5,000+</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="trip-comments">Additional Comments</label>
+                <textarea id="trip-comments" name="comments" placeholder="Tell us more about your trip..." rows="4"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-large">Submit Trip Request</button>
+        </form>
+
+        <!-- Book Tour Guide Modal -->
+        <form id="book-guide-form" class="modal-form" method="POST" action="/api/guides/book" novalidate>
+            <h2>Book a Tour Guide</h2>
+            <input type="hidden" id="guide-id" name="guideId">
+            
+            <div class="guide-info-preview">
+                <div class="guide-avatar" id="guide-avatar-preview"></div>
+                <div>
+                    <h3 id="guide-name-preview"></h3>
+                    <p id="guide-specialty-preview"></p>
+                    <p id="guide-price-preview"></p>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="guide-booking-name">Full Name *</label>
+                    <input type="text" id="guide-booking-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="guide-booking-email">Email *</label>
+                    <input type="email" id="guide-booking-email" name="email" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="guide-booking-date">Tour Date *</label>
+                    <input type="date" id="guide-booking-date" name="tourDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="guide-duration">Duration (hours) *</label>
+                    <select id="guide-duration" name="duration" required>
+                        <option value="4">4 hours - Half Day</option>
+                        <option value="8" selected>8 hours - Full Day</option>
+                        <option value="16">16 hours - 2 Days</option>
+                        <option value="24">24 hours - 3 Days</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="guide-group-size">Group Size *</label>
+                <input type="number" id="guide-group-size" name="groupSize" min="1" max="20" value="1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="guide-language">Preferred Language</label>
+                <select id="guide-language" name="language">
+                    <option value="english">English</option>
+                    <option value="french">French</option>
+                    <option value="kinyarwanda">Kinyarwanda</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="guide-special-requests">Special Requests</label>
+                <textarea id="guide-special-requests" name="specialRequests" rows="3"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-calendar-check"></i> Book Now
+            </button>
+        </form>
+
+        <!-- Hire Translator Modal -->
+        <form id="hire-translator-form" class="modal-form" method="POST" action="/api/translators/hire" novalidate>
+            <h2>Hire a Translator</h2>
+            <input type="hidden" id="translator-id" name="translatorId">
+            
+            <div class="translator-info-preview">
+                <h3 id="translator-name-preview"></h3>
+                <p id="translator-languages-preview"></p>
+                <p id="translator-price-preview"></p>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="translator-client-name">Your Name *</label>
+                    <input type="text" id="translator-client-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="translator-client-email">Email *</label>
+                    <input type="email" id="translator-client-email" name="email" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="translator-service-date">Service Date *</label>
+                    <input type="date" id="translator-service-date" name="serviceDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="translator-service-type">Service Type *</label>
+                    <select id="translator-service-type" name="serviceType" required>
+                        <option value="meeting">Business Meeting</option>
+                        <option value="tour">Tour Translation</option>
+                        <option value="document">Document Translation</option>
+                        <option value="conference">Conference</option>
+                        <option value="medical">Medical Appointment</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="translator-duration">Duration *</label>
+                <div class="duration-options">
+                    <label class="radio-label">
+                        <input type="radio" name="duration" value="2" required> 2 hours
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="duration" value="4" required> 4 hours
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="duration" value="8" required> Full day (8 hours)
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="translator-location">Location</label>
+                <input type="text" id="translator-location" name="location" placeholder="Where will the service take place?">
+            </div>
+            
+            <div class="form-group">
+                <label for="translator-details">Additional Details</label>
+                <textarea id="translator-details" name="details" rows="3"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-language"></i> Hire Translator
+            </button>
+        </form>
+
+        <!-- Book Accommodation Modal -->
+        <form id="book-accommodation-form" class="modal-form" method="POST" action="/api/accommodations/book" novalidate>
+            <h2>Book Accommodation</h2>
+            <input type="hidden" id="accommodation-id" name="accommodationId">
+            
+            <div class="accommodation-info-preview">
+                <h3 id="accommodation-name-preview"></h3>
+                <p id="accommodation-type-preview"></p>
+                <p id="accommodation-price-preview"></p>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="accommodation-guest-name">Guest Name *</label>
+                    <input type="text" id="accommodation-guest-name" name="guestName" required>
+                </div>
+                <div class="form-group">
+                    <label for="accommodation-guest-email">Email *</label>
+                    <input type="email" id="accommodation-guest-email" name="email" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="accommodation-checkin">Check-in Date *</label>
+                    <input type="date" id="accommodation-checkin" name="checkin" required>
+                </div>
+                <div class="form-group">
+                    <label for="accommodation-checkout">Check-out Date *</label>
+                    <input type="date" id="accommodation-checkout" name="checkout" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="accommodation-guests">Number of Guests *</label>
+                    <input type="number" id="accommodation-guests" name="guests" min="1" max="10" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="accommodation-rooms">Number of Rooms</label>
+                    <input type="number" id="accommodation-rooms" name="rooms" min="1" max="5" value="1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="accommodation-room-type">Room Type</label>
+                <select id="accommodation-room-type" name="roomType">
+                    <option value="standard">Standard Room</option>
+                    <option value="deluxe">Deluxe Room</option>
+                    <option value="suite">Suite</option>
+                    <option value="family">Family Room</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="accommodation-special-requests">Special Requests</label>
+                <textarea id="accommodation-special-requests" name="specialRequests" rows="3"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-bed"></i> Book Now
+            </button>
+        </form>
+
+        <!-- Sign In Modal -->
+        <form id="signin-form" class="modal-form" method="POST" action="/api/auth/signin" novalidate>
+            <h2>Sign In</h2>
+            <div class="form-group">
+                <label for="signin-email">Email Address *</label>
+                <input type="email" id="signin-email" name="email" placeholder="Your email address" required>
+            </div>
+            <div class="form-group">
+                <label for="signin-password">Password *</label>
+                <input type="password" id="signin-password" name="password" placeholder="Your password" required>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="remember"> Remember me
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-large">Sign In</button>
+            <p class="form-footer">
+                Don't have an account? <a href="#" class="switch-to-signup">Sign up here</a>
+            </p>
+        </form>
+
+        <!-- Sign Up Modal -->
+        <form id="signup-form" class="modal-form" method="POST" action="/api/auth/signup" novalidate>
+            <h2>Create Account</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="signup-firstname">First Name *</label>
+                    <input type="text" id="signup-firstname" name="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-lastname">Last Name *</label>
+                    <input type="text" id="signup-lastname" name="lastName" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email Address *</label>
+                <input type="email" id="signup-email" name="email" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="signup-password">Password *</label>
+                    <input type="password" id="signup-password" name="password" minlength="8" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm">Confirm Password *</label>
+                    <input type="password" id="signup-confirm" name="confirmPassword" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="signup-phone">Phone Number</label>
+                <input type="tel" id="signup-phone" name="phone">
+            </div>
+            <div class="form-group">
+                <label for="signup-country">Country</label>
+                <input type="text" id="signup-country" name="country">
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="newsletter" checked> Subscribe to newsletter
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="terms" required> I agree to Terms & Conditions
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-large">Create Account</button>
+            <p class="form-footer">
+                Already have an account? <a href="#" class="switch-to-signin">Sign in here</a>
+            </p>
+        </form>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" aria-hidden="true" aria-label="Loading">
+        <div class="loading-spinner"></div>
+        <p>Loading Adventure HillBound...</p>
+    </div>
+
+    <!-- No JavaScript Warning -->
+    <noscript>
+        <div class="noscript-warning">
+            <p>JavaScript is required for the full functionality of this website. Please enable JavaScript to continue.</p>
+        </div>
+    </noscript>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
