@@ -1,7 +1,8 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const validator = require('validator');
+// backend/models/User.js
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import validator from 'validator';
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -11,7 +12,6 @@ const userSchema = new mongoose.Schema({
     minlength: [2, 'First name must be at least 2 characters'],
     maxlength: [50, 'First name cannot exceed 50 characters']
   },
-  
   lastName: {
     type: String,
     required: [true, 'Last name is required'],
@@ -19,7 +19,6 @@ const userSchema = new mongoose.Schema({
     minlength: [2, 'Last name must be at least 2 characters'],
     maxlength: [50, 'Last name cannot exceed 50 characters']
   },
-  
   email: {
     type: String,
     required: [true, 'Email is required'],
@@ -28,64 +27,31 @@ const userSchema = new mongoose.Schema({
     trim: true,
     validate: [validator.isEmail, 'Please provide a valid email']
   },
-  
   password: {
     type: String,
     required: [true, 'Password is required'],
     minlength: [8, 'Password must be at least 8 characters'],
-    select: false // Don't return password in queries
+    select: false
   },
-  
   phone: {
     type: String,
     trim: true,
     validate: {
-      validator: function(v) {
-        return !v || /^\+?[\d\s\-\(\)]{10,}$/.test(v);
-      },
+      validator: v => !v || /^\+?[\d\s\-\(\)]{10,}$/.test(v),
       message: 'Please provide a valid phone number'
     }
   },
-  
-  country: {
-    type: String,
-    trim: true
-  },
-  
-  role: {
-    type: String,
-    enum: ['user', 'admin', 'guide'],
-    default: 'user'
-  },
-  
-  preferences: {
-    type: String,
-    default: ''
-  },
-  
-  newsletterSubscribed: {
-    type: Boolean,
-    default: true
-  },
-  
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
-  
+  country: { type: String, trim: true },
+  role: { type: String, enum: ['user', 'admin', 'guide'], default: 'user' },
+  preferences: { type: String, default: '' },
+  newsletterSubscribed: { type: Boolean, default: true },
+  isVerified: { type: Boolean, default: false },
   verificationToken: String,
   resetPasswordToken: String,
   resetPasswordExpire: Date,
-  
   lastLogin: Date,
-  loginCount: {
-    type: Number,
-    default: 0
-  }
-  
-}, {
-  timestamps: true
-});
+  loginCount: { type: Number, default: 0 }
+}, { timestamps: true });
 
 // Virtual full name
 userSchema.virtual('name').get(function() {
@@ -95,7 +61,6 @@ userSchema.virtual('name').get(function() {
 // Hash password before saving
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
-  
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -107,14 +72,14 @@ userSchema.pre('save', async function(next) {
 
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
 // Generate JWT token
 userSchema.methods.generateAuthToken = function() {
   return jwt.sign(
     { 
-      userId: this._id,
+      _id: this._id,
       email: this.email,
       role: this.role,
       name: this.name
@@ -136,5 +101,4 @@ userSchema.methods.toJSON = function() {
 };
 
 const User = mongoose.model('User', userSchema);
-
-module.exports = User;
+export default User;

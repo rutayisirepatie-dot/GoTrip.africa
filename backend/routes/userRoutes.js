@@ -1,15 +1,16 @@
-import express from 'express';
-const router = express.Router();
+// backend/routes/userRoutes.js
+import { Router } from 'express';
+import { validateUser } from '../middleware/validationMiddleware.js';
+import { protect } from '../middleware/authMiddleware.js';
 
-// Example GET route
-router.get('/', (req, res) => {
-  res.json({ message: 'All users' });
+const router = Router();
+
+router.post('/register', validateUser, (req, res) => {
+  res.json({ success: true, message: 'User registered' });
 });
 
-// Example POST route
-router.post('/', (req, res) => {
-  const user = req.body;
-  res.status(201).json({ message: 'User created', user });
+router.get('/profile', protect, (req, res) => {
+  res.json({ success: true, user: req.user });
 });
 
-export default router; // Must be default export!
+export default router;

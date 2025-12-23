@@ -1,51 +1,59 @@
 // backend/routes/adminRoutes.js
-import express from 'express';
+import { Router } from 'express';
 import { protect, authorize } from '../middleware/authMiddleware.js';
-import * as adminController from '../controllers/adminController.js';
 
-const router = express.Router();
+const router = Router();
 
-router.use(protect);
-router.use(authorize('admin'));
+// Admin root
+router.get('/', protect, authorize('admin'), (req, res) => {
+  res.json({ success: true, message: 'Welcome to the Admin Panel' });
+});
 
-// Dashboard
-router.get('/dashboard', adminController.getDashboardStats);
+// Admin Dashboard
+router.get('/dashboard', protect, authorize('admin'), (req, res) => {
+  // Example JSON response
+  res.json({
+    success: true,
+    message: 'Admin Dashboard Access',
+    stats: {
+      totalUsers: 120,
+      totalTrips: 45,
+      totalBookings: 78,
+    },
+  });
 
-// User Management
-router.get('/users/stats', adminController.getUserStats);
-router.get('/users/activity', adminController.getUserActivity);
+  // If using EJS:
+  // res.render('admin/dashboard', { user: req.user, stats: { ... } });
+});
 
-// Booking Management
-router.get('/bookings/stats', adminController.getBookingStats);
-router.get('/bookings/revenue', adminController.getRevenueStats);
+// Manage Users
+router.get('/users', protect, authorize('admin'), (req, res) => {
+  res.json({
+    success: true,
+    message: 'User management access',
+    users: [
+      { id: 1, name: 'Alice', role: 'user' },
+      { id: 2, name: 'Bob', role: 'user' },
+    ],
+  });
 
-// Service Management
-router.get('/services/stats', adminController.getServiceStats);
-router.get('/services/performance', adminController.getServicePerformance);
+  // If using EJS:
+  // res.render('admin/users', { users: [...], user: req.user });
+});
 
-// Content Management
-router.get('/content/stats', adminController.getContentStats);
+// Settings / Configuration
+router.get('/settings', protect, authorize('admin'), (req, res) => {
+  res.json({
+    success: true,
+    message: 'Admin settings access',
+    settings: {
+      siteName: 'Go Trip',
+      maintenanceMode: false,
+    },
+  });
 
-// Reports
-router.get('/reports/generate', adminController.generateReport);
-router.get('/reports/sales', adminController.getSalesReport);
-router.get('/reports/users', adminController.getUserReport);
-
-// System Settings
-router.get('/settings', adminController.getSettings);
-router.put('/settings', adminController.updateSettings);
-
-// Email Templates
-router.get('/email-templates', adminController.getEmailTemplates);
-router.put('/email-templates/:id', adminController.updateEmailTemplate);
-
-// Newsletter Management
-router.get('/newsletter/stats', adminController.getNewsletterStats);
-router.post('/newsletter/broadcast', adminController.broadcastNewsletter);
-
-// Backup & Restore
-router.post('/backup', adminController.createBackup);
-router.get('/backup/list', adminController.listBackups);
-router.post('/restore/:id', adminController.restoreBackup);
+  // If using EJS:
+  // res.render('admin/settings', { settings: {...}, user: req.user });
+});
 
 export default router;
