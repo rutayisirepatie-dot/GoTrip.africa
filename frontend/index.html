@@ -21,38 +21,13 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Go Trip - Discover Rwanda">
-    <meta property="og:description" content="Experience unforgettable adventures in the Land of a Thousand Hills">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://gotrip.africa">
-    <meta property="og:image" content="https://gotrip.africa/images/og-image.jpg">
-    
-    <!-- Structured Data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "TravelAgency",
-        "name": "Go Trip",
-        "description": "Discover Rwanda - The Land of a Thousand Hills",
-        "url": "https://gotrip.africa",
-        "address": {
-            "@type": "PostalAddress",
-            "addressCountry": "Rwanda"
-        }
-    }
-    </script>
 </head>
 <body>
-    <!-- Enhanced Skip to main content button -->
+    <!-- Skip to main content button -->
     <a href="#main-content" class="skip-to-content" id="skip-to-main">
         <i class="fas fa-arrow-right"></i> Skip to Main Content
     </a>
     
-    <!-- Notification Area -->
-    <div id="notification-area" class="notification-area" role="alert" aria-live="polite"></div>
-
     <!-- Navigation -->
     <header>
         <nav class="main-nav" aria-label="Main Navigation">
@@ -89,12 +64,7 @@
                             <i class="fas fa-chevron-down" aria-hidden="true"></i>
                         </button>
                         <div class="auth-dropdown-menu" id="auth-dropdown-menu" aria-labelledby="auth-toggle">
-                            <a href="#" class="auth-option sign-in-btn" role="menuitem">
-                                <i class="fas fa-sign-in-alt"></i> Sign In
-                            </a>
-                            <a href="#" class="auth-option signup-btn" role="menuitem">
-                                <i class="fas fa-user-plus"></i> Sign Up
-                            </a>
+                            <!-- Dynamic content will be loaded here -->
                         </div>
                     </div>
                 </div>
@@ -196,7 +166,7 @@
                     <div class="newsletter-card">
                         <h2 id="newsletter-heading">Stay Updated</h2>
                         <p>Subscribe to our newsletter for travel tips, news and special offers.</p>
-                        <form id="newsletter-form" class="newsletter-form" method="POST" action="/api/newsletter/subscribe" novalidate>
+                        <form id="newsletter-form" class="newsletter-form" method="POST" novalidate>
                             <div class="form-group newsletter-group">
                                 <label for="newsletter-email" class="sr-only">Your email address</label>
                                 <input type="email" id="newsletter-email" name="email" class="newsletter-input" 
@@ -364,7 +334,7 @@
                     </div>
                     <div class="contact-form-wrapper">
                         <h2>Send us a Message</h2>
-                        <form id="contact-form" method="POST" action="/api/contact/submit" novalidate>
+                        <form id="contact-form" method="POST" novalidate>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="contact-name">Your Name *</label>
@@ -391,9 +361,19 @@
                 </div>
             </div>
         </section>
+
+        <!-- Dashboard Page -->
+        <section id="dashboard" class="page">
+            <!-- Content will be loaded by JavaScript -->
+        </section>
+
+        <!-- Admin Dashboard Page -->
+        <section id="admin" class="page">
+            <!-- Content will be loaded by JavaScript -->
+        </section>
     </main>
 
-    <!-- Enhanced Footer -->
+    <!-- Footer -->
     <footer class="main-footer" aria-label="Footer">
         <div class="container">
             <div class="footer-grid">
@@ -452,7 +432,7 @@
                 <div class="footer-column">
                     <h4>Stay Updated</h4>
                     <p>Subscribe to our newsletter for travel tips, news and special offers.</p>
-                    <form class="footer-newsletter-form" method="POST" action="/api/newsletter/subscribe" novalidate>
+                    <form class="footer-newsletter-form" method="POST" novalidate>
                         <div class="form-group footer-newsletter-group">
                             <label for="footer-newsletter-email" class="sr-only">Your email address</label>
                             <input type="email" id="footer-newsletter-email" name="email" 
@@ -483,379 +463,11 @@
         </div>
     </footer>
 
-    <!-- Modal Container -->
-    <div id="modal-container" class="modal-container">
-        <div class="modal-content">
-            <button class="modal-close" aria-label="Close modal">&times;</button>
-            <div class="modal-body"></div>
-        </div>
-    </div>
-
-    <!-- Hidden Forms Templates -->
-    <div id="modals-templates" style="display: none;">
-        <!-- Plan Your Trip Modal -->
-        <form id="plan-trip-form" class="modal-form" method="POST" action="/api/trip/plan" novalidate>
-            <h2>Plan Your Trip</h2>
-            <div class="form-group">
-                <label for="trip-name">Full Name *</label>
-                <input type="text" id="trip-name" name="name" placeholder="Your full name" required>
-            </div>
-            <div class="form-group">
-                <label for="trip-email">Email Address *</label>
-                <input type="email" id="trip-email" name="email" placeholder="Your email address" required>
-            </div>
-            <div class="form-group">
-                <label for="trip-phone">Phone Number *</label>
-                <input type="tel" id="trip-phone" name="phone" placeholder="Your phone number" required>
-            </div>
-            <div class="form-group">
-                <label for="trip-destination">Destination *</label>
-                <select id="trip-destination" name="destination" required>
-                    <option value="" disabled selected>Select a destination</option>
-                    <option value="kigali">Kigali</option>
-                    <option value="volcanoes_national_park">Volcanoes National Park</option>
-                    <option value="akagera_national_park">Akagera National Park</option>
-                    <option value="nyungwe_forest">Nyungwe Forest</option>
-                    <option value="lake_kivu">Lake Kivu</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="trip-arrival">Arrival Date *</label>
-                    <input type="date" id="trip-arrival" name="arrival" required>
-                </div>
-                <div class="form-group">
-                    <label for="trip-departure">Departure Date *</label>
-                    <input type="date" id="trip-departure" name="departure" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="trip-travelers">Number of Travelers *</label>
-                <input type="number" id="trip-travelers" name="travelers" min="1" max="20" value="1" required>
-            </div>
-            <div class="form-group">
-                <label>Services Needed *</label>
-                <div class="checkbox-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="services[]" value="tour-guide">
-                        Tour Guide
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="services[]" value="translator">
-                        Translator
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="services[]" value="accommodation">
-                        Accommodation
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="services[]" value="transportation">
-                        Transportation
-                    </label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="trip-budget">Estimated Budget ($)</label>
-                <select id="trip-budget" name="budget">
-                    <option value="" selected>Select budget range</option>
-                    <option value="500-1000">$500 - $1,000</option>
-                    <option value="1000-3000">$1,000 - $3,000</option>
-                    <option value="3000-5000">$3,000 - $5,000</option>
-                    <option value="5000+">$5,000+</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="trip-comments">Additional Comments</label>
-                <textarea id="trip-comments" name="comments" placeholder="Tell us more about your trip..." rows="4"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary btn-large">Submit Trip Request</button>
-        </form>
-
-        <!-- Book Tour Guide Modal -->
-        <form id="book-guide-form" class="modal-form" method="POST" action="/api/guides/book" novalidate>
-            <h2>Book a Tour Guide</h2>
-            <input type="hidden" id="guide-id" name="guideId">
-            
-            <div class="guide-info-preview">
-                <div class="guide-avatar" id="guide-avatar-preview"></div>
-                <div>
-                    <h3 id="guide-name-preview"></h3>
-                    <p id="guide-specialty-preview"></p>
-                    <p id="guide-price-preview"></p>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="guide-booking-name">Full Name *</label>
-                    <input type="text" id="guide-booking-name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="guide-booking-email">Email *</label>
-                    <input type="email" id="guide-booking-email" name="email" required>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="guide-booking-date">Tour Date *</label>
-                    <input type="date" id="guide-booking-date" name="tourDate" required>
-                </div>
-                <div class="form-group">
-                    <label for="guide-duration">Duration (hours) *</label>
-                    <select id="guide-duration" name="duration" required>
-                        <option value="4">4 hours - Half Day</option>
-                        <option value="8" selected>8 hours - Full Day</option>
-                        <option value="16">16 hours - 2 Days</option>
-                        <option value="24">24 hours - 3 Days</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="guide-group-size">Group Size *</label>
-                <input type="number" id="guide-group-size" name="groupSize" min="1" max="20" value="1" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="guide-language">Preferred Language</label>
-                <select id="guide-language" name="language">
-                    <option value="english">English</option>
-                    <option value="french">French</option>
-                    <option value="kinyarwanda">Kinyarwanda</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="guide-special-requests">Special Requests</label>
-                <textarea id="guide-special-requests" name="specialRequests" rows="3"></textarea>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-large">
-                <i class="fas fa-calendar-check"></i> Book Now
-            </button>
-        </form>
-
-        <!-- Hire Translator Modal -->
-        <form id="hire-translator-form" class="modal-form" method="POST" action="/api/translators/hire" novalidate>
-            <h2>Hire a Translator</h2>
-            <input type="hidden" id="translator-id" name="translatorId">
-            
-            <div class="translator-info-preview">
-                <h3 id="translator-name-preview"></h3>
-                <p id="translator-languages-preview"></p>
-                <p id="translator-price-preview"></p>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="translator-client-name">Your Name *</label>
-                    <input type="text" id="translator-client-name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="translator-client-email">Email *</label>
-                    <input type="email" id="translator-client-email" name="email" required>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="translator-service-date">Service Date *</label>
-                    <input type="date" id="translator-service-date" name="serviceDate" required>
-                </div>
-                <div class="form-group">
-                    <label for="translator-service-type">Service Type *</label>
-                    <select id="translator-service-type" name="serviceType" required>
-                        <option value="meeting">Business Meeting</option>
-                        <option value="tour">Tour Translation</option>
-                        <option value="document">Document Translation</option>
-                        <option value="conference">Conference</option>
-                        <option value="medical">Medical Appointment</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="translator-duration">Duration *</label>
-                <div class="duration-options">
-                    <label class="radio-label">
-                        <input type="radio" name="duration" value="2" required> 2 hours
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="duration" value="4" required> 4 hours
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="duration" value="8" required> Full day (8 hours)
-                    </label>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="translator-location">Location</label>
-                <input type="text" id="translator-location" name="location" placeholder="Where will the service take place?">
-            </div>
-            
-            <div class="form-group">
-                <label for="translator-details">Additional Details</label>
-                <textarea id="translator-details" name="details" rows="3"></textarea>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-large">
-                <i class="fas fa-language"></i> Hire Translator
-            </button>
-        </form>
-
-        <!-- Book Accommodation Modal -->
-        <form id="book-accommodation-form" class="modal-form" method="POST" action="/api/accommodations/book" novalidate>
-            <h2>Book Accommodation</h2>
-            <input type="hidden" id="accommodation-id" name="accommodationId">
-            
-            <div class="accommodation-info-preview">
-                <h3 id="accommodation-name-preview"></h3>
-                <p id="accommodation-type-preview"></p>
-                <p id="accommodation-price-preview"></p>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="accommodation-guest-name">Guest Name *</label>
-                    <input type="text" id="accommodation-guest-name" name="guestName" required>
-                </div>
-                <div class="form-group">
-                    <label for="accommodation-guest-email">Email *</label>
-                    <input type="email" id="accommodation-guest-email" name="email" required>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="accommodation-checkin">Check-in Date *</label>
-                    <input type="date" id="accommodation-checkin" name="checkin" required>
-                </div>
-                <div class="form-group">
-                    <label for="accommodation-checkout">Check-out Date *</label>
-                    <input type="date" id="accommodation-checkout" name="checkout" required>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="accommodation-guests">Number of Guests *</label>
-                    <input type="number" id="accommodation-guests" name="guests" min="1" max="10" value="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="accommodation-rooms">Number of Rooms</label>
-                    <input type="number" id="accommodation-rooms" name="rooms" min="1" max="5" value="1">
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="accommodation-room-type">Room Type</label>
-                <select id="accommodation-room-type" name="roomType">
-                    <option value="standard">Standard Room</option>
-                    <option value="deluxe">Deluxe Room</option>
-                    <option value="suite">Suite</option>
-                    <option value="family">Family Room</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="accommodation-special-requests">Special Requests</label>
-                <textarea id="accommodation-special-requests" name="specialRequests" rows="3"></textarea>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-large">
-                <i class="fas fa-bed"></i> Book Now
-            </button>
-        </form>
-
-        <!-- Sign In Modal -->
-        <form id="signin-form" class="modal-form" method="POST" action="/api/auth/signin" novalidate>
-            <h2>Sign In</h2>
-            <div class="form-group">
-                <label for="signin-email">Email Address *</label>
-                <input type="email" id="signin-email" name="email" placeholder="Your email address" required>
-            </div>
-            <div class="form-group">
-                <label for="signin-password">Password *</label>
-                <input type="password" id="signin-password" name="password" placeholder="Your password" required>
-            </div>
-            <div class="form-group">
-                <label class="checkbox-label">
-                    <input type="checkbox" name="remember"> Remember me
-                </label>
-            </div>
-            <button type="submit" class="btn btn-primary btn-large">Sign In</button>
-            <p class="form-footer">
-                Don't have an account? <a href="#" class="switch-to-signup">Sign up here</a>
-            </p>
-        </form>
-
-        <!-- Sign Up Modal -->
-        <form id="signup-form" class="modal-form" method="POST" action="/api/auth/signup" novalidate>
-            <h2>Create Account</h2>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="signup-firstname">First Name *</label>
-                    <input type="text" id="signup-firstname" name="firstName" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-lastname">Last Name *</label>
-                    <input type="text" id="signup-lastname" name="lastName" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="signup-email">Email Address *</label>
-                <input type="email" id="signup-email" name="email" required>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="signup-password">Password *</label>
-                    <input type="password" id="signup-password" name="password" minlength="8" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-confirm">Confirm Password *</label>
-                    <input type="password" id="signup-confirm" name="confirmPassword" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="signup-phone">Phone Number</label>
-                <input type="tel" id="signup-phone" name="phone">
-            </div>
-            <div class="form-group">
-                <label for="signup-country">Country</label>
-                <input type="text" id="signup-country" name="country">
-            </div>
-            <div class="form-group">
-                <label class="checkbox-label">
-                    <input type="checkbox" name="newsletter" checked> Subscribe to newsletter
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="terms" required> I agree to Terms & Conditions
-                </label>
-            </div>
-            <button type="submit" class="btn btn-primary btn-large">Create Account</button>
-            <p class="form-footer">
-                Already have an account? <a href="#" class="switch-to-signin">Sign in here</a>
-            </p>
-        </form>
-    </div>
-
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay" aria-hidden="true" aria-label="Loading">
         <div class="loading-spinner"></div>
         <p>Loading Go Trip...</p>
     </div>
-
-    <!-- No JavaScript Warning -->
-    <noscript>
-        <div class="noscript-warning">
-            <p>JavaScript is required for the full functionality of this website. Please enable JavaScript to continue.</p>
-        </div>
-    </noscript>
 
     <!-- Scripts -->
     <script src="script.js"></script>
