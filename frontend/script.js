@@ -6,9 +6,9 @@
     // CONFIGURATION
     // ===============================
     const config = {
-        baseUrl: 'http://localhost:3000/api',
+        baseUrl: 'https://gotrip-backend-uwhn.onrender.com/api',
         debug: true,
-        useMockMode: true, // mock data functionality
+        useMockMode: false, // mock data functionality
         
         endpoints: {
             newsletter: '/newsletter',
