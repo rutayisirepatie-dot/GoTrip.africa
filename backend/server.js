@@ -17,8 +17,7 @@ const app = express();
 // CORS setup
 app.use(cors({
   origin: [
-    'https://gotrip-frontend.onrender.com', // deployed frontend
-    'http://localhost:5500'                 // local dev
+    'https://gotrip-frontend.onrender.com',    
   ]
 }));
 
