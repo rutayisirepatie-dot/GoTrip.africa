@@ -8,7 +8,7 @@
     const config = {
         baseUrl: 'https://gotrip-backend-uwhn.onrender.com/api',
         debug: true,
-        useMockMode: false, // mock data functionality
+        useMockMode: false, // Changed to false to use real backend
         
         endpoints: {
             newsletter: '/newsletter',
@@ -21,7 +21,8 @@
             },
             bookings: {
                 submit: '/bookings',
-                user: '/bookings/user'
+                user: '/bookings/user',
+                cancel: '/bookings'
             },
             guides: '/guides',
             translators: '/translators',
@@ -56,784 +57,10 @@
     };
 
     // ===============================
-    // MOCK DATA
-    // ===============================
-    const mockData = {
-        guides: [
-            { 
-                _id: 1, 
-                name: "Jean Claude N.", 
-                specialty: "Gorilla Trekking Expert", 
-                languages: ["English", "French", "Swahili"],
-                experience: "8 years experience",
-                rating: 4.9,
-                price: "$150/day",
-                dailyRate: 180,
-                image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-                certifications: ["Wildlife First Aid", "CPR Certified"],
-                languageCount: 4,
-                experienceYears: 8,
-                available: true,
-                description: "Expert guide specializing in gorilla trekking with extensive knowledge of Volcanoes National Park."
-            },
-            { 
-                _id: 2, 
-                name: "Marie Aimee K.", 
-                specialty: "Cultural Tour Guide", 
-                languages: ["English", "Swahili", "Kinyarwanda", "French"],
-                experience: "6 years experience",
-                rating: 4.8,
-                price: "$160/day",
-                dailyRate: 160,
-                image: "",
-                certifications: ["Cultural Heritage", "Anthropology Degree"],
-                languageCount: 4,
-                experienceYears: 6,
-                available: true,
-                description: "Cultural expert providing deep insights into Rwandan traditions and history."
-            },
-            { 
-                _id: 3, 
-                name: "David M.", 
-                specialty: "Bird Watching Specialist", 
-                languages: ["English", "German", "French"],
-                experience: "10 years experience",
-                rating: 4.9,
-                price: "$180/day",
-                dailyRate: 200,
-                image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-                certifications: ["Ornithology Certified", "Photography Expert"],
-                languageCount: 4,
-                experienceYears: 10,
-                available: true,
-                description: "Specialized bird watching guide with extensive knowledge of avian species."
-            },
-            { 
-                _id: 4, 
-                name: "Sarah T.", 
-                specialty: "Adventure Hiking Guide", 
-                languages: ["English", "French", "Spanish"],
-                experience: "7 years experience",
-                rating: 4.7,
-                price: "$150/day",
-                dailyRate: 170,
-                image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-                certifications: ["Mountain Guide", "Wilderness First Responder"],
-                languageCount: 4,
-                experienceYears: 7,
-                available: true,
-                description: "Experienced hiking guide for mountain trails and adventure tours."
-            },
-            { 
-                _id: 5, 
-                name: "Peter K.", 
-                specialty: "History & Culture Guide", 
-                languages: ["English", "Kinyarwanda", "French"],
-                experience: "5 years experience",
-                rating: 4.6,
-                price: "$140/day",
-                dailyRate: 140,
-                image: "",
-                certifications: ["History Degree", "Cultural Expert"],
-                languageCount: 3,
-                experienceYears: 5,
-                available: true,
-                description: "History expert providing comprehensive cultural and historical tours."
-            },
-            { 
-                _id: 6, 
-                name: "Grace U.", 
-                specialty: "Family Tour Specialist", 
-                languages: ["English", "French", "Swahili" , "Kinyarwanda"],
-                experience: "4 years experience",
-                rating: 4.5,
-                price: "$130/day",
-                dailyRate: 130,
-                image: "",
-                certifications: ["Child Safety Certified", "Family Specialist"],
-                languageCount: 3,
-                experienceYears: 4,
-                available: true,
-                description: "Family-friendly guide specializing in tours suitable for all ages."
-            }
-        ],
-        translators: [
-            { 
-                _id: 1, 
-                name: "Patience Rutayisire", 
-                languages: ["English", "German", "Spanish", "French", "Swahili", "Chinese", "Kinyarwanda"],
-                specialty: "Tourism & Business Translation",
-                rating: 4.9,
-                price: "$140/day",
-                dailyRate: 140,
-                image: "./images/Patie.png",
-                experience: "5 years experience",
-                certifications: ["Certified Translator", "Tourism Diploma", "Business Communication"],
-                languageCount: 7,
-                experienceYears: 5,
-                available: true,
-                description: "Professional translator specializing in tourism and business communications."
-            },
-            { 
-                _id: 2, 
-                name: "Eric M.", 
-                languages: ["English", "German", "Chinese", "Kinyarwanda", "French"],
-                specialty: "Medical & Technical Translation",
-                rating: 4.8,
-                price: "$150/day",
-                dailyRate: 150,
-                image: "",
-                experience: "8 years experience",
-                certifications: ["Medical Translator", "Technical Certification"],
-                languageCount: 5,
-                experienceYears: 8,
-                available: true,
-                description: "Specialized in medical and technical translations"
-            },
-            { 
-                _id: 3, 
-                name: "Grace U.", 
-                languages: ["English", "Spanish", "Portuguese", "Kinyarwanda", "French"],
-                specialty: "Legal & Government Translation",
-                rating: 4.7,
-                price: "$130/day",
-                dailyRate: 130,
-                image: "",
-                experience: "6 years experience",
-                certifications: ["Legal Translator", "Government Experience", "Diplomatic Experience"],
-                languageCount: 5,
-                experienceYears: 6,
-                available: true,
-                description: "Expert in legal documents and government communications translation."
-            },
-            { 
-                _id: 4, 
-                name: "Robert K.", 
-                languages: ["English", "Arabic", "Swahili", "Kinyarwanda", "French"],
-                specialty: "Conference & Event Translation",
-                rating: 4.8,
-                price: "$145/day",
-                dailyRate: 145,
-                image: "",
-                experience: "7 years experience",
-                certifications: ["Conference Interpreter", "Event Management"],
-                languageCount: 5,
-                experienceYears: 7,
-                available: true,
-                description: "Specialized in conference interpreting and large event translation services."
-            },
-            { 
-                _id: 5, 
-                name: "Alice N.", 
-                languages: ["English", "French", "Kinyarwanda"],
-                specialty: "General Translation",
-                rating: 4.6,
-                price: "$90/day",
-                dailyRate: 90,
-                image: "",
-                experience: "3 years experience",
-                certifications: ["Basic Translation", "Tourism Focus"],
-                languageCount: 3,
-                experienceYears: 3,
-                available: true,
-                description: "General translator with focus on tourism and everyday communication."
-            },
-            { 
-                _id: 6, 
-                name: "Samuel T.", 
-                languages: ["English", "Swahili", "Kinyarwanda", "French", "Spanish", "Portuguese"],
-                specialty: "Multi-Language Specialist",
-                rating: 4.9,
-                price: "$160/day",
-                dailyRate: 160,
-                image: "",
-                experience: "9 years experience",
-                certifications: ["Advanced Translator", "Language Degree"],
-                languageCount: 6,
-                experienceYears: 9,
-                available: true,
-                description: "Multi-lingual expert translator with extensive international experience."
-            }
-        ],
-        destinations: [
-            {
-                _id: 1,
-                name: "Volcanoes National Park",
-                location: "Northern Province, Rwanda",
-                description: "Home to the endangered mountain gorillas, this UNESCO World Heritage site offers unforgettable gorilla trekking experiences in the Virunga Mountains.",
-                image: "./images/mount-bisoke-rwanda.jpg",
-                features: ["Gorilla Trekking", "Mountain Hiking", "Bird Watching", "Cultural Villages"],
-                rating: 4.9,
-                price: "From $1,500",
-                basePrice: 1500,
-                duration: "3-5 days",
-                bestSeason: ["June", "July", "August", "September"]
-            },
-            {
-                _id: 2,
-                name: "Lake Kivu",
-                location: "Western Province, Rwanda",
-                description: "One of Africa's Great Lakes, offering stunning views, water sports, beautiful beaches, and relaxing hot springs along its shores.",
-                image: "./images/ruanda-lake-kivu-aussicht.jpg",
-                features: ["Beaches", "Boating", "Swimming", "Hot Springs"],
-                rating: 4.7,
-                price: "From $300",
-                basePrice: 300,
-                duration: "2-3 days",
-                bestSeason: ["All year"]
-            },
-            {
-                _id: 3,
-                name: "Nyungwe Forest National Park",
-                location: "Southern Province, Rwanda",
-                description: "Ancient rainforest with canopy walkway, home to chimpanzees and over 300 bird species. One of Africa's oldest forests.",
-                image: "./images/nyungwe-weather.jpg",
-                features: ["Canopy Walk", "Chimpanzee Tracking", "Hiking", "Waterfalls"],
-                rating: 4.8,
-                price: "From $600",
-                basePrice: 600,
-                duration: "2-4 days",
-                bestSeason: ["December", "January", "February", "June", "July", "August"]
-            },
-            {
-                _id: 4,
-                name: "Kigali City",
-                location: "Kigali, Rwanda",
-                description: "The vibrant capital city known for its cleanliness, safety, and rich cultural experiences including museums, markets, and memorial sites.",
-                image: "./images/mount-jali-hike.jpg",
-                features: ["City Tours", "Cultural Museums", "Markets", "Nightlife"],
-                rating: 4.8,
-                price: "From $100",
-                basePrice: 100,
-                duration: "1-3 days",
-                bestSeason: ["All year"]
-            },
-            {
-                _id: 5,
-                name: "Akagera National Park",
-                location: "Eastern Province, Rwanda",
-                description: "Rwanda's only Big Five safari destination, offering game drives, boat safaris, and beautiful landscapes.",
-                image: "./images/Akagera-Hippos.jpg",
-                features: ["Game Drives", "Boat Safaris", "Bird Watching", "Camping"],
-                rating: 4.7,
-                price: "From $700",
-                basePrice: 700,
-                duration: "2-3 days",
-                bestSeason: ["June", "July", "August", "September"]
-            },
-            {
-                _id: 6,
-                name: "King's Palace Museum",
-                location: "Nyanza, Rwanda",
-                description: "Traditional royal palace offering insights into Rwanda's pre-colonial history, culture, and monarchy.",
-                image: "./images/palace-museum-rwanda.jpg",
-                features: ["Cultural History", "Traditional Architecture", "Royal Grounds", "Guided Tours"],
-                rating: 4.6,
-                price: "From $200",
-                basePrice: 200,
-                duration: "1 day",
-                bestSeason: ["All year"]
-            }
-        ],
-        accommodations: [
-            { 
-                _id: 1, 
-                name: "Bisate Lodge", 
-                location: "Volcanoes National Park",
-                type: "Luxury Eco-Lodge",
-                description: "Award-winning eco-lodge with stunning views of the volcanoes, offering luxury accommodation and direct gorilla trekking access.",
-                image: "./images/Bisate-Lodge-Rwanda-Exterior.jpg",
-                features: ["Private Villas", "Gorilla Views", "Spa", "Fine Dining"],
-                price: "$2,500/night",
-                dailyRate: 2500,
-                rating: 4.9,
-                category: "luxury",
-                capacity: 2,
-                available: true
-            },
-            { 
-                _id: 2, 
-                name: "Lake Kivu Serena Hotel", 
-                location: "Gisenyi, Lake Kivu",
-                type: "5-Star Hotel",
-                description: "Luxury resort on the shores of Lake Kivu with private beach, water sports, and panoramic lake views.",
-                image: "./images/aeriel-view-serena.jpg",
-                features: ["Lake View", "Private Beach", "Spa", "Water Sports"],
-                price: "$450/night",
-                dailyRate: 450,
-                rating: 4.7,
-                category: "luxury",
-                capacity: 4,
-                available: true
-            },
-            { 
-                _id: 3, 
-                name: "Kigali Marriott Hotel", 
-                location: "Kigali City Center",
-                type: "Business Hotel",
-                description: "Modern luxury hotel in the heart of Kigali, perfect for business travelers and tourists alike.",
-                image: "./images/mariot-kigali.png",
-                features: ["City Center", "Business Center", "Pool", "Multiple Restaurants"],
-                price: "$350/night",
-                dailyRate: 350,
-                rating: 4.6,
-                category: "midrange",
-                capacity: 3,
-                available: true
-            },
-            { 
-                _id: 4, 
-                name: "One&Only Gorilla's Nest", 
-                location: "Volcanoes National Park",
-                type: "Luxury Resort",
-                description: "Ultra-luxurious resort offering bespoke gorilla trekking experiences and unparalleled comfort.",
-                image: "./images/one-and-only-kinigi.jpg",
-                features: ["Butler Service", "Private Trekking", "Helicopter Transfer", "Fine Dining"],
-                price: "$3,500/night",
-                dailyRate: 3500,
-                rating: 4.9,
-                category: "luxury",
-                capacity: 2,
-                available: true
-            },
-            { 
-                _id: 5, 
-                name: "One&Only Nyungwe", 
-                location: "Nyungwe Forest",
-                type: "Eco-Lodge",
-                description: "Sustainable eco-lodge nestled in the Nyungwe Forest, offering immersive nature experiences.",
-                image: "./images/one-only-nyungwe-house.jpg",
-                features: ["Forest Views", "Bird Watching", "Sustainable", "Guided Hikes"],
-                price: "$280/night",
-                dailyRate: 280,
-                rating: 4.5,
-                category: "midrange",
-                capacity: 2,
-                available: true
-            },
-            { 
-                _id: 6, 
-                name: "Raddison Blu Hotel", 
-                location: "Kigali",
-                type: "4-Star Hotel",
-                description: "Contemporary hotel with excellent amenities and convenient city center location.",
-                image: "./images/radison-blue.jpg",
-                features: ["City Views", "Restaurant", "Pool", "Fitness Center"],
-                price: "$220/night",
-                dailyRate: 220,
-                rating: 4.4,
-                category: "midrange",
-                capacity: 2,
-                available: true
-            }
-        ],
-        blog: [
-            { 
-                _id: 1, 
-                title: "Complete Guide to Gorilla Trekking in Rwanda", 
-                excerpt: "Everything you need to know about mountain gorilla trekking in Volcanoes National Park, including permits, preparation, and what to expect.",
-                date: "May 15, 2024",
-                category: "Adventure",
-                image: "./images/gorilla-trekk-rwanda.jpg",
-                readTime: "8 min read",
-                author: "Jean Claude",
-                content: "Full article content here...",
-                tags: ["Gorilla Trekking", "Wildlife", "Adventure", "Rwanda"],
-                views: 1250,
-                createdAt: "2024-05-15T10:00:00.000Z"
-            },
-            { 
-                _id: 2, 
-                title: "Best Time to Visit Rwanda: Weather & Seasons Guide", 
-                excerpt: "Planning your trip? Here's when to visit Rwanda for the best wildlife viewing, hiking conditions, and cultural experiences.",
-                date: "April 28, 2024",
-                category: "Travel Tips",
-                image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-                readTime: "6 min read",
-                author: "Travel Team",
-                content: "Full article content here...",
-                tags: ["Travel Tips", "Weather", "Seasons", "Planning"],
-                views: 980,
-                createdAt: "2024-04-28T09:30:00.000Z"
-            },
-            { 
-                _id: 3, 
-                title: "Rwandan Culture: Traditions, Food & Etiquette", 
-                excerpt: "Discover the rich cultural heritage of Rwanda, from traditional dances and ceremonies to delicious local cuisine.",
-                date: "April 15, 2024",
-                category: "Culture",
-                image: "./images/intore-dancers.jpg",
-                readTime: "7 min read",
-                author: "Marie Aimee",
-                content: "Full article content here...",
-                tags: ["Culture", "Traditions", "Food", "Etiquette"],
-                views: 1120,
-                createdAt: "2024-04-15T11:15:00.000Z"
-            },
-            { 
-                _id: 4, 
-                title: "Top 10 Hiking Trails in the Land of a Thousand Hills", 
-                excerpt: "Explore Rwanda's breathtaking landscapes through these incredible hiking trails suitable for all fitness levels.",
-                date: "March 30, 2024",
-                category: "Hiking",
-                image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-                readTime: "9 min read",
-                author: "Sarah T.",
-                content: "Full article content here...",
-                tags: ["Hiking", "Trails", "Outdoors", "Adventure"],
-                views: 890,
-                createdAt: "2024-03-30T14:20:00.000Z"
-            },
-            { 
-                _id: 5, 
-                title: "Bird Watching in Rwanda: A Birder's Paradise", 
-                excerpt: "With over 700 bird species, Rwanda offers incredible bird watching opportunities across its national parks and forests.",
-                date: "March 15, 2024",
-                category: "Wildlife",
-                image: "https://images.unsplash.com/photo-1452570053594-1b985d6ea890?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-                readTime: "5 min read",
-                author: "David M.",
-                content: "Full article content here...",
-                tags: ["Bird Watching", "Wildlife", "Nature", "Photography"],
-                views: 750,
-                createdAt: "2024-03-15T13:45:00.000Z"
-            },
-            { 
-                _id: 6, 
-                title: "Sustainable Tourism in Rwanda: Making a Positive Impact", 
-                excerpt: "Learn how Rwanda is leading the way in sustainable tourism and how you can travel responsibly in this beautiful country.",
-                date: "February 28, 2024",
-                category: "Sustainability",
-                image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-                readTime: "6 min read",
-                author: "Patience R.",
-                content: "Full article content here...",
-                tags: ["Sustainability", "Eco-Tourism", "Responsible Travel", "Conservation"],
-                views: 1050,
-                createdAt: "2024-02-28T16:00:00.000Z"
-            }
-        ]
-    };
-
-    // ===============================
-    // USER MANAGEMENT SYSTEM
-    // ===============================
-    class UserManager {
-        constructor() {
-            this.users = this.loadUsersFromStorage();
-            this.bookings = this.loadBookingsFromStorage();
-            this.tripPlans = this.loadTripPlansFromStorage();
-        }
-
-        loadUsersFromStorage() {
-            const stored = localStorage.getItem('goTrip_users');
-            if (stored) {
-                return JSON.parse(stored);
-            }
-            return [
-                {
-                    _id: 1,
-                    name: 'Admin User',
-                    email: 'admin@gotrip.africa',
-                    password: 'admin123',
-                    role: 'admin',
-                    phone: '+250 787 407 051',
-                    country: 'Rwanda',
-                    createdAt: new Date().toISOString(),
-                    status: 'active',
-                    lastLogin: new Date().toISOString()
-                },
-                {
-                    _id: 2,
-                    name: 'Test Customer',
-                    email: 'customer@example.com',
-                    password: 'customer123',
-                    role: 'user',
-                    phone: '+250 788 123 456',
-                    country: 'USA',
-                    createdAt: new Date().toISOString(),
-                    status: 'active',
-                    lastLogin: new Date().toISOString()
-                }
-            ];
-        }
-
-        loadBookingsFromStorage() {
-            const stored = localStorage.getItem('goTrip_bookings');
-            if (stored) return JSON.parse(stored);
-            
-            return [
-                {
-                    _id: 'BOOK-001',
-                    userId: 2,
-                    serviceType: 'destination',
-                    serviceId: 1,
-                    serviceName: 'Volcanoes National Park',
-                    userEmail: 'customer@example.com',
-                    userName: 'Test Customer',
-                    date: new Date(Date.now() + 86400000 * 7).toISOString(),
-                    endDate: new Date(Date.now() + 86400000 * 9).toISOString(),
-                    travelers: 2,
-                    duration: 3,
-                    status: 'confirmed',
-                    totalAmount: 1500,
-                    createdAt: new Date().toISOString(),
-                    notes: 'Looking forward to gorilla trekking'
-                },
-                {
-                    _id: 'BOOK-002',
-                    userId: 2,
-                    serviceType: 'guide',
-                    serviceId: 1,
-                    serviceName: 'Jean Claude N.',
-                    userEmail: 'customer@example.com',
-                    userName: 'Test Customer',
-                    date: new Date(Date.now() + 86400000 * 5).toISOString(),
-                    endDate: new Date(Date.now() + 86400000 * 6).toISOString(),
-                    travelers: 4,
-                    duration: 2,
-                    status: 'pending',
-                    totalAmount: 360,
-                    createdAt: new Date().toISOString(),
-                    notes: 'Need a gorilla trekking expert'
-                }
-            ];
-        }
-
-        loadTripPlansFromStorage() {
-            const stored = localStorage.getItem('goTrip_tripPlans');
-            if (stored) return JSON.parse(stored);
-            
-            return [
-                {
-                    _id: 'TRIP-001',
-                    userId: 2,
-                    userName: 'Test Customer',
-                    userEmail: 'customer@example.com',
-                    startDate: new Date(Date.now() + 86400000 * 14).toISOString(),
-                    duration: '6-8 days',
-                    travelers: 3,
-                    budget: 'midrange',
-                    interests: ['gorilla', 'culture', 'hiking'],
-                    message: 'Looking for a family adventure with gorilla trekking and cultural experiences',
-                    status: 'review',
-                    createdAt: new Date().toISOString(),
-                    assignedTo: null,
-                    itinerary: null
-                }
-            ];
-        }
-
-        saveUsers() {
-            localStorage.setItem('goTrip_users', JSON.stringify(this.users));
-        }
-
-        saveBookings() {
-            localStorage.setItem('goTrip_bookings', JSON.stringify(this.bookings));
-        }
-
-        saveTripPlans() {
-            localStorage.setItem('goTrip_tripPlans', JSON.stringify(this.tripPlans));
-        }
-
-        // User methods
-        registerUser(userData) {
-            const existingUser = this.users.find(u => u.email === userData.email);
-            if (existingUser) {
-                throw new Error('User already exists');
-            }
-
-            const newUser = {
-                _id: Date.now(),
-                ...userData,
-                role: 'user',
-                status: 'active',
-                createdAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString()
-            };
-
-            this.users.push(newUser);
-            this.saveUsers();
-            return newUser;
-        }
-
-        authenticateUser(email, password) {
-            const user = this.users.find(u => 
-                u.email === email && u.password === password && u.status === 'active'
-            );
-            
-            if (user) {
-                user.lastLogin = new Date().toISOString();
-                this.saveUsers();
-                return user;
-            }
-            return null;
-        }
-
-        updateUser(userId, updates) {
-            const index = this.users.findIndex(u => u._id === userId);
-            if (index !== -1) {
-                this.users[index] = { ...this.users[index], ...updates };
-                this.saveUsers();
-                return this.users[index];
-            }
-            return null;
-        }
-
-        deleteUser(userId) {
-            this.users = this.users.filter(u => u._id !== userId);
-            this.saveUsers();
-            return true;
-        }
-
-        // Booking methods
-        createBooking(bookingData) {
-            const bookingId = `BOOK-${Date.now().toString().slice(-6)}`;
-            const booking = {
-                _id: bookingId,
-                ...bookingData,
-                createdAt: new Date().toISOString(),
-                status: 'pending'
-            };
-
-            this.bookings.push(booking);
-            this.saveBookings();
-            return booking;
-        }
-
-        updateBooking(bookingId, updates) {
-            const index = this.bookings.findIndex(b => b._id === bookingId);
-            if (index !== -1) {
-                this.bookings[index] = { ...this.bookings[index], ...updates };
-                this.saveBookings();
-                return this.bookings[index];
-            }
-            return null;
-        }
-
-        cancelBooking(bookingId) {
-            return this.updateBooking(bookingId, { status: 'cancelled' });
-        }
-
-        confirmBooking(bookingId) {
-            return this.updateBooking(bookingId, { status: 'confirmed' });
-        }
-
-        getUserBookings(userId) {
-            return this.bookings.filter(b => b.userId === userId);
-        }
-
-        // Trip Plan methods
-        createTripPlan(tripData) {
-            const tripId = `TRIP-${Date.now().toString().slice(-6)}`;
-            const trip = {
-                _id: tripId,
-                ...tripData,
-                createdAt: new Date().toISOString(),
-                status: 'review'
-            };
-
-            this.tripPlans.push(trip);
-            this.saveTripPlans();
-            return trip;
-        }
-
-        updateTripPlan(tripId, updates) {
-            const index = this.tripPlans.findIndex(t => t._id === tripId);
-            if (index !== -1) {
-                this.tripPlans[index] = { ...this.tripPlans[index], ...updates };
-                this.saveTripPlans();
-                return this.tripPlans[index];
-            }
-            return null;
-        }
-
-        // Analytics methods
-        getStats() {
-            const totalUsers = this.users.length;
-            const totalBookings = this.bookings.length;
-            const activeBookings = this.bookings.filter(b => 
-                ['confirmed', 'pending'].includes(b.status)
-            ).length;
-            
-            const totalRevenue = this.bookings
-                .filter(b => b.status === 'confirmed')
-                .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
-            
-            const pendingTripPlans = this.tripPlans.filter(t => t.status === 'review').length;
-
-            return {
-                totalUsers,
-                totalBookings,
-                activeBookings,
-                totalRevenue,
-                pendingTripPlans
-            };
-        }
-
-        getMonthlyRevenue() {
-            const monthlyRevenue = {};
-            const confirmedBookings = this.bookings.filter(b => b.status === 'confirmed');
-            
-            confirmedBookings.forEach(booking => {
-                const date = new Date(booking.createdAt);
-                const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                
-                if (!monthlyRevenue[monthYear]) {
-                    monthlyRevenue[monthYear] = 0;
-                }
-                monthlyRevenue[monthYear] += booking.totalAmount || 0;
-            });
-
-            return Object.entries(monthlyRevenue).map(([month, revenue]) => ({
-                month,
-                revenue
-            }));
-        }
-
-        getRecentActivity() {
-            const allActivities = [
-                ...this.users.map(u => ({
-                    type: 'user',
-                    id: u._id,
-                    name: u.name,
-                    email: u.email,
-                    action: 'registered',
-                    timestamp: u.createdAt
-                })),
-                ...this.bookings.map(b => ({
-                    type: 'booking',
-                    id: b._id,
-                    name: b.serviceName,
-                    email: b.userEmail,
-                    action: b.status,
-                    timestamp: b.createdAt
-                })),
-                ...this.tripPlans.map(t => ({
-                    type: 'trip_plan',
-                    id: t._id,
-                    name: t.userName,
-                    email: t.userEmail,
-                    action: 'requested',
-                    timestamp: t.createdAt
-                }))
-            ];
-
-            return allActivities.sort((a, b) => 
-                new Date(b.timestamp) - new Date(a.timestamp)
-            ).slice(0, 20);
-        }
-    }
-
-    // Initialize User Manager
-    const userManager = new UserManager();
-
-    // ===============================
     // STATE MANAGEMENT
     // ===============================
     let isAuthenticated = false;
     let currentUser = null;
-    let useMockData = config.useMockMode;
 
     // ===============================
     // CORE UTILITIES
@@ -888,7 +115,7 @@
     }
 
     // ===============================
-    // API SERVICE
+    // API SERVICE - UPDATED FOR MONGODB
     // ===============================
     
     async function apiRequest(endpoint, options = {}) {
@@ -904,14 +131,9 @@
             headers['Authorization'] = `Bearer ${token}`;
         }
         
-        // If using mock mode, simulate response
-        if (useMockData) {
-            return simulateMockResponse(endpoint, options);
-        }
-        
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
             
             const response = await fetch(url, {
                 ...options,
@@ -920,6 +142,13 @@
             });
             
             clearTimeout(timeoutId);
+            
+            // Handle 401 Unauthorized
+            if (response.status === 401) {
+                clearUserData();
+                updateAuthUI();
+                throw new Error('Session expired. Please login again.');
+            }
             
             if (!response.ok) {
                 const error = await response.json().catch(() => ({}));
@@ -931,164 +160,13 @@
         } catch (error) {
             console.error('API Error:', error);
             
-            // Fall back to mock data on network error
-            if (!useMockData) {
-                console.log('Falling back to mock data');
-                useMockData = true;
-            }
-            
-            return simulateMockResponse(endpoint, options);
+            // Re-throw error for handling in calling functions
+            throw new Error(error.message || 'Network error. Please check your connection.');
         }
     }
 
-    function simulateMockResponse(endpoint, options) {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                let response = { success: true, data: [], message: 'Mock response' };
-                
-                const method = options?.method || 'GET';
-                const body = options?.body ? JSON.parse(options.body) : {};
-                
-                if (endpoint.includes('/auth')) {
-                    if (endpoint.includes('/login') && method === 'POST') {
-                        response = {
-                            success: true,
-                            token: 'mock-jwt-token-' + Date.now(),
-                            user: {
-                                _id: Date.now(),
-                                name: body.email.split('@')[0],
-                                email: body.email,
-                                role: 'user',
-                                phone: '+250 787 407 051',
-                                country: 'Rwanda'
-                            },
-                            message: 'Login successful (demo)'
-                        };
-                    } else if (endpoint.includes('/register') && method === 'POST') {
-                        response = {
-                            success: true,
-                            token: 'mock-jwt-token-' + Date.now(),
-                            user: {
-                                _id: Date.now(),
-                                name: body.name,
-                                email: body.email,
-                                role: 'user',
-                                phone: body.phone || '+250 787 407 051',
-                                country: body.country || 'Rwanda'
-                            },
-                            message: 'Registration successful (demo)'
-                        };
-                    } else if (endpoint.includes('/verify')) {
-                        const userData = getUserData();
-                        response = {
-                            success: !!userData,
-                            user: userData || null,
-                            message: userData ? 'User verified (demo)' : 'Not authenticated'
-                        };
-                    }
-                } else if (endpoint.includes('/newsletter')) {
-                    response = {
-                        success: true,
-                        data: { email: body.email, subscribed: true },
-                        message: 'Subscribed to newsletter (demo)'
-                    };
-                } else if (endpoint.includes('/contact')) {
-                    response = {
-                        success: true,
-                        data: { reference: 'CONTACT-' + Date.now(), status: 'received' },
-                        message: 'Message received (demo)'
-                    };
-                } else if (endpoint.includes('/bookings')) {
-                    if (method === 'POST') {
-                        response = {
-                            success: true,
-                            data: {
-                                booking_reference: 'BOOK-' + Date.now(),
-                                service_name: body.service_name,
-                                status: 'confirmed'
-                            },
-                            message: 'Booking confirmed (demo)'
-                        };
-                    } else {
-                        response = {
-                            success: true,
-                            data: [
-                                {
-                                    _id: 'mock-1',
-                                    service_name: 'Gorilla Trekking Tour',
-                                    booking_reference: 'GT-2024-001',
-                                    status: 'confirmed',
-                                    date: new Date().toISOString(),
-                                    service_type: 'destination'
-                                }
-                            ]
-                        };
-                    }
-                } else if (endpoint.includes('/tripPlan')) {
-                    response = {
-                        success: true,
-                        data: {
-                            trip_reference: 'TRIP-' + Date.now(),
-                            status: 'pending'
-                        },
-                        message: 'Trip plan submitted (demo)'
-                    };
-                } else if (endpoint.includes('/guides')) {
-                    response = { success: true, data: mockData.guides };
-                } else if (endpoint.includes('/translators')) {
-                    response = { success: true, data: mockData.translators };
-                } else if (endpoint.includes('/destinations')) {
-                    response = { success: true, data: mockData.destinations };
-                } else if (endpoint.includes('/accommodations')) {
-                    response = { success: true, data: mockData.accommodations };
-                } else if (endpoint.includes('/blog')) {
-                    response = { success: true, data: mockData.blog };
-                } else if (endpoint.includes('/dashboard')) {
-                    if (endpoint.includes('/admin')) {
-                        const stats = userManager.getStats();
-                        const monthlyRevenue = userManager.getMonthlyRevenue();
-                        const recentActivity = userManager.getRecentActivity();
-                        const recentUsers = userManager.users.slice(-5).reverse();
-                        const recentBookings = userManager.bookings.slice(-5).reverse();
-                        
-                        response = {
-                            success: true,
-                            data: {
-                                stats,
-                                monthlyRevenue,
-                                recentActivity,
-                                recentUsers,
-                                recentBookings
-                            }
-                        };
-                    } else {
-                        const userBookings = userManager.getUserBookings(currentUser._id);
-                        const userTripPlans = userManager.tripPlans.filter(t => t.userId === currentUser._id);
-                        
-                        response = {
-                            success: true,
-                            data: {
-                                stats: {
-                                    totalBookings: userBookings.length,
-                                    upcomingBookings: userBookings.filter(b => ['confirmed', 'pending'].includes(b.status)).length,
-                                    completedBookings: userBookings.filter(b => b.status === 'completed').length,
-                                    pendingTripPlans: userTripPlans.filter(t => t.status === 'review').length,
-                                    totalSpent: [{ total: userBookings.filter(b => b.status === 'confirmed').reduce((sum, b) => sum + (b.totalAmount || 0), 0) }]
-                                },
-                                recentBookings: userBookings.slice(-3).reverse(),
-                                recentTripPlans: userTripPlans.slice(-2).reverse()
-                            }
-                        };
-                    }
-                }
-                
-                resolve(response);
-            }, 300);
-        });
-    }
-
     // ===============================
-    // AUTHENTICATION
+    // AUTHENTICATION - UPDATED FOR MONGODB
     // ===============================
     
     async function checkAuth() {
@@ -1120,20 +198,22 @@
 
     async function login(email, password) {
         try {
-            const user = userManager.authenticateUser(email, password);
-            if (user) {
-                const { password, ...userWithoutPassword } = user;
-                
+            const result = await apiRequest(config.endpoints.auth.login, {
+                method: 'POST',
+                body: JSON.stringify({ email, password })
+            });
+            
+            if (result.success) {
                 isAuthenticated = true;
-                currentUser = userWithoutPassword;
-                saveUserData(userWithoutPassword);
-                updateAuthUI(true, userWithoutPassword);
+                currentUser = result.user;
+                saveUserData({ ...result.user, token: result.token });
+                updateAuthUI(true, result.user);
                 
-                showNotification(`✅ Welcome back, ${user.name}!`, 'success');
+                showNotification(`✅ Welcome back, ${result.user.name}!`, 'success');
                 
                 // Redirect to dashboard after login
                 setTimeout(() => {
-                    if (user.role === 'admin') {
+                    if (result.user.role === 'admin') {
                         showPage('admin');
                     } else {
                         showPage('dashboard');
@@ -1142,7 +222,7 @@
                 
                 return { success: true };
             } else {
-                throw new Error('Invalid email or password');
+                throw new Error(result.message || 'Login failed');
             }
         } catch (error) {
             showNotification(`❌ ${error.message}`, 'error');
@@ -1152,24 +232,28 @@
 
     async function register(userData) {
         try {
-            const newUser = userManager.registerUser(userData);
+            const result = await apiRequest(config.endpoints.auth.register, {
+                method: 'POST',
+                body: JSON.stringify(userData)
+            });
             
-            // Remove password from user object before storing
-            const { password, ...userWithoutPassword } = newUser;
-            
-            isAuthenticated = true;
-            currentUser = userWithoutPassword;
-            saveUserData(userWithoutPassword);
-            updateAuthUI(true, userWithoutPassword);
-            
-            showNotification('✅ Registration successful! Welcome to Go Trip!', 'success');
-            
-            // Redirect to dashboard after registration
-            setTimeout(() => {
-                showPage('dashboard');
-            }, 1500);
-            
-            return { success: true };
+            if (result.success) {
+                isAuthenticated = true;
+                currentUser = result.user;
+                saveUserData({ ...result.user, token: result.token });
+                updateAuthUI(true, result.user);
+                
+                showNotification('✅ Registration successful! Welcome to Go Trip!', 'success');
+                
+                // Redirect to dashboard after registration
+                setTimeout(() => {
+                    showPage('dashboard');
+                }, 1500);
+                
+                return { success: true };
+            } else {
+                throw new Error(result.message || 'Registration failed');
+            }
         } catch (error) {
             showNotification(`❌ ${error.message}`, 'error');
             return { success: false, message: error.message };
@@ -1280,7 +364,7 @@
     }
 
     // ===============================
-    // ENHANCED DASHBOARD FUNCTIONS
+    // ENHANCED DASHBOARD FUNCTIONS - UPDATED FOR MONGODB
     // ===============================
     
     async function loadDashboard() {
@@ -1296,21 +380,17 @@
         }
         
         try {
-            // Get user data
-            const userBookings = userManager.getUserBookings(currentUser._id);
-            const userTripPlans = userManager.tripPlans.filter(t => t.userId === currentUser._id);
+            // Get user dashboard data from backend
+            const result = await apiRequest(config.endpoints.dashboard.user);
             
-            // Calculate user stats
-            const totalBookings = userBookings.length;
-            const upcomingBookings = userBookings.filter(b => 
-                ['confirmed', 'pending'].includes(b.status)
-            ).length;
-            const completedBookings = userBookings.filter(b => 
-                b.status === 'completed'
-            ).length;
-            const totalSpent = userBookings
-                .filter(b => b.status === 'confirmed')
-                .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+            if (!result.success) {
+                throw new Error(result.message || 'Failed to load dashboard');
+            }
+            
+            const data = result.data;
+            const userBookings = data.recentBookings || [];
+            const userTripPlans = data.recentTripPlans || [];
+            const stats = data.stats || {};
             
             // Render dashboard
             dashboard.innerHTML = `
@@ -1334,11 +414,11 @@
                                     <p class="user-role"><span class="badge badge-${currentUser.role === 'admin' ? 'danger' : 'primary'}">${currentUser.role.toUpperCase()}</span></p>
                                     <div class="user-stats-mini">
                                         <div class="stat">
-                                            <strong>${totalBookings}</strong>
+                                            <strong>${stats.totalBookings || 0}</strong>
                                             <span>Bookings</span>
                                         </div>
                                         <div class="stat">
-                                            <strong>$${totalSpent}</strong>
+                                            <strong>$${stats.totalSpent || 0}</strong>
                                             <span>Spent</span>
                                         </div>
                                     </div>
@@ -1355,26 +435,20 @@
                                         <a href="#" class="dashboard-tab-link" data-tab="bookings">
                                             <i class="fas fa-calendar-check"></i>
                                             My Bookings
-                                            <span class="nav-badge">${totalBookings}</span>
+                                            <span class="nav-badge">${stats.totalBookings || 0}</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#" class="dashboard-tab-link" data-tab="trip-plans">
                                             <i class="fas fa-route"></i>
                                             Trip Plans
-                                            <span class="nav-badge">${userTripPlans.length}</span>
+                                            <span class="nav-badge">${stats.pendingTripPlans || 0}</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#" class="dashboard-tab-link" data-tab="profile">
                                             <i class="fas fa-user-cog"></i>
                                             Profile Settings
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="dashboard-tab-link" data-tab="documents">
-                                            <i class="fas fa-file-alt"></i>
-                                            Travel Documents
                                         </a>
                                     </li>
                                 </ul>
@@ -1399,7 +473,7 @@
                                             </div>
                                             <div class="dashboard-stat-content">
                                                 <h3>Total Bookings</h3>
-                                                <p class="dashboard-stat-number">${totalBookings}</p>
+                                                <p class="dashboard-stat-number">${stats.totalBookings || 0}</p>
                                                 <p class="dashboard-stat-subtitle">All-time bookings</p>
                                             </div>
                                         </div>
@@ -1410,7 +484,7 @@
                                             </div>
                                             <div class="dashboard-stat-content">
                                                 <h3>Upcoming</h3>
-                                                <p class="dashboard-stat-number">${upcomingBookings}</p>
+                                                <p class="dashboard-stat-number">${stats.upcomingBookings || 0}</p>
                                                 <p class="dashboard-stat-subtitle">Active bookings</p>
                                             </div>
                                         </div>
@@ -1421,7 +495,7 @@
                                             </div>
                                             <div class="dashboard-stat-content">
                                                 <h3>Completed</h3>
-                                                <p class="dashboard-stat-number">${completedBookings}</p>
+                                                <p class="dashboard-stat-number">${stats.completedBookings || 0}</p>
                                                 <p class="dashboard-stat-subtitle">Past experiences</p>
                                             </div>
                                         </div>
@@ -1432,7 +506,7 @@
                                             </div>
                                             <div class="dashboard-stat-content">
                                                 <h3>Total Spent</h3>
-                                                <p class="dashboard-stat-number">$${totalSpent}</p>
+                                                <p class="dashboard-stat-number">$${stats.totalSpent || 0}</p>
                                                 <p class="dashboard-stat-subtitle">All transactions</p>
                                             </div>
                                         </div>
@@ -1444,7 +518,7 @@
                                             <a href="#" class="btn-link view-all" data-tab="bookings">View All</a>
                                         </div>
                                         <div id="dashboard-recent-bookings" class="dashboard-booking-cards">
-                                            ${renderRecentBookings(userBookings.slice(0, 3))}
+                                            ${renderRecentBookings(userBookings)}
                                         </div>
                                     </div>
                                     
@@ -1454,7 +528,7 @@
                                             <a href="#" class="btn-link view-all" data-tab="trip-plans">View All</a>
                                         </div>
                                         <div id="dashboard-recent-trip-plans" class="dashboard-booking-cards">
-                                            ${renderRecentTripPlans(userTripPlans.slice(0, 2))}
+                                            ${renderRecentTripPlans(userTripPlans)}
                                         </div>
                                     </div>
                                 </div>
@@ -1540,26 +614,6 @@
                                                 <input type="text" name="country" value="${currentUser.country || ''}" required>
                                             </div>
                                             
-                                            <div class="dashboard-form-group full-width">
-                                                <label><i class="fas fa-home"></i> Address</label>
-                                                <textarea name="address" rows="2">${currentUser.address || ''}</textarea>
-                                            </div>
-                                            
-                                            <div class="dashboard-form-group">
-                                                <label><i class="fas fa-birthday-cake"></i> Date of Birth</label>
-                                                <input type="date" name="dob" value="${currentUser.dob || ''}">
-                                            </div>
-                                            
-                                            <div class="dashboard-form-group">
-                                                <label><i class="fas fa-passport"></i> Passport Number</label>
-                                                <input type="text" name="passport" value="${currentUser.passport || ''}">
-                                            </div>
-                                            
-                                            <div class="dashboard-form-group full-width">
-                                                <label><i class="fas fa-heart"></i> Travel Preferences</label>
-                                                <textarea name="preferences" rows="3" placeholder="Any specific preferences, dietary requirements, or special needs...">${currentUser.preferences || ''}</textarea>
-                                            </div>
-                                            
                                             <div class="form-actions">
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="fas fa-save"></i> Update Profile
@@ -1569,69 +623,6 @@
                                                 </button>
                                             </div>
                                         </form>
-                                    </div>
-                                </div>
-                                
-                                <!-- Documents Tab -->
-                                <div id="dashboard-documents" class="dashboard-tab-container">
-                                    <div class="tab-header">
-                                        <h2><i class="fas fa-file-alt"></i> Travel Documents</h2>
-                                        <button class="btn btn-primary" id="upload-document-btn">
-                                            <i class="fas fa-upload"></i> Upload Document
-                                        </button>
-                                    </div>
-                                    <div class="dashboard-section">
-                                        <div class="documents-container">
-                                            <div class="document-cards">
-                                                <div class="document-card">
-                                                    <div class="document-icon">
-                                                        <i class="fas fa-passport"></i>
-                                                    </div>
-                                                    <div class="document-content">
-                                                        <h4>Passport</h4>
-                                                        <p>Upload your passport copy for visa processing</p>
-                                                        <div class="document-actions">
-                                                            <button class="btn btn-sm btn-outline">
-                                                                <i class="fas fa-upload"></i> Upload
-                                                            </button>
-                                                            <button class="btn btn-sm btn-outline" disabled>
-                                                                <i class="fas fa-eye"></i> View
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="document-card">
-                                                    <div class="document-icon">
-                                                        <i class="fas fa-plane"></i>
-                                                    </div>
-                                                    <div class="document-content">
-                                                        <h4>Flight Tickets</h4>
-                                                        <p>Upload flight itinerary or e-tickets</p>
-                                                        <div class="document-actions">
-                                                            <button class="btn btn-sm btn-outline">
-                                                                <i class="fas fa-upload"></i> Upload
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="document-card">
-                                                    <div class="document-icon">
-                                                        <i class="fas fa-file-medical"></i>
-                                                    </div>
-                                                    <div class="document-content">
-                                                        <h4>Medical Insurance</h4>
-                                                        <p>Travel medical insurance documents</p>
-                                                        <div class="document-actions">
-                                                            <button class="btn btn-sm btn-outline">
-                                                                <i class="fas fa-upload"></i> Upload
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1661,7 +652,7 @@
     }
 
     function renderRecentBookings(bookings) {
-        if (bookings.length === 0) {
+        if (!bookings || bookings.length === 0) {
             return `
                 <div class="dashboard-empty-state">
                     <i class="fas fa-calendar-times"></i>
@@ -1677,21 +668,21 @@
             <div class="dashboard-booking-card">
                 <div class="dashboard-booking-header">
                     <div class="booking-service-type">
-                        <span class="service-badge service-${booking.serviceType}">
-                            ${booking.serviceType}
+                        <span class="service-badge service-${booking.serviceType || 'general'}">
+                            ${booking.serviceType || 'Service'}
                         </span>
                     </div>
-                    <span class="dashboard-booking-status dashboard-status-${booking.status}">
-                        ${booking.status.toUpperCase()}
+                    <span class="dashboard-booking-status dashboard-status-${booking.status || 'pending'}">
+                        ${(booking.status || 'pending').toUpperCase()}
                     </span>
                 </div>
                 
-                <h4 class="dashboard-booking-title">${booking.serviceName}</h4>
+                <h4 class="dashboard-booking-title">${booking.serviceName || 'Service'}</h4>
                 
                 <div class="dashboard-booking-details">
-                    <p><i class="far fa-calendar"></i> ${new Date(booking.date).toLocaleDateString()}</p>
-                    <p><i class="fas fa-users"></i> ${booking.travelers} travelers</p>
-                    <p><i class="fas fa-hashtag"></i> ${booking._id}</p>
+                    <p><i class="far fa-calendar"></i> ${new Date(booking.date || booking.createdAt).toLocaleDateString()}</p>
+                    <p><i class="fas fa-users"></i> ${booking.travelers || 1} travelers</p>
+                    <p><i class="fas fa-hashtag"></i> ${booking.bookingReference || booking._id || ''}</p>
                 </div>
                 
                 <div class="dashboard-booking-footer">
@@ -1714,7 +705,7 @@
     }
 
     function renderBookingsTable(bookings) {
-        if (bookings.length === 0) {
+        if (!bookings || bookings.length === 0) {
             return `
                 <tr>
                     <td colspan="6" class="text-center">
@@ -1734,28 +725,28 @@
             <tr>
                 <td>
                     <div class="service-cell">
-                        <div class="service-icon-small service-${booking.serviceType}">
+                        <div class="service-icon-small service-${booking.serviceType || 'general'}">
                             <i class="fas fa-${getServiceIcon(booking.serviceType)}"></i>
                         </div>
                         <div>
-                            <strong>${booking.serviceName}</strong>
-                            <small>${booking._id}</small>
+                            <strong>${booking.serviceName || 'Service'}</strong>
+                            <small>${booking.bookingReference || booking._id || ''}</small>
                         </div>
                     </div>
                 </td>
                 <td>
-                    <span class="badge badge-service">${booking.serviceType}</span>
+                    <span class="badge badge-service">${booking.serviceType || 'general'}</span>
                 </td>
                 <td>
-                    ${new Date(booking.date).toLocaleDateString()}<br>
+                    ${new Date(booking.date || booking.createdAt).toLocaleDateString()}<br>
                     <small>${booking.duration || 1} days</small>
                 </td>
                 <td>
                     <strong>$${booking.totalAmount || '0'}</strong>
                 </td>
                 <td>
-                    <span class="badge badge-${booking.status}">
-                        ${booking.status.toUpperCase()}
+                    <span class="badge badge-${booking.status || 'pending'}">
+                        ${(booking.status || 'pending').toUpperCase()}
                     </span>
                 </td>
                 <td>
@@ -1764,9 +755,6 @@
                             <i class="fas fa-eye"></i>
                         </button>
                         ${booking.status === 'pending' ? `
-                            <button class="btn-action btn-edit" onclick="editBooking('${booking._id}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
                             <button class="btn-action btn-cancel" onclick="cancelBooking('${booking._id}')">
                                 <i class="fas fa-times"></i>
                             </button>
@@ -1781,7 +769,7 @@
     }
 
     function renderRecentTripPlans(tripPlans) {
-        if (tripPlans.length === 0) {
+        if (!tripPlans || tripPlans.length === 0) {
             return `
                 <div class="dashboard-empty-state">
                     <i class="fas fa-route"></i>
@@ -1801,17 +789,17 @@
                             <i class="fas fa-route"></i> TRIP PLAN
                         </span>
                     </div>
-                    <span class="dashboard-booking-status dashboard-status-${trip.status}">
-                        ${trip.status.toUpperCase()}
+                    <span class="dashboard-booking-status dashboard-status-${trip.status || 'review'}">
+                        ${(trip.status || 'review').toUpperCase()}
                     </span>
                 </div>
                 
-                <h4 class="dashboard-booking-title">${trip.duration} Trip</h4>
+                <h4 class="dashboard-booking-title">${trip.duration || 'Custom'} Trip</h4>
                 
                 <div class="dashboard-booking-details">
                     <p><i class="far fa-calendar"></i> Start: ${new Date(trip.startDate).toLocaleDateString()}</p>
-                    <p><i class="fas fa-users"></i> ${trip.travelers} travelers</p>
-                    <p><i class="fas fa-wallet"></i> Budget: ${trip.budget}</p>
+                    <p><i class="fas fa-users"></i> ${trip.travelers || 1} travelers</p>
+                    <p><i class="fas fa-wallet"></i> Budget: ${trip.budget || 'Custom'}</p>
                 </div>
                 
                 <div class="trip-interests">
@@ -1838,7 +826,7 @@
     }
 
     function renderTripPlans(tripPlans) {
-        if (tripPlans.length === 0) {
+        if (!tripPlans || tripPlans.length === 0) {
             return `
                 <div class="empty-state">
                     <div class="empty-state-icon">
@@ -1857,8 +845,8 @@
             <div class="trip-plan-card">
                 <div class="trip-plan-header">
                     <div class="trip-plan-id">
-                        <h4>${trip._id}</h4>
-                        <span class="badge badge-${trip.status}">${trip.status}</span>
+                        <h4>${trip.tripReference || trip._id}</h4>
+                        <span class="badge badge-${trip.status || 'review'}">${trip.status || 'review'}</span>
                     </div>
                     <div class="trip-plan-date">
                         <small>Requested: ${new Date(trip.createdAt).toLocaleDateString()}</small>
@@ -1924,28 +912,11 @@
                             </div>
                         </div>
                     ` : ''}
-                    
-                    ${trip.itinerary ? `
-                        <div class="detail-row">
-                            <div class="detail-item full-width">
-                                <i class="fas fa-map"></i>
-                                <div>
-                                    <label>Itinerary</label>
-                                    <div class="itinerary-container">
-                                        ${renderItinerary(trip.itinerary)}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ` : ''}
                 </div>
                 
                 <div class="trip-plan-footer">
                     <div class="trip-plan-actions">
                         ${trip.status === 'review' ? `
-                            <button class="btn btn-sm btn-outline" onclick="editTripPlan('${trip._id}')">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
                             <button class="btn btn-sm btn-danger" onclick="cancelTripPlan('${trip._id}')">
                                 <i class="fas fa-times"></i> Cancel
                             </button>
@@ -1961,28 +932,6 @@
                             </button>
                         `}
                     </div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function renderItinerary(itinerary) {
-        if (!itinerary || !itinerary.days) return '<p>No itinerary available</p>';
-        
-        return itinerary.days.map(day => `
-            <div class="itinerary-day">
-                <h5>Day ${day.day}: ${day.title}</h5>
-                <div class="itinerary-activities">
-                    ${day.activities.map(activity => `
-                        <div class="itinerary-activity">
-                            <i class="fas fa-${activity.icon || 'map-marker-alt'}"></i>
-                            <div>
-                                <strong>${activity.time}</strong>
-                                <p>${activity.description}</p>
-                                ${activity.location ? `<small><i class="fas fa-map-pin"></i> ${activity.location}</small>` : ''}
-                            </div>
-                        </div>
-                    `).join('')}
                 </div>
             </div>
         `).join('');
@@ -2044,11 +993,6 @@
             showChangePasswordModal();
         });
         
-        // Upload document button
-        document.getElementById('upload-document-btn')?.addEventListener('click', () => {
-            showUploadDocumentModal();
-        });
-        
         // Booking filter
         const bookingFilter = document.getElementById('dashboard-booking-filter');
         if (bookingFilter) {
@@ -2066,14 +1010,15 @@
                 const data = Object.fromEntries(formData.entries());
                 
                 try {
-                    const updatedUser = userManager.updateUser(currentUser._id, data);
-                    if (updatedUser) {
-                        currentUser = updatedUser;
-                        saveUserData(currentUser);
+                    const result = await apiRequest(config.endpoints.dashboard.updateProfile, {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
+                    
+                    if (result.success) {
                         showNotification('✅ Profile updated successfully!', 'success');
-                        setTimeout(() => {
-                            loadDashboard();
-                        }, 1000);
+                        currentUser = result.user;
+                        saveUserData(currentUser);
                     }
                 } catch (error) {
                     showNotification('❌ Error updating profile', 'error');
@@ -2083,7 +1028,7 @@
     }
 
     // ===============================
-    // ADMIN DASHBOARD FUNCTIONS
+    // ADMIN DASHBOARD FUNCTIONS - UPDATED FOR MONGODB
     // ===============================
 
     async function loadAdminDashboard() {
@@ -2100,11 +1045,18 @@
         if (!admin) return;
         
         try {
-            const stats = userManager.getStats();
-            const monthlyRevenue = userManager.getMonthlyRevenue();
-            const recentActivity = userManager.getRecentActivity();
-            const recentBookings = userManager.bookings.slice(-5).reverse();
-            const recentUsers = userManager.users.slice(-5).reverse();
+            const result = await apiRequest(config.endpoints.dashboard.admin);
+            
+            if (!result.success) {
+                throw new Error(result.message || 'Failed to load admin dashboard');
+            }
+            
+            const data = result.data;
+            const stats = data.stats || {};
+            const monthlyRevenue = data.monthlyRevenue || [];
+            const recentActivity = data.recentActivity || [];
+            const recentBookings = data.recentBookings || [];
+            const recentUsers = data.recentUsers || [];
             
             admin.innerHTML = `
                 <div class="admin-dashboard">
@@ -2140,9 +1092,9 @@
                                 </div>
                                 <div class="dashboard-stat-content">
                                     <h3>Total Users</h3>
-                                    <p class="dashboard-stat-number">${stats.totalUsers}</p>
+                                    <p class="dashboard-stat-number">${stats.totalUsers || 0}</p>
                                     <p class="dashboard-stat-subtitle">
-                                        <span class="stat-change positive">+2 this week</span>
+                                        <span class="stat-change positive">Active</span>
                                     </p>
                                 </div>
                             </div>
@@ -2153,9 +1105,9 @@
                                 </div>
                                 <div class="dashboard-stat-content">
                                     <h3>Total Bookings</h3>
-                                    <p class="dashboard-stat-number">${stats.totalBookings}</p>
+                                    <p class="dashboard-stat-number">${stats.totalBookings || 0}</p>
                                     <p class="dashboard-stat-subtitle">
-                                        <span class="stat-change positive">+5 this month</span>
+                                        <span class="stat-change positive">This month</span>
                                     </p>
                                 </div>
                             </div>
@@ -2166,9 +1118,9 @@
                                 </div>
                                 <div class="dashboard-stat-content">
                                     <h3>Total Revenue</h3>
-                                    <p class="dashboard-stat-number">$${stats.totalRevenue.toLocaleString()}</p>
+                                    <p class="dashboard-stat-number">$${stats.totalRevenue ? stats.totalRevenue.toLocaleString() : '0'}</p>
                                     <p class="dashboard-stat-subtitle">
-                                        <span class="stat-change positive">+15% this month</span>
+                                        <span class="stat-change positive">All time</span>
                                     </p>
                                 </div>
                             </div>
@@ -2179,9 +1131,9 @@
                                 </div>
                                 <div class="dashboard-stat-content">
                                     <h3>Active Bookings</h3>
-                                    <p class="dashboard-stat-number">${stats.activeBookings}</p>
+                                    <p class="dashboard-stat-number">${stats.activeBookings || 0}</p>
                                     <p class="dashboard-stat-subtitle">
-                                        ${stats.pendingTripPlans} pending trips
+                                        ${stats.pendingTripPlans || 0} pending trips
                                     </p>
                                 </div>
                             </div>
@@ -2201,18 +1153,6 @@
                                     <div class="widget-body">
                                         <div class="revenue-chart">
                                             ${renderRevenueChart(monthlyRevenue)}
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="admin-widget">
-                                    <div class="widget-header">
-                                        <h3><i class="fas fa-bell"></i> Recent Activity</h3>
-                                        <button class="btn-link" id="view-all-activity">View All</button>
-                                    </div>
-                                    <div class="widget-body">
-                                        <div class="activity-list">
-                                            ${renderRecentActivity(recentActivity)}
                                         </div>
                                     </div>
                                 </div>
@@ -2257,12 +1197,6 @@
                                 <button class="admin-tab-link" data-tab="trip-plans-management">
                                     <i class="fas fa-route"></i> Trip Plans Management
                                 </button>
-                                <button class="admin-tab-link" data-tab="services-management">
-                                    <i class="fas fa-concierge-bell"></i> Services Management
-                                </button>
-                                <button class="admin-tab-link" data-tab="reports">
-                                    <i class="fas fa-chart-bar"></i> Reports
-                                </button>
                             </nav>
                             
                             <div class="admin-tab-content">
@@ -2274,9 +1208,6 @@
                                             <div class="table-actions">
                                                 <button class="btn btn-sm btn-success" id="add-new-user-btn">
                                                     <i class="fas fa-plus"></i> Add User
-                                                </button>
-                                                <button class="btn btn-sm btn-outline" id="export-users-btn">
-                                                    <i class="fas fa-download"></i> Export
                                                 </button>
                                             </div>
                                         </div>
@@ -2293,7 +1224,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody id="users-table-body">
-                                                    ${renderUsersTable(userManager.users)}
+                                                    Loading users...
                                                 </tbody>
                                             </table>
                                         </div>
@@ -2313,9 +1244,6 @@
                                                     <option value="translator">Translators</option>
                                                     <option value="accommodation">Accommodations</option>
                                                 </select>
-                                                <button class="btn btn-sm btn-outline" id="export-bookings-btn">
-                                                    <i class="fas fa-download"></i> Export
-                                                </button>
                                             </div>
                                         </div>
                                         <div class="table-responsive">
@@ -2332,7 +1260,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody id="bookings-table-body">
-                                                    ${renderAdminBookingsTable(userManager.bookings)}
+                                                    Loading bookings...
                                                 </tbody>
                                             </table>
                                         </div>
@@ -2352,9 +1280,6 @@
                                                     <option value="completed">Completed</option>
                                                     <option value="cancelled">Cancelled</option>
                                                 </select>
-                                                <button class="btn btn-sm btn-outline" id="export-trips-btn">
-                                                    <i class="fas fa-download"></i> Export
-                                                </button>
                                             </div>
                                         </div>
                                         <div class="table-responsive">
@@ -2371,145 +1296,9 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody id="trips-table-body">
-                                                    ${renderAdminTripsTable(userManager.tripPlans)}
+                                                    Loading trip plans...
                                                 </tbody>
                                             </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Services Management Tab -->
-                                <div id="services-management" class="admin-tab-pane">
-                                    <div class="services-management">
-                                        <div class="services-tabs">
-                                            <button class="service-tab active" data-service="guides">
-                                                <i class="fas fa-user-tie"></i> Guides
-                                            </button>
-                                            <button class="service-tab" data-service="translators">
-                                                <i class="fas fa-language"></i> Translators
-                                            </button>
-                                            <button class="service-tab" data-service="accommodations">
-                                                <i class="fas fa-hotel"></i> Accommodations
-                                            </button>
-                                            <button class="service-tab" data-service="destinations">
-                                                <i class="fas fa-map-marked-alt"></i> Destinations
-                                            </button>
-                                            <button class="service-tab" data-service="blog">
-                                                <i class="fas fa-newspaper"></i> Blog Posts
-                                            </button>
-                                        </div>
-                                        
-                                        <div class="services-content">
-                                            <div id="guides-management" class="service-tab-content active">
-                                                <div class="service-header">
-                                                    <h3>Tour Guides Management</h3>
-                                                    <button class="btn btn-success" id="add-guide-btn">
-                                                        <i class="fas fa-plus"></i> Add Guide
-                                                    </button>
-                                                </div>
-                                                <div class="service-table-container">
-                                                    <table class="admin-table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Guide</th>
-                                                                <th>Specialty</th>
-                                                                <th>Languages</th>
-                                                                <th>Rate</th>
-                                                                <th>Status</th>
-                                                                <th>Actions</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            ${mockData.guides.map(guide => `
-                                                                <tr>
-                                                                    <td>
-                                                                        <div class="user-cell">
-                                                                            <div class="user-avatar-small">
-                                                                                <i class="fas fa-user-tie"></i>
-                                                                            </div>
-                                                                            <div>
-                                                                                <strong>${guide.name}</strong>
-                                                                                <small>${guide.experience}</small>
-                                                                            </div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>${guide.specialty}</td>
-                                                                    <td>${guide.languages.slice(0, 2).join(', ')}${guide.languages.length > 2 ? '...' : ''}</td>
-                                                                    <td>${guide.price}</td>
-                                                                    <td>
-                                                                        <span class="badge badge-${guide.available ? 'success' : 'secondary'}">
-                                                                            ${guide.available ? 'Available' : 'Busy'}
-                                                                        </span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class="table-actions">
-                                                                            <button class="btn-action btn-view" onclick="viewGuideDetails(${guide._id})">
-                                                                                <i class="fas fa-eye"></i>
-                                                                            </button>
-                                                                            <button class="btn-action btn-edit" onclick="editGuide(${guide._id})">
-                                                                                <i class="fas fa-edit"></i>
-                                                                            </button>
-                                                                            <button class="btn-action btn-delete" onclick="deleteGuide(${guide._id})">
-                                                                                <i class="fas fa-trash"></i>
-                                                                            </button>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            `).join('')}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                            <!-- Other services tabs -->
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Reports Tab -->
-                                <div id="reports" class="admin-tab-pane">
-                                    <div class="reports-container">
-                                        <h3>Generate Reports</h3>
-                                        <div class="reports-grid">
-                                            <div class="report-card">
-                                                <div class="report-icon">
-                                                    <i class="fas fa-file-invoice-dollar"></i>
-                                                </div>
-                                                <h4>Revenue Report</h4>
-                                                <p>Monthly revenue breakdown</p>
-                                                <button class="btn btn-primary" onclick="generateReport('revenue')">
-                                                    Generate
-                                                </button>
-                                            </div>
-                                            <div class="report-card">
-                                                <div class="report-icon">
-                                                    <i class="fas fa-users"></i>
-                                                </div>
-                                                <h4>User Report</h4>
-                                                <p>User statistics and growth</p>
-                                                <button class="btn btn-primary" onclick="generateReport('users')">
-                                                    Generate
-                                                </button>
-                                            </div>
-                                            <div class="report-card">
-                                                <div class="report-icon">
-                                                    <i class="fas fa-calendar-alt"></i>
-                                                </div>
-                                                <h4>Bookings Report</h4>
-                                                <p>Booking trends and performance</p>
-                                                <button class="btn btn-primary" onclick="generateReport('bookings')">
-                                                    Generate
-                                                </button>
-                                            </div>
-                                            <div class="report-card">
-                                                <div class="report-icon">
-                                                    <i class="fas fa-chart-pie"></i>
-                                                </div>
-                                                <h4>Custom Report</h4>
-                                                <p>Create custom report</p>
-                                                <button class="btn btn-primary" onclick="showCustomReportModal()">
-                                                    Create
-                                                </button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2518,6 +1307,11 @@
                     </div>
                 </div>
             `;
+            
+            // Load tables data
+            loadAdminUsersTable();
+            loadAdminBookingsTable();
+            loadAdminTripsTable();
             
             // Setup admin dashboard event listeners
             setupAdminDashboardListeners();
@@ -2539,15 +1333,57 @@
         }
     }
 
+    async function loadAdminUsersTable() {
+        try {
+            const result = await apiRequest(config.endpoints.dashboard.allUsers);
+            if (result.success) {
+                const tableBody = document.getElementById('users-table-body');
+                if (tableBody) {
+                    tableBody.innerHTML = renderUsersTable(result.data || []);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading users table:', error);
+        }
+    }
+
+    async function loadAdminBookingsTable() {
+        try {
+            const result = await apiRequest(config.endpoints.dashboard.allBookings);
+            if (result.success) {
+                const tableBody = document.getElementById('bookings-table-body');
+                if (tableBody) {
+                    tableBody.innerHTML = renderAdminBookingsTable(result.data || []);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading bookings table:', error);
+        }
+    }
+
+    async function loadAdminTripsTable() {
+        try {
+            const result = await apiRequest('/api/tripPlan/all');
+            if (result.success) {
+                const tableBody = document.getElementById('trips-table-body');
+                if (tableBody) {
+                    tableBody.innerHTML = renderAdminTripsTable(result.data || []);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading trips table:', error);
+        }
+    }
+
     function renderRevenueChart(monthlyRevenue) {
-        if (monthlyRevenue.length === 0) {
+        if (!monthlyRevenue || monthlyRevenue.length === 0) {
             return '<p class="text-center">No revenue data available</p>';
         }
         
         const maxRevenue = Math.max(...monthlyRevenue.map(m => m.revenue));
         
         return monthlyRevenue.map(item => {
-            const height = (item.revenue / maxRevenue) * 100;
+            const height = maxRevenue > 0 ? (item.revenue / maxRevenue) * 100 : 0;
             return `
                 <div class="chart-bar-container">
                     <div class="chart-bar" style="height: ${height}%">
@@ -2559,29 +1395,8 @@
         }).join('');
     }
 
-    function renderRecentActivity(activities) {
-        if (activities.length === 0) {
-            return '<p class="text-center">No recent activity</p>';
-        }
-        
-        return activities.slice(0, 6).map(activity => `
-            <div class="activity-item">
-                <div class="activity-icon">
-                    <i class="fas fa-${getActivityIcon(activity.type)}"></i>
-                </div>
-                <div class="activity-content">
-                    <p>
-                        <strong>${activity.name}</strong> ${activity.action} 
-                        ${activity.type === 'user' ? 'account' : activity.type}
-                    </p>
-                    <small>${formatTimeAgo(activity.timestamp)}</small>
-                </div>
-            </div>
-        `).join('');
-    }
-
     function renderRecentUsers(users) {
-        if (users.length === 0) {
+        if (!users || users.length === 0) {
             return '<p class="text-center">No recent users</p>';
         }
         
@@ -2597,17 +1412,12 @@
                         ${user.role}
                     </span>
                 </div>
-                <div class="user-actions">
-                    <button class="btn-action btn-sm" onclick="viewUserDetails(${user._id})">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
             </div>
         `).join('');
     }
 
     function renderAdminRecentBookings(bookings) {
-        if (bookings.length === 0) {
+        if (!bookings || bookings.length === 0) {
             return '<p class="text-center">No recent bookings</p>';
         }
         
@@ -2618,16 +1428,11 @@
                 </div>
                 <div class="booking-info">
                     <strong>${booking.serviceName}</strong>
-                    <small>${booking._id}</small>
+                    <small>${booking.bookingReference || booking._id}</small>
                     <div>
                         <span class="badge badge-${booking.status}">${booking.status}</span>
                         <span class="amount">$${booking.totalAmount || '0'}</span>
                     </div>
-                </div>
-                <div class="booking-actions">
-                    <button class="btn-action btn-sm" onclick="viewBookingDetails('${booking._id}')">
-                        <i class="fas fa-eye"></i>
-                    </button>
                 </div>
             </div>
         `).join('');
@@ -2661,14 +1466,11 @@
                 <td>${new Date(user.createdAt).toLocaleDateString()}</td>
                 <td>
                     <div class="table-actions">
-                        <button class="btn-action btn-view" onclick="viewUserDetails(${user._id})">
+                        <button class="btn-action btn-view" onclick="viewUserDetails('${user._id}')">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn-action btn-edit" onclick="editUser(${user._id})">
+                        <button class="btn-action btn-edit" onclick="editUser('${user._id}')">
                             <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-action btn-delete" onclick="deleteUserConfirm(${user._id})">
-                            <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </td>
@@ -2680,7 +1482,7 @@
         return bookings.map(booking => `
             <tr>
                 <td>
-                    <strong>${booking._id}</strong>
+                    <strong>${booking.bookingReference || booking._id}</strong>
                 </td>
                 <td>
                     <div class="user-cell">
@@ -2722,9 +1524,6 @@
                             <button class="btn-action btn-confirm" onclick="confirmBooking('${booking._id}')">
                                 <i class="fas fa-check"></i>
                             </button>
-                            <button class="btn-action btn-cancel" onclick="cancelBookingAdmin('${booking._id}')">
-                                <i class="fas fa-times"></i>
-                            </button>
                         ` : ''}
                         <button class="btn-action btn-download" onclick="downloadBookingInvoice('${booking._id}')">
                             <i class="fas fa-download"></i>
@@ -2739,7 +1538,7 @@
         return tripPlans.map(trip => `
             <tr>
                 <td>
-                    <strong>${trip._id}</strong>
+                    <strong>${trip.tripReference || trip._id}</strong>
                 </td>
                 <td>
                     <div class="user-cell">
@@ -2765,9 +1564,6 @@
                         <button class="btn-action btn-view" onclick="viewTripPlanAdmin('${trip._id}')">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn-action btn-edit" onclick="editTripPlanAdmin('${trip._id}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
                         ${trip.status === 'review' ? `
                             <button class="btn-action btn-process" onclick="processTripPlan('${trip._id}')">
                                 <i class="fas fa-cogs"></i>
@@ -2777,29 +1573,6 @@
                 </td>
             </tr>
         `).join('');
-    }
-
-    function getActivityIcon(activityType) {
-        const icons = {
-            'user': 'user-plus',
-            'booking': 'calendar-check',
-            'trip_plan': 'route'
-        };
-        return icons[activityType] || 'bell';
-    }
-
-    function formatTimeAgo(timestamp) {
-        const now = new Date();
-        const past = new Date(timestamp);
-        const diff = now - past;
-        
-        const minutes = Math.floor(diff / 60000);
-        const hours = Math.floor(diff / 3600000);
-        const days = Math.floor(diff / 86400000);
-        
-        if (minutes < 60) return `${minutes} minutes ago`;
-        if (hours < 24) return `${hours} hours ago`;
-        return `${days} days ago`;
     }
 
     function setupAdminDashboardListeners() {
@@ -2814,18 +1587,6 @@
                 this.classList.add('active');
                 const tabId = this.dataset.tab;
                 document.getElementById(tabId).classList.add('active');
-            });
-        });
-        
-        // Service tabs
-        document.querySelectorAll('.service-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.service-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.service-tab-content').forEach(c => c.classList.remove('active'));
-                
-                this.classList.add('active');
-                const service = this.dataset.service;
-                document.getElementById(`${service}-management`).classList.add('active');
             });
         });
         
@@ -2858,7 +1619,7 @@
     }
 
     // ===============================
-    // DATA LOADING FUNCTIONS
+    // DATA LOADING FUNCTIONS - UPDATED FOR MONGODB
     // ===============================
     
     async function loadHomePage() {
@@ -2866,59 +1627,67 @@
         // Load featured destinations
         const destinationsGrid = document.querySelector('.destinations-grid');
         if (destinationsGrid) {
-            const result = await apiRequest(config.endpoints.destinations);
-            const featuredDestinations = result.data?.slice(0, 3) || mockData.destinations.slice(0, 3);
-            
-            destinationsGrid.innerHTML = featuredDestinations.map(dest => `
-                <div class="destination-card">
-                    <div class="destination-image">
-                        <img src="${dest.image}" alt="${dest.name}" loading="lazy">
-                        <div class="destination-rating">
-                            <i class="fas fa-star"></i> ${dest.rating}
+            try {
+                const result = await apiRequest(config.endpoints.destinations);
+                const featuredDestinations = result.data?.slice(0, 3) || [];
+                
+                destinationsGrid.innerHTML = featuredDestinations.map(dest => `
+                    <div class="destination-card">
+                        <div class="destination-image">
+                            <img src="${dest.image}" alt="${dest.name}" loading="lazy" onerror="this.src='./images/default-destination.jpg'">
+                            <div class="destination-rating">
+                                <i class="fas fa-star"></i> ${dest.rating || 4.5}
+                            </div>
+                        </div>
+                        <div class="destination-content">
+                            <h3>${dest.name}</h3>
+                            <div class="destination-location">
+                                <i class="fas fa-map-marker-alt"></i> ${dest.location}
+                            </div>
+                            <p>${dest.description ? dest.description.substring(0, 100) + '...' : 'Discover this amazing destination'}</p>
+                            <button class="btn btn-primary book-now" 
+                                    data-type="destination" 
+                                    data-id="${dest._id}"
+                                    data-name="${dest.name}">
+                                Book Now
+                            </button>
                         </div>
                     </div>
-                    <div class="destination-content">
-                        <h3>${dest.name}</h3>
-                        <div class="destination-location">
-                            <i class="fas fa-map-marker-alt"></i> ${dest.location}
-                        </div>
-                        <p>${dest.description.substring(0, 100)}...</p>
-                        <button class="btn btn-primary book-now" 
-                                data-type="destination" 
-                                data-id="${dest._id}"
-                                data-name="${dest.name}">
-                            Book Now
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            } catch (error) {
+                console.error('Error loading destinations:', error);
+            }
         }
         
         // Load featured blog posts
         const blogGrid = document.querySelector('.blog-grid');
         if (blogGrid) {
-            const result = await apiRequest(config.endpoints.blog);
-            const featuredBlogs = result.data?.slice(0, 3) || mockData.blog.slice(0, 3);
-            
-            blogGrid.innerHTML = featuredBlogs.map(blog => `
-                <div class="blog-card">
-                    <div class="blog-image">
-                        <img src="${blog.image}" alt="${blog.title}" loading="lazy">
-                        <span class="blog-category">${blog.category}</span>
-                    </div>
-                    <div class="blog-content">
-                        <div class="blog-meta">
-                            <span class="blog-date">
-                                <i class="far fa-calendar"></i> ${blog.date}
-                            </span>
-                            <span class="blog-read-time">${blog.readTime}</span>
+            try {
+                const result = await apiRequest(config.endpoints.blog);
+                const featuredBlogs = result.data?.slice(0, 3) || [];
+                
+                blogGrid.innerHTML = featuredBlogs.map(blog => `
+                    <div class="blog-card">
+                        <div class="blog-image">
+                            <img src="${blog.image}" alt="${blog.title}" loading="lazy" onerror="this.src='./images/default-blog.jpg'">
+                            <span class="blog-category">${blog.category || 'Travel'}</span>
                         </div>
-                        <h3>${blog.title}</h3>
-                        <p>${blog.excerpt.substring(0, 120)}...</p>
-                        <a href="#" class="read-more-link" data-page="blog">Read More <i class="fas fa-arrow-right"></i></a>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span class="blog-date">
+                                    <i class="far fa-calendar"></i> ${new Date(blog.createdAt).toLocaleDateString()}
+                                </span>
+                                <span class="blog-read-time">${blog.readTime || '5 min read'}</span>
+                            </div>
+                            <h3>${blog.title}</h3>
+                            <p>${blog.excerpt ? blog.excerpt.substring(0, 120) + '...' : 'Read this interesting article...'}</p>
+                            <a href="#" class="read-more-link" data-page="blog">Read More <i class="fas fa-arrow-right"></i></a>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+            } catch (error) {
+                console.error('Error loading blog posts:', error);
+            }
         }
         
         // Update plan trip button
@@ -2936,36 +1705,41 @@
         const grid = document.querySelector('.destinations-grid-full');
         if (!grid) return;
         
-        const result = await apiRequest(config.endpoints.destinations);
-        const destinations = result.data || mockData.destinations;
-        
-        grid.innerHTML = destinations.map(dest => `
-            <div class="destination-card">
-                <div class="destination-image">
-                    <img src="${dest.image}" alt="${dest.name}" loading="lazy">
-                    <div class="destination-rating">
-                        <i class="fas fa-star"></i> ${dest.rating}
+        try {
+            const result = await apiRequest(config.endpoints.destinations);
+            const destinations = result.data || [];
+            
+            grid.innerHTML = destinations.map(dest => `
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <img src="${dest.image}" alt="${dest.name}" loading="lazy" onerror="this.src='./images/default-destination.jpg'">
+                        <div class="destination-rating">
+                            <i class="fas fa-star"></i> ${dest.rating || 4.5}
+                        </div>
+                    </div>
+                    <div class="destination-content">
+                        <h3>${dest.name}</h3>
+                        <div class="destination-location">
+                            <i class="fas fa-map-marker-alt"></i> ${dest.location}
+                        </div>
+                        <p>${dest.description || 'Discover this amazing destination'}</p>
+                        <div class="features">
+                            ${(dest.features || []).map(f => `<span class="feature-tag">${f}</span>`).join('')}
+                        </div>
+                        <div class="price-tag">${dest.price || 'Contact for price'}</div>
+                        <button class="btn btn-primary book-now" 
+                                data-type="destination" 
+                                data-id="${dest._id}"
+                                data-name="${dest.name}">
+                            Book Tour
+                        </button>
                     </div>
                 </div>
-                <div class="destination-content">
-                    <h3>${dest.name}</h3>
-                    <div class="destination-location">
-                        <i class="fas fa-map-marker-alt"></i> ${dest.location}
-                    </div>
-                    <p>${dest.description}</p>
-                    <div class="features">
-                        ${dest.features.map(f => `<span class="feature-tag">${f}</span>`).join('')}
-                    </div>
-                    <div class="price-tag">${dest.price}</div>
-                    <button class="btn btn-primary book-now" 
-                            data-type="destination" 
-                            data-id="${dest._id}"
-                            data-name="${dest.name}">
-                        Book Tour
-                    </button>
-                </div>
-            </div>
-        `).join('');
+            `).join('');
+        } catch (error) {
+            console.error('Error loading destinations:', error);
+            grid.innerHTML = '<p class="text-center">Error loading destinations. Please try again later.</p>';
+        }
     }
 
     async function loadGuides() {
@@ -2973,54 +1747,59 @@
         const grid = document.querySelector('.guides-grid-full');
         if (!grid) return;
         
-        const result = await apiRequest(config.endpoints.guides);
-        const guides = result.data || mockData.guides;
-        
-        grid.innerHTML = guides.map(guide => `
-            <div class="guide-card">
-                <div class="guide-avatar">
-                    <img src="${guide.image}" alt="${guide.name}" loading="lazy">
-                </div>
-                
-                <div class="guide-info">
-                    <h3>${guide.name}</h3>
-                    
-                    <p class="specialty">${guide.specialty}</p>
-                    
-                    <div class="languages-section">
-                        <div class="languages-header">
-                            <i class="fas fa-language"></i>
-                            <strong>Languages:</strong>
-                        </div>
-                        <div class="languages-list">
-                            ${guide.languages.map(lang => `
-                                <span class="language-tag">
-                                    ${lang}
-                                </span>
-                            `).join('')}
-                        </div>
+        try {
+            const result = await apiRequest(config.endpoints.guides);
+            const guides = result.data || [];
+            
+            grid.innerHTML = guides.map(guide => `
+                <div class="guide-card">
+                    <div class="guide-avatar">
+                        <img src="${guide.image}" alt="${guide.name}" loading="lazy" onerror="this.src='./images/default-guide.jpg'">
                     </div>
                     
-                    <p class="experience">
-                        <i class="fas fa-briefcase"></i> ${guide.experience}
-                    </p>
-                    
-                    <div class="rating">
-                        ${'★'.repeat(Math.floor(guide.rating))}${guide.rating % 1 ? '½' : ''}
-                        <span>${guide.rating}</span>
+                    <div class="guide-info">
+                        <h3>${guide.name}</h3>
+                        
+                        <p class="specialty">${guide.specialty || 'Tour Guide'}</p>
+                        
+                        <div class="languages-section">
+                            <div class="languages-header">
+                                <i class="fas fa-language"></i>
+                                <strong>Languages:</strong>
+                            </div>
+                            <div class="languages-list">
+                                ${(guide.languages || []).map(lang => `
+                                    <span class="language-tag">
+                                        ${lang}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <p class="experience">
+                            <i class="fas fa-briefcase"></i> ${guide.experience || 'Professional guide'}
+                        </p>
+                        
+                        <div class="rating">
+                            ${'★'.repeat(Math.floor(guide.rating || 4))}${(guide.rating || 4) % 1 ? '½' : ''}
+                            <span>${guide.rating || 4.0}</span>
+                        </div>
+                        
+                        <div class="price">${guide.price || '$100/day'}</div>
+                        
+                        <button class="btn btn-primary book-now" 
+                                data-type="guide" 
+                                data-id="${guide._id}"
+                                data-name="${guide.name}">
+                            Hire Now
+                        </button>
                     </div>
-                    
-                    <div class="price">${guide.price}</div>
-                    
-                    <button class="btn btn-primary book-now" 
-                            data-type="guide" 
-                            data-id="${guide._id}"
-                            data-name="${guide.name}">
-                        Hire Now
-                    </button>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        } catch (error) {
+            console.error('Error loading guides:', error);
+            grid.innerHTML = '<p class="text-center">Error loading guides. Please try again later.</p>';
+        }
     }
 
     async function loadTranslators() {
@@ -3028,54 +1807,59 @@
         const grid = document.querySelector('.translators-grid-full');
         if (!grid) return;
         
-        const result = await apiRequest(config.endpoints.translators);
-        const translators = result.data || mockData.translators;
-        
-        grid.innerHTML = translators.map(translator => `
-            <div class="translator-card">
-                <div class="guide-avatar">
-                    <img src="${translator.image}" alt="${translator.name}" loading="lazy">
-                </div>
-                
-                <div class="guide-info">
-                    <h3>${translator.name}</h3>
-                    
-                    <p class="specialty">${translator.specialty}</p>
-                    
-                    <div class="languages-section">
-                        <div class="languages-header">
-                            <i class="fas fa-language"></i>
-                            <strong>Languages:</strong>
-                        </div>
-                        <div class="languages-list">
-                            ${translator.languages.map(lang => `
-                                <span class="language-tag">
-                                    ${lang}
-                                </span>
-                            `).join('')}
-                        </div>
+        try {
+            const result = await apiRequest(config.endpoints.translators);
+            const translators = result.data || [];
+            
+            grid.innerHTML = translators.map(translator => `
+                <div class="translator-card">
+                    <div class="guide-avatar">
+                        <img src="${translator.image}" alt="${translator.name}" loading="lazy" onerror="this.src='./images/default-translator.jpg'">
                     </div>
                     
-                    <p class="experience">
-                        <i class="fas fa-briefcase"></i> ${translator.experience}
-                    </p>
-                    
-                    <div class="rating">
-                        ${'★'.repeat(Math.floor(translator.rating))}${translator.rating % 1 ? '½' : ''}
-                        <span>${translator.rating}</span>
+                    <div class="guide-info">
+                        <h3>${translator.name}</h3>
+                        
+                        <p class="specialty">${translator.specialty || 'Translator'}</p>
+                        
+                        <div class="languages-section">
+                            <div class="languages-header">
+                                <i class="fas fa-language"></i>
+                                <strong>Languages:</strong>
+                            </div>
+                            <div class="languages-list">
+                                ${(translator.languages || []).map(lang => `
+                                    <span class="language-tag">
+                                        ${lang}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <p class="experience">
+                            <i class="fas fa-briefcase"></i> ${translator.experience || 'Professional translator'}
+                        </p>
+                        
+                        <div class="rating">
+                            ${'★'.repeat(Math.floor(translator.rating || 4))}${(translator.rating || 4) % 1 ? '½' : ''}
+                            <span>${translator.rating || 4.0}</span>
+                        </div>
+                        
+                        <div class="price">${translator.price || '$80/day'}</div>
+                        
+                        <button class="btn btn-primary book-now" 
+                                data-type="translator" 
+                                data-id="${translator._id}"
+                                data-name="${translator.name}">
+                            Hire Now
+                        </button>
                     </div>
-                    
-                    <div class="price">${translator.price}</div>
-                    
-                    <button class="btn btn-primary book-now" 
-                            data-type="translator" 
-                            data-id="${translator._id}"
-                            data-name="${translator.name}">
-                        Hire Now
-                    </button>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        } catch (error) {
+            console.error('Error loading translators:', error);
+            grid.innerHTML = '<p class="text-center">Error loading translators. Please try again later.</p>';
+        }
     }
 
     async function loadAccommodations() {
@@ -3083,34 +1867,39 @@
         const grid = document.querySelector('.accommodations-grid-full');
         if (!grid) return;
         
-        const result = await apiRequest(config.endpoints.accommodations);
-        const accommodations = result.data || mockData.accommodations;
-        
-        grid.innerHTML = accommodations.map(acc => `
-            <div class="accommodation-card">
-                <div class="accommodation-image">
-                    <img src="${acc.image}" alt="${acc.name}" loading="lazy">
-                </div>
-                <div class="accommodation-content">
-                    <span class="type">${acc.type}</span>
-                    <h3>${acc.name}</h3>
-                    <div class="location">
-                        <i class="fas fa-map-marker-alt"></i> ${acc.location}
+        try {
+            const result = await apiRequest(config.endpoints.accommodations);
+            const accommodations = result.data || [];
+            
+            grid.innerHTML = accommodations.map(acc => `
+                <div class="accommodation-card">
+                    <div class="accommodation-image">
+                        <img src="${acc.image}" alt="${acc.name}" loading="lazy" onerror="this.src='./images/default-accommodation.jpg'">
                     </div>
-                    <p>${acc.description.substring(0, 120)}...</p>
-                    <div class="features">
-                        ${acc.features.slice(0, 3).map(f => `<span class="feature-tag">${f}</span>`).join('')}
+                    <div class="accommodation-content">
+                        <span class="type">${acc.type || 'Accommodation'}</span>
+                        <h3>${acc.name}</h3>
+                        <div class="location">
+                            <i class="fas fa-map-marker-alt"></i> ${acc.location}
+                        </div>
+                        <p>${acc.description ? acc.description.substring(0, 120) + '...' : 'Comfortable accommodation'}</p>
+                        <div class="features">
+                            ${(acc.features || []).slice(0, 3).map(f => `<span class="feature-tag">${f}</span>`).join('')}
+                        </div>
+                        <div class="price-tag">${acc.price || 'Contact for price'}</div>
+                        <button class="btn btn-primary book-now" 
+                                data-type="accommodation" 
+                                data-id="${acc._id}"
+                                data-name="${acc.name}">
+                            Book Now
+                        </button>
                     </div>
-                    <div class="price-tag">${acc.price}</div>
-                    <button class="btn btn-primary book-now" 
-                            data-type="accommodation" 
-                            data-id="${acc._id}"
-                            data-name="${acc.name}">
-                        Book Now
-                    </button>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        } catch (error) {
+            console.error('Error loading accommodations:', error);
+            grid.innerHTML = '<p class="text-center">Error loading accommodations. Please try again later.</p>';
+        }
     }
 
     async function loadBlog() {
@@ -3118,29 +1907,34 @@
         const grid = document.querySelector('.blog-grid-full');
         if (!grid) return;
         
-        const result = await apiRequest(config.endpoints.blog);
-        const blogs = result.data || mockData.blog;
-        
-        grid.innerHTML = blogs.map(blog => `
-            <div class="blog-card">
-                <div class="blog-image">
-                    <img src="${blog.image}" alt="${blog.title}" loading="lazy">
-                    <span class="blog-category">${blog.category}</span>
-                </div>
-                <div class="blog-content">
-                    <div class="blog-meta">
-                        <span class="blog-date">
-                            <i class="fas fa-calendar"></i> ${blog.date}
-                        </span>
-                        <span class="blog-read-time">${blog.readTime}</span>
+        try {
+            const result = await apiRequest(config.endpoints.blog);
+            const blogs = result.data || [];
+            
+            grid.innerHTML = blogs.map(blog => `
+                <div class="blog-card">
+                    <div class="blog-image">
+                        <img src="${blog.image}" alt="${blog.title}" loading="lazy" onerror="this.src='./images/default-blog.jpg'">
+                        <span class="blog-category">${blog.category || 'Travel'}</span>
                     </div>
-                    <h3>${blog.title}</h3>
-                    <p>${blog.excerpt}</p>
-                    <p class="author"><i class="fas fa-user"></i> ${blog.author}</p>
-                    <a href="#" class="read-more-link">Read Full Article</a>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-date">
+                                <i class="fas fa-calendar"></i> ${new Date(blog.createdAt).toLocaleDateString()}
+                            </span>
+                            <span class="blog-read-time">${blog.readTime || '5 min read'}</span>
+                        </div>
+                        <h3>${blog.title}</h3>
+                        <p>${blog.excerpt || 'Read this interesting article...'}</p>
+                        <p class="author"><i class="fas fa-user"></i> ${blog.author || 'Admin'}</p>
+                        <a href="#" class="read-more-link" onclick="viewBlogPost('${blog._id}')">Read Full Article</a>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        } catch (error) {
+            console.error('Error loading blog:', error);
+            grid.innerHTML = '<p class="text-center">Error loading blog posts. Please try again later.</p>';
+        }
     }
 
     // ===============================
@@ -3309,13 +2103,6 @@
                             <label>Country</label>
                             <input type="text" name="country">
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="checkbox">
-                                <input type="checkbox" name="newsletter" checked>
-                                Subscribe to newsletter
-                            </label>
-                        </div>
                     ` : ''}
                     
                     <button type="submit" class="btn btn-primary btn-block">
@@ -3445,19 +2232,6 @@
     function showEnhancedBookingModal(serviceType, serviceId = null, serviceName = null) {
         const modal = createModal();
         
-        // Get service details if ID is provided
-        let serviceDetails = null;
-        if (serviceId) {
-            // Find the service in mock data
-            let allServices = [];
-            if (serviceType === 'guide') allServices = mockData.guides;
-            else if (serviceType === 'translator') allServices = mockData.translators;
-            else if (serviceType === 'accommodation') allServices = mockData.accommodations;
-            else if (serviceType === 'destination') allServices = mockData.destinations;
-            
-            serviceDetails = allServices.find(s => s._id == serviceId);
-        }
-        
         modal.innerHTML = `
             <div class="modal-header">
                 <h2><i class="fas fa-calendar-plus"></i> Book ${serviceType.charAt(0).toUpperCase() + serviceType.slice(1)}</h2>
@@ -3468,39 +2242,13 @@
                 <form id="enhanced-booking-form">
                     <input type="hidden" name="service_type" value="${serviceType}">
                     <input type="hidden" name="service_id" value="${serviceId || ''}">
-                    <input type="hidden" name="service_name" value="${serviceDetails?.name || serviceName || ''}">
+                    <input type="hidden" name="service_name" value="${serviceName || ''}">
                     
-                    ${serviceDetails ? `
+                    ${serviceName ? `
                         <div class="booking-service-preview">
-                            <h4>${serviceDetails.name}</h4>
-                            <p><strong>Price:</strong> ${serviceDetails.price}</p>
-                            ${serviceDetails.description ? `<p>${serviceDetails.description.substring(0, 100)}...</p>` : ''}
+                            <h4>${serviceName}</h4>
                         </div>
                     ` : ''}
-                    
-                    <div class="form-section">
-                        <h4><i class="fas fa-user"></i> Personal Information</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Full Name *</label>
-                                <input type="text" name="name" value="${currentUser?.name || ''}" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Email *</label>
-                                <input type="email" name="email" value="${currentUser?.email || ''}" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Phone *</label>
-                                <input type="tel" name="phone" value="${currentUser?.phone || ''}" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Nationality</label>
-                                <input type="text" name="nationality" value="${currentUser?.country || ''}">
-                            </div>
-                        </div>
-                    </div>
                     
                     <div class="form-section">
                         <h4><i class="fas fa-calendar-alt"></i> Booking Details</h4>
@@ -3533,9 +2281,8 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Total Amount ($)</label>
-                                <input type="number" name="total_amount" placeholder="Estimated total" min="0" 
-                                       value="${serviceDetails?.dailyRate ? serviceDetails.dailyRate : serviceDetails?.basePrice ? serviceDetails.basePrice : ''}">
+                                <label>Total Amount ($) *</label>
+                                <input type="number" name="total_amount" required min="0" placeholder="Enter total amount">
                             </div>
                         </div>
                     </div>
@@ -3545,32 +2292,6 @@
                         <div class="form-group">
                             <label>Special Requirements</label>
                             <textarea name="notes" rows="3" placeholder="Any dietary restrictions, accessibility needs, or special requests..."></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <h4><i class="fas fa-file-invoice-dollar"></i> Payment Method</h4>
-                        <div class="payment-options">
-                            <label class="payment-option">
-                                <input type="radio" name="payment_method" value="pay_now" checked>
-                                <div class="payment-content">
-                                    <i class="fas fa-credit-card"></i>
-                                    <div>
-                                        <strong>Pay Now</strong>
-                                        <small>Secure online payment</small>
-                                    </div>
-                                </div>
-                            </label>
-                            <label class="payment-option">
-                                <input type="radio" name="payment_method" value="pay_later">
-                                <div class="payment-content">
-                                    <i class="fas fa-clock"></i>
-                                    <div>
-                                        <strong>Pay Later</strong>
-                                        <small>Pay upon arrival</small>
-                                    </div>
-                                </div>
-                            </label>
                         </div>
                     </div>
                     
@@ -3608,35 +2329,8 @@
                 }
                 
                 input.value = value;
-                
-                // Update total amount if service has daily rate
-                if (serviceDetails?.dailyRate) {
-                    const duration = parseInt(modal.querySelector('select[name="duration"]').value);
-                    const totalAmount = serviceDetails.dailyRate * duration * value;
-                    modal.querySelector('input[name="total_amount"]').value = totalAmount;
-                } else if (serviceDetails?.basePrice) {
-                    const totalAmount = serviceDetails.basePrice * value;
-                    modal.querySelector('input[name="total_amount"]').value = totalAmount;
-                }
             });
         });
-        
-        // Update amount when duration changes
-        const durationSelect = modal.querySelector('select[name="duration"]');
-        if (durationSelect && (serviceDetails?.dailyRate || serviceDetails?.basePrice)) {
-            durationSelect.addEventListener('change', function() {
-                const travelers = parseInt(modal.querySelector('input[name="travelers"]').value);
-                const duration = parseInt(this.value);
-                
-                if (serviceDetails.dailyRate) {
-                    const totalAmount = serviceDetails.dailyRate * duration * travelers;
-                    modal.querySelector('input[name="total_amount"]').value = totalAmount;
-                } else if (serviceDetails.basePrice) {
-                    const totalAmount = serviceDetails.basePrice * travelers;
-                    modal.querySelector('input[name="total_amount"]').value = totalAmount;
-                }
-            });
-        }
         
         // Form submission
         const form = modal.querySelector('#enhanced-booking-form');
@@ -3646,31 +2340,27 @@
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
             
-            // Add user ID and calculate end date
-            data.userId = currentUser._id;
-            data.userName = currentUser.name;
-            data.userEmail = currentUser.email;
-            
-            const startDate = new Date(data.date);
-            const endDate = new Date(startDate);
-            endDate.setDate(endDate.getDate() + parseInt(data.duration));
-            data.endDate = endDate.toISOString();
-            
             try {
-                const booking = userManager.createBooking(data);
+                const result = await apiRequest(config.endpoints.bookings.submit, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
                 
-                // Show success message and generate invoice
-                showNotification(`✅ Booking created successfully! Reference: ${booking._id}`, 'success');
-                closeModal();
-                
-                // Refresh dashboard to show new booking
-                setTimeout(() => {
-                    if (currentUser.role === 'user') {
-                        loadDashboard();
-                    } else if (currentUser.role === 'admin') {
-                        loadAdminDashboard();
-                    }
-                }, 500);
+                if (result.success) {
+                    showNotification(`✅ Booking created successfully! ${result.message || ''}`, 'success');
+                    closeModal();
+                    
+                    // Refresh dashboard to show new booking
+                    setTimeout(() => {
+                        if (currentUser.role === 'user') {
+                            loadDashboard();
+                        } else if (currentUser.role === 'admin') {
+                            loadAdminDashboard();
+                        }
+                    }, 500);
+                } else {
+                    throw new Error(result.message || 'Booking failed');
+                }
                 
             } catch (error) {
                 showNotification(`❌ Error creating booking: ${error.message}`, 'error');
@@ -3730,46 +2420,32 @@
             <div class="modal-body">
                 <form id="trip-plan-form">
                     <div class="form-group">
-                        <label>Full Name *</label>
-                        <input type="text" name="name" value="${currentUser?.name || ''}" required>
+                        <label>Start Date *</label>
+                        <input type="date" name="start_date" required>
                     </div>
                     
                     <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" name="email" value="${currentUser?.email || ''}" required>
+                        <label>Duration *</label>
+                        <select name="duration" required>
+                            <option value="3-5">3-5 days</option>
+                            <option value="6-8">6-8 days</option>
+                            <option value="9-12">9-12 days</option>
+                            <option value="13+">13+ days</option>
+                        </select>
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Start Date *</label>
-                            <input type="date" name="start_date" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Duration *</label>
-                            <select name="duration" required>
-                                <option value="3-5">3-5 days</option>
-                                <option value="6-8">6-8 days</option>
-                                <option value="9-12">9-12 days</option>
-                                <option value="13+">13+ days</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label>Travelers *</label>
+                        <input type="number" name="travelers" min="1" value="2" required>
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Travelers *</label>
-                            <input type="number" name="travelers" min="1" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Budget *</label>
-                            <select name="budget" required>
-                                <option value="budget">Budget ($500-$1000)</option>
-                                <option value="midrange">Mid-range ($1000-$2500)</option>
-                                <option value="luxury">Luxury ($2500+)</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label>Budget *</label>
+                        <select name="budget" required>
+                            <option value="budget">Budget ($500-$1000)</option>
+                            <option value="midrange">Mid-range ($1000-$2500)</option>
+                            <option value="luxury">Luxury ($2500+)</option>
+                        </select>
                     </div>
                     
                     <div class="form-group">
@@ -3813,9 +2489,6 @@
             dateInput.min = new Date().toISOString().split('T')[0];
         }
         
-        // Set default travelers
-        modal.querySelector('input[name="travelers"]').value = currentUser?.travelers || 2;
-        
         const form = modal.querySelector('#trip-plan-form');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -3827,24 +2500,25 @@
                 .map(input => input.value);
             data.interests = interests;
             
-            // Add user information
-            data.userId = currentUser._id;
-            data.userName = currentUser.name;
-            data.userEmail = currentUser.email;
-            data.status = 'review';
-            
             try {
-                const tripPlan = userManager.createTripPlan(data);
+                const result = await apiRequest(config.endpoints.tripPlan, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
                 
-                showNotification(`✅ Trip plan submitted! Our team will review it and get back to you within 24 hours. Reference: ${tripPlan._id}`, 'success');
-                closeModal();
-                
-                // Refresh dashboard to show new trip plan
-                setTimeout(() => {
-                    if (currentUser.role === 'user') {
-                        loadDashboard();
-                    }
-                }, 500);
+                if (result.success) {
+                    showNotification(`✅ Trip plan submitted! ${result.message || ''}`, 'success');
+                    closeModal();
+                    
+                    // Refresh dashboard to show new trip plan
+                    setTimeout(() => {
+                        if (currentUser.role === 'user') {
+                            loadDashboard();
+                        }
+                    }, 500);
+                } else {
+                    throw new Error(result.message || 'Trip plan submission failed');
+                }
                 
             } catch (error) {
                 showNotification(`❌ Error: ${error.message}`, 'error');
@@ -3854,122 +2528,8 @@
         modal.querySelector('.modal-close').addEventListener('click', closeModal);
     }
 
-    function showAddUserModal() {
-        const modal = createModal();
-        
-        modal.innerHTML = `
-            <div class="modal-header">
-                <h2><i class="fas fa-user-plus"></i> Add New User</h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <form id="add-user-form">
-                    <div class="form-section">
-                        <h4>Basic Information</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Full Name *</label>
-                                <input type="text" name="name" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Email *</label>
-                                <input type="email" name="email" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Password *</label>
-                                <input type="password" name="password" required minlength="6">
-                            </div>
-                            <div class="form-group">
-                                <label>Confirm Password *</label>
-                                <input type="password" name="confirm_password" required minlength="6">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <h4>Role & Permissions</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>User Role *</label>
-                                <select name="role" required>
-                                    <option value="user">User (Customer)</option>
-                                    <option value="admin">Administrator</option>
-                                    <option value="agent">Travel Agent</option>
-                                    <option value="guide">Tour Guide</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Status</label>
-                                <select name="status">
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                    <option value="pending">Pending</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <h4>Contact Information</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Phone Number</label>
-                                <input type="tel" name="phone">
-                            </div>
-                            <div class="form-group">
-                                <label>Country</label>
-                                <input type="text" name="country">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save"></i> Create User
-                        </button>
-                        <button type="button" class="btn btn-outline" onclick="closeModal()">
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        `;
-        
-        const form = modal.querySelector('#add-user-form');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Validate passwords match
-            if (data.password !== data.confirm_password) {
-                showNotification('❌ Passwords do not match', 'error');
-                return;
-            }
-            
-            try {
-                const newUser = userManager.registerUser(data);
-                showNotification(`✅ User ${newUser.name} created successfully!`, 'success');
-                closeModal();
-                
-                // Refresh admin dashboard
-                setTimeout(() => {
-                    loadAdminDashboard();
-                }, 500);
-                
-            } catch (error) {
-                showNotification(`❌ Error creating user: ${error.message}`, 'error');
-            }
-        });
-    }
-
     // ===============================
-    // FORM HANDLERS
+    // FORM HANDLERS - UPDATED FOR MONGODB
     // ===============================
     
     function setupForms() {
@@ -4214,425 +2774,164 @@
     }
 
     // ===============================
-    // ADMIN FUNCTIONS
+    // BOOKING MANAGEMENT FUNCTIONS - UPDATED FOR MONGODB
     // ===============================
 
-    function viewUserDetails(userId) {
-        const user = userManager.users.find(u => u._id === userId);
-        if (!user) {
-            showNotification('User not found', 'error');
-            return;
-        }
-        
-        const modal = createModal();
-        modal.innerHTML = `
-            <div class="modal-header">
-                <h2><i class="fas fa-user-circle"></i> User Details</h2>
-                <button class="modal-close">&times;</button>
-            </div>
+    async function viewBookingDetails(bookingId) {
+        try {
+            const result = await apiRequest(`${config.endpoints.bookings.user}/${bookingId}`);
             
-            <div class="modal-body">
-                <div class="user-details">
-                    <div class="user-header">
-                        <div class="user-avatar-large">
-                            <i class="fas fa-user-circle"></i>
-                        </div>
-                        <div class="user-info">
-                            <h3>${user.name}</h3>
-                            <p>${user.email}</p>
-                            <div class="user-badges">
-                                <span class="badge badge-${user.role === 'admin' ? 'danger' : 'primary'}">
-                                    ${user.role.toUpperCase()}
-                                </span>
-                                <span class="badge badge-${user.status === 'active' ? 'success' : 'secondary'}">
-                                    ${user.status.toUpperCase()}
-                                </span>
+            if (!result.success) {
+                throw new Error(result.message || 'Booking not found');
+            }
+            
+            const booking = result.data;
+            const modal = createModal();
+            
+            modal.innerHTML = `
+                <div class="modal-header">
+                    <h2><i class="fas fa-calendar-check"></i> Booking Details</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="booking-details">
+                        <div class="booking-header">
+                            <div class="booking-id">
+                                <h3>${booking.bookingReference || booking._id}</h3>
+                                <span class="badge badge-${booking.status}">${booking.status.toUpperCase()}</span>
+                            </div>
+                            <div class="booking-date">
+                                <small>Created: ${new Date(booking.createdAt).toLocaleDateString()}</small>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="user-details-grid">
-                        <div class="detail-item">
-                            <label><i class="fas fa-phone"></i> Phone</label>
-                            <p>${user.phone || 'Not provided'}</p>
-                        </div>
-                        <div class="detail-item">
-                            <label><i class="fas fa-globe"></i> Country</label>
-                            <p>${user.country || 'Not provided'}</p>
-                        </div>
-                        <div class="detail-item">
-                            <label><i class="fas fa-calendar-plus"></i> Joined</label>
-                            <p>${new Date(user.createdAt).toLocaleDateString()}</p>
-                        </div>
-                        <div class="detail-item">
-                            <label><i class="fas fa-sign-in-alt"></i> Last Login</label>
-                            <p>${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="user-stats">
-                        <h4><i class="fas fa-chart-bar"></i> User Statistics</h4>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-number">
-                                    ${userManager.getUserBookings(user._id).length}
+                        
+                        <div class="booking-info-grid">
+                            <div class="info-section">
+                                <h4><i class="fas fa-info-circle"></i> Service Details</h4>
+                                <div class="info-item">
+                                    <label>Service Type</label>
+                                    <p>${booking.serviceType}</p>
                                 </div>
-                                <div class="stat-label">Total Bookings</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number">
-                                    $${userManager.getUserBookings(user._id)
-                                        .filter(b => b.status === 'confirmed')
-                                        .reduce((sum, b) => sum + (b.totalAmount || 0), 0)}
+                                <div class="info-item">
+                                    <label>Service Name</label>
+                                    <p>${booking.serviceName}</p>
                                 </div>
-                                <div class="stat-label">Total Spent</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number">
-                                    ${userManager.tripPlans.filter(t => t.userId === user._id).length}
+                                <div class="info-item">
+                                    <label>Service ID</label>
+                                    <p>${booking.serviceId || 'N/A'}</p>
                                 </div>
-                                <div class="stat-label">Trip Plans</div>
+                            </div>
+                            
+                            <div class="info-section">
+                                <h4><i class="fas fa-calendar-alt"></i> Booking Dates</h4>
+                                <div class="info-item">
+                                    <label>Start Date</label>
+                                    <p>${new Date(booking.date).toLocaleDateString()}</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Duration</label>
+                                    <p>${booking.duration || 1} days</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Travelers</label>
+                                    <p>${booking.travelers || 1} person(s)</p>
+                                </div>
+                            </div>
+                            
+                            <div class="info-section">
+                                <h4><i class="fas fa-file-invoice-dollar"></i> Payment Details</h4>
+                                <div class="info-item">
+                                    <label>Total Amount</label>
+                                    <p class="amount">$${booking.totalAmount || '0'}</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Payment Status</label>
+                                    <p>${booking.paymentStatus || 'Pending'}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="user-actions">
-                        <button class="btn btn-primary" onclick="editUser(${user._id})">
-                            <i class="fas fa-edit"></i> Edit User
-                        </button>
-                        ${user.role !== 'admin' ? `
-                            <button class="btn btn-danger" onclick="deleteUserConfirm(${user._id})">
-                                <i class="fas fa-trash"></i> Delete User
-                            </button>
+                        
+                        ${booking.notes ? `
+                            <div class="info-section">
+                                <h4><i class="fas fa-comment"></i> Special Requirements</h4>
+                                <div class="notes-container">
+                                    <p>${booking.notes}</p>
+                                </div>
+                            </div>
                         ` : ''}
+                        
+                        <div class="booking-actions">
+                            <button class="btn btn-primary" onclick="downloadBookingInvoice('${booking._id}')">
+                                <i class="fas fa-download"></i> Download Invoice
+                            </button>
+                            ${currentUser.role === 'user' && booking.status === 'pending' ? `
+                                <button class="btn btn-danger" onclick="cancelBooking('${booking._id}')">
+                                    <i class="fas fa-times"></i> Cancel Booking
+                                </button>
+                            ` : ''}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+            
+        } catch (error) {
+            showNotification(`❌ Error loading booking details: ${error.message}`, 'error');
+        }
     }
 
-    function editUser(userId) {
-        const user = userManager.users.find(u => u._id === userId);
-        if (!user) {
-            showNotification('User not found', 'error');
-            return;
-        }
-        
-        const modal = createModal();
-        modal.innerHTML = `
-            <div class="modal-header">
-                <h2><i class="fas fa-edit"></i> Edit User</h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <form id="edit-user-form">
-                    <input type="hidden" name="user_id" value="${user._id}">
-                    
-                    <div class="form-section">
-                        <h4>Basic Information</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Full Name *</label>
-                                <input type="text" name="name" value="${user.name}" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Email *</label>
-                                <input type="email" name="email" value="${user.email}" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <h4>Role & Status</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>User Role *</label>
-                                <select name="role" required>
-                                    <option value="user" ${user.role === 'user' ? 'selected' : ''}>User (Customer)</option>
-                                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Administrator</option>
-                                    <option value="agent" ${user.role === 'agent' ? 'selected' : ''}>Travel Agent</option>
-                                    <option value="guide" ${user.role === 'guide' ? 'selected' : ''}>Tour Guide</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Status</label>
-                                <select name="status">
-                                    <option value="active" ${user.status === 'active' ? 'selected' : ''}>Active</option>
-                                    <option value="inactive" ${user.status === 'inactive' ? 'selected' : ''}>Inactive</option>
-                                    <option value="pending" ${user.status === 'pending' ? 'selected' : ''}>Pending</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <h4>Contact Information</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Phone Number</label>
-                                <input type="tel" name="phone" value="${user.phone || ''}">
-                            </div>
-                            <div class="form-group">
-                                <label>Country</label>
-                                <input type="text" name="country" value="${user.country || ''}">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <h4>Change Password (Optional)</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>New Password</label>
-                                <input type="password" name="new_password" minlength="6">
-                            </div>
-                            <div class="form-group">
-                                <label>Confirm Password</label>
-                                <input type="password" name="confirm_password" minlength="6">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Save Changes
-                        </button>
-                        <button type="button" class="btn btn-outline" onclick="closeModal()">
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        `;
-        
-        const form = modal.querySelector('#edit-user-form');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Validate passwords if provided
-            if (data.new_password && data.new_password !== data.confirm_password) {
-                showNotification('❌ Passwords do not match', 'error');
-                return;
-            }
-            
-            // Prepare update data
-            const updateData = {
-                name: data.name,
-                email: data.email,
-                role: data.role,
-                status: data.status,
-                phone: data.phone,
-                country: data.country
-            };
-            
-            // Add password if changed
-            if (data.new_password) {
-                updateData.password = data.new_password;
-            }
-            
-            try {
-                const updatedUser = userManager.updateUser(parseInt(data.user_id), updateData);
-                showNotification(`✅ User ${updatedUser.name} updated successfully!`, 'success');
-                closeModal();
-                
-                // Refresh admin dashboard
-                setTimeout(() => {
-                    loadAdminDashboard();
-                }, 500);
-                
-            } catch (error) {
-                showNotification(`❌ Error updating user: ${error.message}`, 'error');
-            }
-        });
-    }
-
-    function deleteUserConfirm(userId) {
-        if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-            return;
-        }
+    async function cancelBooking(bookingId) {
+        if (!confirm('Are you sure you want to cancel this booking?')) return;
         
         try {
-            const user = userManager.users.find(u => u._id === userId);
-            if (!user) {
-                showNotification('User not found', 'error');
-                return;
-            }
+            const result = await apiRequest(`${config.endpoints.bookings.cancel}/${bookingId}/cancel`, {
+                method: 'PUT'
+            });
             
-            if (user.role === 'admin') {
-                showNotification('Cannot delete admin users', 'error');
-                return;
-            }
-            
-            const success = userManager.deleteUser(userId);
-            if (success) {
-                showNotification('✅ User deleted successfully!', 'success');
+            if (result.success) {
+                showNotification('✅ Booking cancelled successfully!', 'success');
                 closeModal();
                 
-                // Refresh admin dashboard
+                // Refresh dashboard
                 setTimeout(() => {
-                    loadAdminDashboard();
+                    loadDashboard();
                 }, 500);
+            } else {
+                throw new Error(result.message || 'Cancellation failed');
             }
         } catch (error) {
-            showNotification(`❌ Error deleting user: ${error.message}`, 'error');
+            showNotification(`❌ Error cancelling booking: ${error.message}`, 'error');
         }
     }
 
-    function confirmBooking(bookingId) {
+    async function confirmBooking(bookingId) {
         try {
-            const booking = userManager.confirmBooking(bookingId);
-            showNotification(`✅ Booking ${bookingId} confirmed!`, 'success');
+            const result = await apiRequest(`${config.endpoints.bookings.cancel}/${bookingId}/confirm`, {
+                method: 'PUT'
+            });
             
-            // Refresh admin dashboard
-            setTimeout(() => {
-                loadAdminDashboard();
-            }, 500);
+            if (result.success) {
+                showNotification(`✅ Booking ${bookingId} confirmed!`, 'success');
+                
+                // Refresh admin dashboard
+                setTimeout(() => {
+                    loadAdminDashboard();
+                }, 500);
+            } else {
+                throw new Error(result.message || 'Confirmation failed');
+            }
         } catch (error) {
             showNotification(`❌ Error confirming booking: ${error.message}`, 'error');
         }
     }
 
-    function viewBookingDetails(bookingId) {
-        const booking = userManager.bookings.find(b => b._id === bookingId);
-        if (!booking) {
-            showNotification('Booking not found', 'error');
-            return;
-        }
-        
-        const modal = createModal();
-        modal.innerHTML = `
-            <div class="modal-header">
-                <h2><i class="fas fa-calendar-check"></i> Booking Details</h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="booking-details">
-                    <div class="booking-header">
-                        <div class="booking-id">
-                            <h3>${booking._id}</h3>
-                            <span class="badge badge-${booking.status}">${booking.status.toUpperCase()}</span>
-                        </div>
-                        <div class="booking-date">
-                            <small>Created: ${new Date(booking.createdAt).toLocaleDateString()}</small>
-                        </div>
-                    </div>
-                    
-                    <div class="booking-info-grid">
-                        <div class="info-section">
-                            <h4><i class="fas fa-info-circle"></i> Service Details</h4>
-                            <div class="info-item">
-                                <label>Service Type</label>
-                                <p>${booking.serviceType}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Service Name</label>
-                                <p>${booking.serviceName}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Service ID</label>
-                                <p>${booking.serviceId || 'N/A'}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="info-section">
-                            <h4><i class="fas fa-user"></i> Customer Details</h4>
-                            <div class="info-item">
-                                <label>Customer Name</label>
-                                <p>${booking.userName}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Email</label>
-                                <p>${booking.userEmail}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Phone</label>
-                                <p>${booking.phone || 'N/A'}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="info-section">
-                            <h4><i class="fas fa-calendar-alt"></i> Booking Dates</h4>
-                            <div class="info-item">
-                                <label>Start Date</label>
-                                <p>${new Date(booking.date).toLocaleDateString()}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Duration</label>
-                                <p>${booking.duration || 1} days</p>
-                            </div>
-                            <div class="info-item">
-                                <label>End Date</label>
-                                <p>${booking.endDate ? new Date(booking.endDate).toLocaleDateString() : 'N/A'}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="info-section">
-                            <h4><i class="fas fa-file-invoice-dollar"></i> Payment Details</h4>
-                            <div class="info-item">
-                                <label>Total Amount</label>
-                                <p class="amount">$${booking.totalAmount || '0'}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Payment Method</label>
-                                <p>${booking.payment_method || 'Not specified'}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Travelers</label>
-                                <p>${booking.travelers || 1} person(s)</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    ${booking.notes ? `
-                        <div class="info-section">
-                            <h4><i class="fas fa-comment"></i> Special Requirements</h4>
-                            <div class="notes-container">
-                                <p>${booking.notes}</p>
-                            </div>
-                        </div>
-                    ` : ''}
-                    
-                    <div class="booking-actions">
-                        <button class="btn btn-primary" onclick="downloadBookingInvoice('${booking._id}')">
-                            <i class="fas fa-download"></i> Download Invoice
-                        </button>
-                        ${currentUser.role === 'admin' && booking.status === 'pending' ? `
-                            <button class="btn btn-success" onclick="confirmBooking('${booking._id}')">
-                                <i class="fas fa-check"></i> Confirm Booking
-                            </button>
-                            <button class="btn btn-danger" onclick="cancelBookingAdmin('${booking._id}')">
-                                <i class="fas fa-times"></i> Cancel Booking
-                            </button>
-                        ` : ''}
-                        ${currentUser.role === 'user' && booking.status === 'pending' ? `
-                            <button class="btn btn-danger" onclick="cancelBooking('${booking._id}')">
-                                <i class="fas fa-times"></i> Cancel Booking
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
     function downloadBookingInvoice(bookingId) {
-        const booking = userManager.bookings.find(b => b._id === bookingId);
-        if (!booking) {
-            showNotification('Booking not found', 'error');
-            return;
-        }
-        
-        // Create invoice HTML
+        // Create invoice HTML (this would normally come from the backend)
         const invoiceHTML = `
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Invoice ${booking._id}</title>
+                <title>Invoice ${bookingId}</title>
                 <style>
                     body { font-family: Arial, sans-serif; margin: 40px; }
                     .invoice-header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
@@ -4647,38 +2946,8 @@
                 <div class="invoice-header">
                     <h1>GO TRIP RWANDA</h1>
                     <h2>INVOICE</h2>
-                    <p><strong>Invoice #:</strong> ${booking._id}</p>
+                    <p><strong>Invoice #:</strong> ${bookingId}</p>
                     <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-                </div>
-                
-                <div class="invoice-details">
-                    <h3>Bill To:</h3>
-                    <p>${booking.userName}<br>
-                    ${booking.userEmail}<br>
-                    ${booking.phone || ''}</p>
-                </div>
-                
-                <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th>Date</th>
-                            <th>Travelers</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>${booking.serviceName} (${booking.serviceType})</td>
-                            <td>${new Date(booking.date).toLocaleDateString()}</td>
-                            <td>${booking.travelers || 1}</td>
-                            <td>$${booking.totalAmount || '0'}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="invoice-total">
-                    <h3>Total Amount: $${booking.totalAmount || '0'}</h3>
                 </div>
                 
                 <div class="footer">
@@ -4694,7 +2963,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `invoice-${booking._id}.html`;
+        a.download = `invoice-${bookingId}.html`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -4703,980 +2972,173 @@
         showNotification('✅ Invoice downloaded successfully!', 'success');
     }
 
-    function cancelBooking(bookingId) {
-        if (!confirm('Are you sure you want to cancel this booking?')) return;
-        
-        try {
-            const booking = userManager.cancelBooking(bookingId);
-            showNotification('✅ Booking cancelled successfully!', 'success');
-            
-            // Refresh dashboard
-            setTimeout(() => {
-                loadDashboard();
-            }, 500);
-        } catch (error) {
-            showNotification('❌ Error cancelling booking', 'error');
-        }
-    }
+    // ===============================
+    // TRIP PLAN FUNCTIONS - UPDATED FOR MONGODB
+    // ===============================
 
-    function cancelBookingAdmin(bookingId) {
-        if (!confirm('Are you sure you want to cancel this booking?')) {
-            return;
-        }
-        
+    async function viewTripPlan(tripId) {
         try {
-            const booking = userManager.cancelBooking(bookingId);
-            showNotification(`✅ Booking ${bookingId} cancelled!`, 'success');
+            const result = await apiRequest(`${config.endpoints.tripPlan}/${tripId}`);
             
-            // Refresh dashboard
-            setTimeout(() => {
-                if (currentUser.role === 'admin') {
-                    loadAdminDashboard();
-                } else {
-                    loadDashboard();
-                }
-            }, 500);
-        } catch (error) {
-            showNotification(`❌ Error cancelling booking: ${error.message}`, 'error');
-        }
-    }
-
-    function viewTripPlanAdmin(tripId) {
-        const trip = userManager.tripPlans.find(t => t._id === tripId);
-        if (!trip) {
-            showNotification('Trip plan not found', 'error');
-            return;
-        }
-        
-        const modal = createModal();
-        modal.innerHTML = `
-            <div class="modal-header">
-                <h2><i class="fas fa-route"></i> Trip Plan Details</h2>
-                <button class="modal-close">&times;</button>
-            </div>
+            if (!result.success) {
+                throw new Error(result.message || 'Trip plan not found');
+            }
             
-            <div class="modal-body">
-                <div class="trip-plan-details-admin">
-                    <div class="trip-header">
-                        <div class="trip-id">
-                            <h3>${trip._id}</h3>
-                            <span class="badge badge-${trip.status}">${trip.status.toUpperCase()}</span>
-                        </div>
-                        <div class="trip-date">
-                            <small>Requested: ${new Date(trip.createdAt).toLocaleDateString()}</small>
-                        </div>
-                    </div>
-                    
-                    <div class="trip-info-grid">
-                        <div class="info-section">
-                            <h4><i class="fas fa-user"></i> Customer Information</h4>
-                            <div class="info-item">
-                                <label>Name</label>
-                                <p>${trip.userName}</p>
+            const trip = result.data;
+            const modal = createModal();
+            
+            modal.innerHTML = `
+                <div class="modal-header">
+                    <h2><i class="fas fa-route"></i> Trip Plan Details</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="trip-plan-details-admin">
+                        <div class="trip-header">
+                            <div class="trip-id">
+                                <h3>${trip.tripReference || trip._id}</h3>
+                                <span class="badge badge-${trip.status}">${trip.status.toUpperCase()}</span>
                             </div>
-                            <div class="info-item">
-                                <label>Email</label>
-                                <p>${trip.userEmail}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Travelers</label>
-                                <p>${trip.travelers} people</p>
+                            <div class="trip-date">
+                                <small>Requested: ${new Date(trip.createdAt).toLocaleDateString()}</small>
                             </div>
                         </div>
                         
-                        <div class="info-section">
-                            <h4><i class="fas fa-calendar-alt"></i> Trip Details</h4>
-                            <div class="info-item">
-                                <label>Start Date</label>
-                                <p>${new Date(trip.startDate).toLocaleDateString()}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Duration</label>
-                                <p>${trip.duration}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Budget</label>
-                                <p>${trip.budget}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    ${trip.interests && trip.interests.length > 0 ? `
-                        <div class="info-section">
-                            <h4><i class="fas fa-heart"></i> Interests</h4>
-                            <div class="interests-container">
-                                ${trip.interests.map(interest => `
-                                    <span class="interest-tag">${interest}</span>
-                                `).join('')}
+                        <div class="trip-info-grid">
+                            <div class="info-section">
+                                <h4><i class="fas fa-calendar-alt"></i> Trip Details</h4>
+                                <div class="info-item">
+                                    <label>Start Date</label>
+                                    <p>${new Date(trip.startDate).toLocaleDateString()}</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Duration</label>
+                                    <p>${trip.duration}</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Travelers</label>
+                                    <p>${trip.travelers} people</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Budget</label>
+                                    <p>${trip.budget}</p>
+                                </div>
                             </div>
                         </div>
-                    ` : ''}
-                    
-                    ${trip.message ? `
-                        <div class="info-section">
-                            <h4><i class="fas fa-comment"></i> Customer Message</h4>
-                            <div class="message-container">
-                                <p>${trip.message}</p>
+                        
+                        ${trip.interests && trip.interests.length > 0 ? `
+                            <div class="info-section">
+                                <h4><i class="fas fa-heart"></i> Interests</h4>
+                                <div class="interests-container">
+                                    ${trip.interests.map(interest => `
+                                        <span class="interest-tag">${interest}</span>
+                                    `).join('')}
+                                </div>
                             </div>
-                        </div>
-                    ` : ''}
-                    
-                    <div class="trip-actions-admin">
-                        ${trip.status === 'review' ? `
-                            <button class="btn btn-success" onclick="processTripPlan('${trip._id}')">
-                                <i class="fas fa-cogs"></i> Process Trip Plan
-                            </button>
                         ` : ''}
-                        <button class="btn btn-outline" onclick="downloadTripPlan('${trip._id}')">
-                            <i class="fas fa-download"></i> Export
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    function processTripPlan(tripId) {
-        const trip = userManager.updateTripPlan(tripId, { 
-            status: 'processing',
-            assignedTo: currentUser.name,
-            assignedAt: new Date().toISOString()
-        });
-        
-        showNotification(`✅ Trip plan ${tripId} is now being processed!`, 'success');
-        closeModal();
-        
-        // Refresh admin dashboard
-        setTimeout(() => {
-            loadAdminDashboard();
-        }, 500);
-    }
-
-    function viewTripPlan(tripId) {
-        const trip = userManager.tripPlans.find(t => t._id === tripId);
-        if (!trip) {
-            showNotification('Trip plan not found', 'error');
-            return;
-        }
-        
-        const modal = createModal();
-        modal.innerHTML = `
-            <div class="modal-header">
-                <h2><i class="fas fa-route"></i> Trip Plan Details</h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="trip-plan-details-admin">
-                    <div class="trip-header">
-                        <div class="trip-id">
-                            <h3>${trip._id}</h3>
-                            <span class="badge badge-${trip.status}">${trip.status.toUpperCase()}</span>
-                        </div>
-                        <div class="trip-date">
-                            <small>Requested: ${new Date(trip.createdAt).toLocaleDateString()}</small>
-                        </div>
-                    </div>
-                    
-                    <div class="trip-info-grid">
-                        <div class="info-section">
-                            <h4><i class="fas fa-user"></i> Your Information</h4>
-                            <div class="info-item">
-                                <label>Name</label>
-                                <p>${trip.userName}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Email</label>
-                                <p>${trip.userEmail}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Travelers</label>
-                                <p>${trip.travelers} people</p>
-                            </div>
-                        </div>
                         
-                        <div class="info-section">
-                            <h4><i class="fas fa-calendar-alt"></i> Trip Details</h4>
-                            <div class="info-item">
-                                <label>Start Date</label>
-                                <p>${new Date(trip.startDate).toLocaleDateString()}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Duration</label>
-                                <p>${trip.duration}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Budget</label>
-                                <p>${trip.budget}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    ${trip.interests && trip.interests.length > 0 ? `
-                        <div class="info-section">
-                            <h4><i class="fas fa-heart"></i> Your Interests</h4>
-                            <div class="interests-container">
-                                ${trip.interests.map(interest => `
-                                    <span class="interest-tag">${interest}</span>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-                    
-                    ${trip.message ? `
-                        <div class="info-section">
-                            <h4><i class="fas fa-comment"></i> Your Message</h4>
-                            <div class="message-container">
-                                <p>${trip.message}</p>
-                            </div>
-                        </div>
-                    ` : ''}
-                    
-                    ${trip.assignedTo ? `
-                        <div class="info-section">
-                            <h4><i class="fas fa-user-tie"></i> Assigned To</h4>
-                            <div class="assigned-info">
-                                <p><strong>${trip.assignedTo}</strong></p>
-                                <small>Assigned on: ${new Date(trip.assignedAt).toLocaleDateString()}</small>
-                            </div>
-                        </div>
-                    ` : ''}
-                    
-                    <div class="trip-status-info">
-                        <div class="status-message">
-                            ${trip.status === 'review' ? `
-                                <i class="fas fa-clock text-warning"></i>
-                                <div>
-                                    <h5>Under Review</h5>
-                                    <p>Our team is reviewing your trip plan. We'll contact you within 24 hours.</p>
+                        ${trip.message ? `
+                            <div class="info-section">
+                                <h4><i class="fas fa-comment"></i> Customer Message</h4>
+                                <div class="message-container">
+                                    <p>${trip.message}</p>
                                 </div>
-                            ` : trip.status === 'processing' ? `
-                                <i class="fas fa-cogs text-info"></i>
-                                <div>
-                                    <h5>Processing</h5>
-                                    <p>Our travel experts are creating your customized itinerary.</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${trip.assignedTo ? `
+                            <div class="info-section">
+                                <h4><i class="fas fa-user-tie"></i> Assigned To</h4>
+                                <div class="assigned-info">
+                                    <p><strong>${trip.assignedTo}</strong></p>
+                                    <small>Assigned on: ${new Date(trip.assignedAt).toLocaleDateString()}</small>
                                 </div>
-                            ` : trip.status === 'completed' ? `
-                                <i class="fas fa-check-circle text-success"></i>
-                                <div>
-                                    <h5>Completed</h5>
-                                    <p>Your trip plan is ready! Check your email for the complete itinerary.</p>
-                                </div>
-                            ` : ''}
-                        </div>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
-            </div>
-        `;
-    }
-
-    function editTripPlan(tripId) {
-        const trip = userManager.tripPlans.find(t => t._id === tripId);
-        if (!trip) {
-            showNotification('Trip plan not found', 'error');
-            return;
+            `;
+            
+        } catch (error) {
+            showNotification(`❌ Error loading trip plan details: ${error.message}`, 'error');
         }
-        
-        showTripPlanModal();
-        // Note: For simplicity, we're just showing the trip plan modal again
-        // In a real application, you would populate the form with existing data
     }
 
-    function cancelTripPlan(tripId) {
+    async function cancelTripPlan(tripId) {
         if (!confirm('Are you sure you want to cancel this trip plan?')) return;
         
         try {
-            const trip = userManager.updateTripPlan(tripId, { status: 'cancelled' });
-            showNotification('✅ Trip plan cancelled successfully!', 'success');
+            const result = await apiRequest(`${config.endpoints.tripPlan}/${tripId}/cancel`, {
+                method: 'PUT'
+            });
             
-            // Refresh dashboard
-            setTimeout(() => {
-                loadDashboard();
-            }, 500);
+            if (result.success) {
+                showNotification('✅ Trip plan cancelled successfully!', 'success');
+                
+                // Refresh dashboard
+                setTimeout(() => {
+                    loadDashboard();
+                }, 500);
+            } else {
+                throw new Error(result.message || 'Cancellation failed');
+            }
         } catch (error) {
-            showNotification('❌ Error cancelling trip plan', 'error');
+            showNotification(`❌ Error cancelling trip plan: ${error.message}`, 'error');
         }
     }
 
-    function downloadItinerary(tripId) {
-        const trip = userManager.tripPlans.find(t => t._id === tripId);
-        if (!trip || !trip.itinerary) {
-            showNotification('Itinerary not available yet', 'warning');
-            return;
-        }
-        
-        // Create itinerary HTML
-        const itineraryHTML = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Itinerary ${trip._id}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 40px; }
-                    .header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
-                    .day-section { margin: 30px 0; border-left: 4px solid #4CAF50; padding-left: 20px; }
-                    .activity { margin: 15px 0; padding: 10px; background: #f5f5f5; border-radius: 5px; }
-                    .footer { margin-top: 50px; font-size: 12px; color: #666; }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1>GO TRIP RWANDA</h1>
-                    <h2>TRIP ITINERARY</h2>
-                    <p><strong>Trip ID:</strong> ${trip._id}</p>
-                    <p><strong>Customer:</strong> ${trip.userName}</p>
-                    <p><strong>Duration:</strong> ${trip.duration}</p>
-                    <p><strong>Budget:</strong> ${trip.budget}</p>
-                </div>
-                
-                ${trip.itinerary.days.map(day => `
-                    <div class="day-section">
-                        <h3>Day ${day.day}: ${day.title}</h3>
-                        ${day.activities.map(activity => `
-                            <div class="activity">
-                                <h4>${activity.time}</h4>
-                                <p><strong>${activity.description}</strong></p>
-                                ${activity.location ? `<p><i>Location:</i> ${activity.location}</p>` : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                `).join('')}
-                
-                ${trip.itinerary.total_cost ? `
-                    <div class="cost-summary">
-                        <h3>Cost Summary</h3>
-                        <p><strong>Total Cost:</strong> $${trip.itinerary.total_cost.total || 'N/A'}</p>
-                    </div>
-                ` : ''}
-                
-                <div class="footer">
-                    <p>Thank you for choosing Go Trip Rwanda!</p>
-                    <p>For any queries, contact: info@gotrip.africa | +250 787 407 051</p>
-                </div>
-            </body>
-            </html>
-        `;
-        
-        // Create and download the itinerary
-        const blob = new Blob([itineraryHTML], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `itinerary-${trip._id}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showNotification('✅ Itinerary downloaded successfully!', 'success');
-    }
-
-    function generateReport(type) {
-        let reportData;
-        let reportTitle;
-        
-        switch(type) {
-            case 'revenue':
-                reportData = userManager.getMonthlyRevenue();
-                reportTitle = 'Monthly Revenue Report';
-                break;
-            case 'users':
-                reportData = {
-                    total: userManager.users.length,
-                    byRole: userManager.users.reduce((acc, user) => {
-                        acc[user.role] = (acc[user.role] || 0) + 1;
-                        return acc;
-                    }, {}),
-                    active: userManager.users.filter(u => u.status === 'active').length
-                };
-                reportTitle = 'User Statistics Report';
-                break;
-            case 'bookings':
-                reportData = {
-                    total: userManager.bookings.length,
-                    byStatus: userManager.bookings.reduce((acc, booking) => {
-                        acc[booking.status] = (acc[booking.status] || 0) + 1;
-                        return acc;
-                    }, {}),
-                    byType: userManager.bookings.reduce((acc, booking) => {
-                        acc[booking.serviceType] = (acc[booking.serviceType] || 0) + 1;
-                        return acc;
-                    }, {})
-                };
-                reportTitle = 'Bookings Analysis Report';
-                break;
-            case 'full':
-                reportData = {
-                    stats: userManager.getStats(),
-                    monthlyRevenue: userManager.getMonthlyRevenue(),
-                    recentActivity: userManager.getRecentActivity(),
-                    topUsers: userManager.users.slice(0, 5),
-                    topBookings: userManager.bookings.slice(0, 5)
-                };
-                reportTitle = 'Comprehensive System Report';
-                break;
-            default:
-                reportData = {};
-                reportTitle = 'Custom Report';
-        }
-        
-        // Create report HTML
-        const reportHTML = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>${reportTitle} - Go Trip</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 40px; }
-                    .report-header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
-                    .report-section { margin: 30px 0; }
-                    .report-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                    .report-table th, .report-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-                    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-                    .stat-card { background: #f8f9fa; padding: 20px; border-radius: 5px; text-align: center; }
-                    .footer { margin-top: 50px; font-size: 12px; color: #666; }
-                </style>
-            </head>
-            <body>
-                <div class="report-header">
-                    <h1>GO TRIP RWANDA</h1>
-                    <h2>${reportTitle}</h2>
-                    <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
-                    <p><strong>Generated by:</strong> ${currentUser.name}</p>
-                </div>
-                
-                ${renderReportContent(type, reportData)}
-                
-                <div class="footer">
-                    <p>This report was generated automatically by the Go Trip system.</p>
-                    <p>© ${new Date().getFullYear()} Go Trip Rwanda. All rights reserved.</p>
-                </div>
-            </body>
-            </html>
-        `;
-        
-        // Download the report
-        const blob = new Blob([reportHTML], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `report-${type}-${Date.now()}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showNotification(`✅ ${reportTitle} downloaded successfully!`, 'success');
-    }
-
-    function renderReportContent(type, data) {
-        switch(type) {
-            case 'revenue':
-                return `
-                    <div class="report-section">
-                        <h3>Revenue Overview</h3>
-                        <table class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>Month</th>
-                                    <th>Revenue</th>
-                                    <th>Change</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${data.map((item, index) => `
-                                    <tr>
-                                        <td>${item.month}</td>
-                                        <td>$${item.revenue.toLocaleString()}</td>
-                                        <td>${index > 0 ? 
-                                            (((item.revenue - data[index-1].revenue) / data[index-1].revenue * 100).toFixed(1) + '%') : 
-                                            'N/A'}
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                
-            case 'users':
-                return `
-                    <div class="report-section">
-                        <h3>User Statistics</h3>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <h4>Total Users</h4>
-                                <p class="stat-number">${data.total}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h4>Active Users</h4>
-                                <p class="stat-number">${data.active}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h4>Inactive Users</h4>
-                                <p class="stat-number">${data.total - data.active}</p>
-                            </div>
-                        </div>
-                        
-                        <h4>Users by Role</h4>
-                        <table class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>Role</th>
-                                    <th>Count</th>
-                                    <th>Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${Object.entries(data.byRole).map(([role, count]) => `
-                                    <tr>
-                                        <td>${role}</td>
-                                        <td>${count}</td>
-                                        <td>${((count / data.total) * 100).toFixed(1)}%</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                
-            case 'bookings':
-                return `
-                    <div class="report-section">
-                        <h3>Booking Statistics</h3>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <h4>Total Bookings</h4>
-                                <p class="stat-number">${data.total}</p>
-                            </div>
-                        </div>
-                        
-                        <h4>Bookings by Status</h4>
-                        <table class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>Status</th>
-                                    <th>Count</th>
-                                    <th>Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${Object.entries(data.byStatus).map(([status, count]) => `
-                                    <tr>
-                                        <td>${status}</td>
-                                        <td>${count}</td>
-                                        <td>${((count / data.total) * 100).toFixed(1)}%</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                        
-                        <h4>Bookings by Service Type</h4>
-                        <table class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>Service Type</th>
-                                    <th>Count</th>
-                                    <th>Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${Object.entries(data.byType).map(([type, count]) => `
-                                    <tr>
-                                        <td>${type}</td>
-                                        <td>${count}</td>
-                                        <td>${((count / data.total) * 100).toFixed(1)}%</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                
-            case 'full':
-                return `
-                    <div class="report-section">
-                        <h3>System Overview</h3>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <h4>Total Users</h4>
-                                <p class="stat-number">${data.stats.totalUsers}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h4>Total Bookings</h4>
-                                <p class="stat-number">${data.stats.totalBookings}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h4>Total Revenue</h4>
-                                <p class="stat-number">$${data.stats.totalRevenue.toLocaleString()}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h4>Active Bookings</h4>
-                                <p class="stat-number">${data.stats.activeBookings}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="report-section">
-                        <h3>Recent Activity</h3>
-                        <table class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>User</th>
-                                    <th>Action</th>
-                                    <th>Time</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${data.recentActivity.slice(0, 10).map(activity => `
-                                    <tr>
-                                        <td>${activity.type}</td>
-                                        <td>${activity.name}</td>
-                                        <td>${activity.action}</td>
-                                        <td>${formatTimeAgo(activity.timestamp)}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="report-section">
-                        <h3>Top Users by Activity</h3>
-                        <table class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Role</th>
-                                    <th>Status</th>
-                                    <th>Joined</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${data.topUsers.map(user => `
-                                    <tr>
-                                        <td>${user.name}</td>
-                                        <td>${user.role}</td>
-                                        <td>${user.status}</td>
-                                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                
-            default:
-                return '<p>No data available for this report type.</p>';
-        }
-    }
-
-    function showCustomReportModal() {
-        const modal = createModal();
-        
-        modal.innerHTML = `
-            <div class="modal-header">
-                <h2><i class="fas fa-chart-pie"></i> Custom Report</h2>
-                <button class="modal-close">&times;</button>
-            </div>
+    async function processTripPlan(tripId) {
+        try {
+            const result = await apiRequest(`${config.endpoints.tripPlan}/${tripId}/process`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    assignedTo: currentUser.name,
+                    status: 'processing'
+                })
+            });
             
-            <div class="modal-body">
-                <form id="custom-report-form">
-                    <div class="form-section">
-                        <h4>Report Parameters</h4>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Report Type</label>
-                                <select name="report_type" required>
-                                    <option value="custom_booking">Booking Analysis</option>
-                                    <option value="custom_user">User Analysis</option>
-                                    <option value="custom_revenue">Revenue Analysis</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Date Range</label>
-                                <select name="date_range" required>
-                                    <option value="last_week">Last Week</option>
-                                    <option value="last_month">Last Month</option>
-                                    <option value="last_quarter">Last Quarter</option>
-                                    <option value="last_year">Last Year</option>
-                                    <option value="all_time">All Time</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Include Charts</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox">
-                                    <input type="checkbox" name="include_charts" checked>
-                                    Include Charts
-                                </label>
-                                <label class="checkbox">
-                                    <input type="checkbox" name="include_tables" checked>
-                                    Include Detailed Tables
-                                </label>
-                                <label class="checkbox">
-                                    <input type="checkbox" name="include_summary">
-                                    Include Executive Summary
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-file-export"></i> Generate Report
-                        </button>
-                        <button type="button" class="btn btn-outline" onclick="closeModal()">
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        `;
-        
-        const form = modal.querySelector('#custom-report-form');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-            
-            showNotification('✅ Custom report generated!', 'success');
-            closeModal();
-            generateReport('full');
-        });
-    }
-
-    function showChangePasswordModal() {
-        const modal = createModal();
-        
-        modal.innerHTML = `
-            <div class="modal-header">
-                <h2><i class="fas fa-key"></i> Change Password</h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <form id="change-password-form">
-                    <div class="form-group">
-                        <label>Current Password</label>
-                        <input type="password" name="current_password" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>New Password</label>
-                        <input type="password" name="new_password" required minlength="6">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Confirm New Password</label>
-                        <input type="password" name="confirm_password" required minlength="6">
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Change Password
-                        </button>
-                        <button type="button" class="btn btn-outline" onclick="closeModal()">
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        `;
-        
-        const form = modal.querySelector('#change-password-form');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-            
-            if (data.new_password !== data.confirm_password) {
-                showNotification('❌ New passwords do not match', 'error');
-                return;
-            }
-            
-            // In a real app, you would verify current password first
-            // For demo, we'll just update it
-            try {
-                const updatedUser = userManager.updateUser(currentUser._id, { password: data.new_password });
-                showNotification('✅ Password changed successfully!', 'success');
+            if (result.success) {
+                showNotification(`✅ Trip plan ${tripId} is now being processed!`, 'success');
                 closeModal();
-            } catch (error) {
-                showNotification('❌ Error changing password', 'error');
+                
+                // Refresh admin dashboard
+                setTimeout(() => {
+                    loadAdminDashboard();
+                }, 500);
+            } else {
+                throw new Error(result.message || 'Processing failed');
             }
-        });
+        } catch (error) {
+            showNotification(`❌ Error processing trip plan: ${error.message}`, 'error');
+        }
     }
 
-    function showUploadDocumentModal() {
-        const modal = createModal();
-        
-        modal.innerHTML = `
-            <div class="modal-header">
-                <h2><i class="fas fa-upload"></i> Upload Document</h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <form id="upload-document-form">
-                    <div class="form-group">
-                        <label>Document Type</label>
-                        <select name="document_type" required>
-                            <option value="">Select Document Type</option>
-                            <option value="passport">Passport</option>
-                            <option value="visa">Visa</option>
-                            <option value="flight_tickets">Flight Tickets</option>
-                            <option value="insurance">Travel Insurance</option>
-                            <option value="medical">Medical Certificate</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Document Name</label>
-                        <input type="text" name="document_name" placeholder="e.g., Passport Copy" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Expiry Date (if applicable)</label>
-                        <input type="date" name="expiry_date">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Upload File</label>
-                        <div class="file-upload">
-                            <input type="file" name="document_file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required>
-                            <div class="file-upload-label">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <span>Click to upload or drag and drop</span>
-                                <small>PDF, JPG, PNG, DOC up to 10MB</small>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Notes</label>
-                        <textarea name="notes" rows="3" placeholder="Any additional notes about this document..."></textarea>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-upload"></i> Upload Document
-                        </button>
-                        <button type="button" class="btn btn-outline" onclick="closeModal()">
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        `;
-        
-        // File upload styling
-        const fileInput = modal.querySelector('input[type="file"]');
-        const fileLabel = modal.querySelector('.file-upload-label');
-        
-        fileInput.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                fileLabel.innerHTML = `
-                    <i class="fas fa-file"></i>
-                    <span>${this.files[0].name}</span>
-                    <small>${(this.files[0].size / 1024 / 1024).toFixed(2)} MB</small>
-                `;
-            }
-        });
-        
-        // Form submission
-        const form = modal.querySelector('#upload-document-form');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            // In a real app, you would upload the file to a server
-            // For demo, we'll just show a success message
-            showNotification('✅ Document uploaded successfully!', 'success');
-            closeModal();
-        });
-    }
+    // ===============================
+    // HELPER FUNCTIONS
+    // ===============================
 
     function filterBookings(status) {
-        const bookings = userManager.getUserBookings(currentUser._id);
-        const filteredBookings = status ? 
-            bookings.filter(b => b.status === status) : 
-            bookings;
-        
-        const tableBody = document.getElementById('dashboard-bookings-list');
-        if (tableBody) {
-            tableBody.innerHTML = renderBookingsTable(filteredBookings);
-        }
+        // This would normally filter on the backend
+        // For now, we'll just reload the dashboard
+        loadDashboard();
     }
 
     function filterAdminBookings(type) {
-        const filteredBookings = type ? 
-            userManager.bookings.filter(b => b.serviceType === type) : 
-            userManager.bookings;
-        
-        const tableBody = document.getElementById('bookings-table-body');
-        if (tableBody) {
-            tableBody.innerHTML = renderAdminBookingsTable(filteredBookings);
-        }
+        // This would normally filter on the backend
+        // For now, we'll just reload the admin dashboard
+        loadAdminDashboard();
     }
 
     function filterAdminTrips(status) {
-        const filteredTrips = status ? 
-            userManager.tripPlans.filter(t => t.status === status) : 
-            userManager.tripPlans;
-        
-        const tableBody = document.getElementById('trips-table-body');
-        if (tableBody) {
-            tableBody.innerHTML = renderAdminTripsTable(filteredTrips);
-        }
+        // This would normally filter on the backend
+        // For now, we'll just reload the admin dashboard
+        loadAdminDashboard();
     }
 
     function searchAdminContent(query) {
-        if (!query.trim()) {
-            // Reset all tables to show all data
-            const usersTable = document.getElementById('users-table-body');
-            const bookingsTable = document.getElementById('bookings-table-body');
-            const tripsTable = document.getElementById('trips-table-body');
-            
-            if (usersTable) usersTable.innerHTML = renderUsersTable(userManager.users);
-            if (bookingsTable) bookingsTable.innerHTML = renderAdminBookingsTable(userManager.bookings);
-            if (tripsTable) tripsTable.innerHTML = renderAdminTripsTable(userManager.tripPlans);
-            return;
-        }
-        
-        const lowerQuery = query.toLowerCase();
-        
-        // Search users
-        const filteredUsers = userManager.users.filter(user => 
-            user.name.toLowerCase().includes(lowerQuery) ||
-            user.email.toLowerCase().includes(lowerQuery) ||
-            user.role.toLowerCase().includes(lowerQuery) ||
-            user.country?.toLowerCase().includes(lowerQuery)
-        );
-        const usersTable = document.getElementById('users-table-body');
-        if (usersTable) usersTable.innerHTML = renderUsersTable(filteredUsers);
-        
-        // Search bookings
-        const filteredBookings = userManager.bookings.filter(booking => 
-            booking._id.toLowerCase().includes(lowerQuery) ||
-            booking.userName.toLowerCase().includes(lowerQuery) ||
-            booking.userEmail.toLowerCase().includes(lowerQuery) ||
-            booking.serviceName.toLowerCase().includes(lowerQuery) ||
-            booking.serviceType.toLowerCase().includes(lowerQuery)
-        );
-        const bookingsTable = document.getElementById('bookings-table-body');
-        if (bookingsTable) bookingsTable.innerHTML = renderAdminBookingsTable(filteredBookings);
-        
-        // Search trip plans
-        const filteredTrips = userManager.tripPlans.filter(trip => 
-            trip._id.toLowerCase().includes(lowerQuery) ||
-            trip.userName.toLowerCase().includes(lowerQuery) ||
-            trip.userEmail.toLowerCase().includes(lowerQuery) ||
-            trip.duration.toLowerCase().includes(lowerQuery) ||
-            trip.budget.toLowerCase().includes(lowerQuery)
-        );
-        const tripsTable = document.getElementById('trips-table-body');
-        if (tripsTable) tripsTable.innerHTML = renderAdminTripsTable(filteredTrips);
+        // This would normally search on the backend
+        showNotification('Search functionality coming soon!', 'info');
     }
 
     // ===============================
@@ -5686,7 +3148,7 @@
     async function init() {
         console.log('Initializing Go Trip Professional System...');
         
-        // Hide loading overlay immediately
+        // Hide loading overlay
         const loadingOverlay = document.getElementById('loading-overlay');
         if (loadingOverlay) {
             loadingOverlay.style.opacity = '0';
@@ -5717,7 +3179,7 @@
             if (currentUser) {
                 showNotification(`Welcome back, ${currentUser.name}!`, 'info');
             } else {
-                showNotification('Welcome to Go Trip!', 'info');
+                showNotification('Welcome to Go Trip! Book your Rwanda adventure today.', 'info');
             }
         }, 1000);
         
@@ -5734,33 +3196,16 @@
     window.showAuthModal = showAuthModal;
     window.showNotification = showNotification;
     window.logout = logout;
-    window.apiRequest = apiRequest;
-    window.config = config;
-    window.currentUser = () => currentUser;
-    window.isAuthenticated = () => isAuthenticated;
     window.showServiceSelectionModal = showServiceSelectionModal;
     window.showEnhancedBookingModal = showEnhancedBookingModal;
     window.showTripPlanModal = showTripPlanModal;
-    window.showAddUserModal = showAddUserModal;
-    window.viewUserDetails = viewUserDetails;
-    window.editUser = editUser;
-    window.deleteUserConfirm = deleteUserConfirm;
-    window.confirmBooking = confirmBooking;
     window.viewBookingDetails = viewBookingDetails;
-    window.downloadBookingInvoice = downloadBookingInvoice;
     window.cancelBooking = cancelBooking;
-    window.cancelBookingAdmin = cancelBookingAdmin;
+    window.confirmBooking = confirmBooking;
+    window.downloadBookingInvoice = downloadBookingInvoice;
     window.viewTripPlan = viewTripPlan;
-    window.viewTripPlanAdmin = viewTripPlanAdmin;
-    window.processTripPlan = processTripPlan;
-    window.editTripPlan = editTripPlan;
     window.cancelTripPlan = cancelTripPlan;
-    window.downloadItinerary = downloadItinerary;
-    window.generateReport = generateReport;
-    window.showCustomReportModal = showCustomReportModal;
-    window.showChangePasswordModal = showChangePasswordModal;
-    window.showUploadDocumentModal = showUploadDocumentModal;
-    window.userManager = userManager;
+    window.processTripPlan = processTripPlan;
 
     // Initialize when DOM is ready
     domReady(() => {
