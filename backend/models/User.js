@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -53,10 +52,11 @@ const userSchema = new mongoose.Schema({
 // Encrypt password using bcrypt
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) {
-    next();
+    return next(); // 🔴 IMPORTANT: return here
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 // Sign JWT and return
@@ -68,9 +68,12 @@ userSchema.methods.getSignedJwtToken = function() {
   );
 };
 
-// Match user entered password to hashed password in database
+// Match user entered password
 userSchema.methods.matchPassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  return bcrypt.compare(enteredPassword, this.password);
 };
 
-export default mongoose.model('User', userSchema);
+// ✅ SAFE EXPORT (prevents OverwriteModelError)
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+
+export default User;

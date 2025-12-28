@@ -1,86 +1,72 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
+import mongoose from 'mongoose';
+import validator from 'validator';
 
 const contactMessageSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Name is required'],
+    required: true,
     trim: true,
-    minlength: [2, 'Name must be at least 2 characters'],
-    maxlength: [100, 'Name cannot exceed 100 characters']
+    minlength: 2,
+    maxlength: 100
   },
-  
+
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: true,
     trim: true,
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email']
   },
-  
+
   subject: {
     type: String,
-    required: [true, 'Subject is required'],
+    required: true,
     trim: true,
-    minlength: [5, 'Subject must be at least 5 characters'],
-    maxlength: [200, 'Subject cannot exceed 200 characters']
+    minlength: 5,
+    maxlength: 200
   },
-  
+
   message: {
     type: String,
-    required: [true, 'Message is required'],
+    required: true,
     trim: true,
-    minlength: [10, 'Message must be at least 10 characters'],
-    maxlength: [5000, 'Message cannot exceed 5000 characters']
+    minlength: 10,
+    maxlength: 5000
   },
-  
-  // Status tracking
+
   status: {
     type: String,
     enum: ['new', 'read', 'replied', 'archived', 'spam'],
     default: 'new'
   },
-  
-  assignedTo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  
-  repliedAt: Date,
-  
-  replyMessage: String,
-  
-  // Categorization
+
   category: {
     type: String,
     enum: ['general', 'booking', 'complaint', 'suggestion', 'partnership', 'other'],
     default: 'general'
   },
-  
+
   urgency: {
     type: String,
     enum: ['low', 'normal', 'high', 'urgent'],
     default: 'normal'
   },
-  
-  // Analytics
+
   source: {
     type: String,
     default: 'contact-page'
   },
-  
+
   ipAddress: String,
   userAgent: String
-  
-}, {
-  timestamps: true
-});
+
+}, { timestamps: true });
 
 // Indexes
 contactMessageSchema.index({ status: 1, createdAt: -1 });
 contactMessageSchema.index({ email: 1 });
 contactMessageSchema.index({ category: 1 });
 
-const ContactMessage = mongoose.model('ContactMessage', contactMessageSchema);
+const Contact = mongoose.model('Contact', contactMessageSchema);
 
-module.exports = ContactMessage;
+export default Contact; // ✅ REQUIRED

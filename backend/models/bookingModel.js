@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const bookingSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   userName: { type: String, required: true },
   userEmail: { type: String, required: true },
   serviceName: { type: String, required: true },
@@ -18,5 +19,5 @@ const bookingSchema = new mongoose.Schema({
   totalAmount: { type: Number, min: 0, required: true }
 }, { timestamps: true });
 
-const Booking = mongoose.model('Booking', bookingSchema);
+const Booking = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
 export default Booking;
