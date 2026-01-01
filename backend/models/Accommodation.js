@@ -1,4 +1,3 @@
-// backend/models/Accommodation.js
 import mongoose from 'mongoose';
 
 const accommodationSchema = new mongoose.Schema({
@@ -13,5 +12,7 @@ const accommodationSchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 
-const Accommodation = mongoose.model('Accommodation', accommodationSchema);
+// Safe model compilation to prevent OverwriteModelError
+const Accommodation = mongoose.models.Accommodation || mongoose.model('Accommodation', accommodationSchema);
+
 export default Accommodation;

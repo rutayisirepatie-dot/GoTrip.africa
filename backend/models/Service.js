@@ -7,4 +7,7 @@ const serviceSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
-export default mongoose.model('Service', serviceSchema);
+// ✅ Hot-reload safe export
+const Service = mongoose.models.Service || mongoose.model('Service', serviceSchema);
+
+export default Service;

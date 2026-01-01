@@ -33,18 +33,11 @@ const performanceMetricSchema = new mongoose.Schema({
     }
   },
   statusCode: Number,
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   ipAddress: String,
   userAgent: String,
   additionalData: mongoose.Schema.Types.Mixed,
-  timestamp: {
-    type: Date,
-    default: Date.now,
-    index: true
-  },
+  timestamp: { type: Date, default: Date.now, index: true },
   tags: [String]
 }, {
   timeseries: {
@@ -60,46 +53,19 @@ performanceMetricSchema.index({ endpoint: 1, timestamp: -1 });
 
 // Static methods for performance analysis
 performanceMetricSchema.statics.getPerformanceMetrics = async function(startDate, endDate, metricType = null) {
-  const matchStage = {
-    timestamp: { $gte: startDate, $lte: endDate }
-  };
-  
-  if (metricType) {
-    matchStage.metricType = metricType;
-  }
-  
+  const matchStage = { timestamp: { $gte: startDate, $lte: endDate } };
+  if (metricType) matchStage.metricType = metricType;
+
   return this.aggregate([
     { $match: matchStage },
     {
       $group: {
-        _id: {
-          $dateToString: {
-            format: '%Y-%m-%d %H:00',
-            date: '$timestamp'
-          }
-        },
+        _id: { $dateToString: { format: '%Y-%m-%d %H:00', date: '$timestamp' } },
         avgDuration: { $avg: '$duration.value' },
         minDuration: { $min: '$duration.value' },
         maxDuration: { $max: '$duration.value' },
-        p95Duration: { 
-          $avg: {
-            $cond: [
-              { $lte: ['$percentile', 95] },
-              '$duration.value',
-              null
-            ]
-          }
-        },
         count: { $sum: 1 },
-        errorCount: {
-          $sum: {
-            $cond: [
-              { $gte: ['$statusCode', 400] },
-              1,
-              0
-            ]
-          }
-        }
+        errorCount: { $sum: { $cond: [{ $gte: ['$statusCode', 400] }, 1, 0] } }
       }
     },
     {
@@ -108,14 +74,9 @@ performanceMetricSchema.statics.getPerformanceMetrics = async function(startDate
         avgDuration: { $round: ['$avgDuration', 2] },
         minDuration: 1,
         maxDuration: 1,
-        p95Duration: { $round: ['$p95Duration', 2] },
         count: 1,
         errorRate: {
-          $cond: [
-            { $eq: ['$count', 0] },
-            0,
-            { $round: [{ $multiply: [{ $divide: ['$errorCount', '$count'] }, 100] }, 2] }
-          ]
+          $cond: [{ $eq: ['$count', 0] }, 0, { $round: [{ $multiply: [{ $divide: ['$errorCount', '$count'] }, 100] }, 2] }]
         }
       }
     },
@@ -123,7 +84,7 @@ performanceMetricSchema.statics.getPerformanceMetrics = async function(startDate
   ]);
 };
 
-// Method to get slow endpoints
+// Static method to get slow endpoints
 performanceMetricSchema.statics.getSlowEndpoints = async function(startDate, endDate, threshold = 1000) {
   return this.aggregate([
     {
@@ -156,4 +117,6 @@ performanceMetricSchema.statics.getSlowEndpoints = async function(startDate, end
   ]);
 };
 
-export default mongoose.model('PerformanceMetric', performanceMetricSchema);
+// ✅ Hot-reload safe export
+const PerformanceMetric = mongoose.models.PerformanceMetric || mongoose.model('PerformanceMetric', performanceMetricSchema);
+export default PerformanceMetric;

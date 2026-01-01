@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
+import mongoose from 'mongoose';
+import validator from 'validator';
 
 const newsletterSubscriptionSchema = new mongoose.Schema({
   email: {
@@ -29,19 +29,11 @@ const newsletterSubscriptionSchema = new mongoose.Schema({
     default: 'active'
   },
   
-  subscribedAt: {
-    type: Date,
-    default: Date.now
-  },
-  
+  subscribedAt: { type: Date, default: Date.now },
   unsubscribedAt: Date,
-  
   lastEmailSent: Date,
   
-  emailCount: {
-    type: Number,
-    default: 0
-  },
+  emailCount: { type: Number, default: 0 },
   
   // Additional info
   name: String,
@@ -58,15 +50,14 @@ const newsletterSubscriptionSchema = new mongoose.Schema({
   userAgent: String,
   referrer: String
   
-}, {
-  timestamps: true
-});
+}, { timestamps: true });
 
 // Indexes
 newsletterSubscriptionSchema.index({ email: 1 }, { unique: true });
 newsletterSubscriptionSchema.index({ status: 1 });
 newsletterSubscriptionSchema.index({ subscribedAt: -1 });
 
-const NewsletterSubscription = mongoose.model('NewsletterSubscription', newsletterSubscriptionSchema);
+// ✅ Hot-reload safe export
+const NewsletterSubscription = mongoose.models.NewsletterSubscription || mongoose.model('NewsletterSubscription', newsletterSubscriptionSchema);
 
-module.exports = NewsletterSubscription;
+export default NewsletterSubscription;

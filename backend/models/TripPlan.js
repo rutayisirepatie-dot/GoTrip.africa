@@ -65,4 +65,7 @@ const tripPlanSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model('TripPlan', tripPlanSchema);
+// ✅ Hot-reload safe export
+const TripPlan = mongoose.models.TripPlan || mongoose.model('TripPlan', tripPlanSchema);
+
+export default TripPlan;

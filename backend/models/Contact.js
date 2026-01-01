@@ -67,6 +67,7 @@ contactMessageSchema.index({ status: 1, createdAt: -1 });
 contactMessageSchema.index({ email: 1 });
 contactMessageSchema.index({ category: 1 });
 
-const Contact = mongoose.model('Contact', contactMessageSchema);
+// Safe model compilation to prevent OverwriteModelError
+const Contact = mongoose.models.Contact || mongoose.model('Contact', contactMessageSchema);
 
-export default Contact; // ✅ REQUIRED
+export default Contact;

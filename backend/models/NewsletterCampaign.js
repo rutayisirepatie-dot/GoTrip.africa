@@ -10,4 +10,7 @@ const newsletterCampaignSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
-export default mongoose.model('NewsletterCampaign', newsletterCampaignSchema);
+// ✅ Hot-reload safe export
+const NewsletterCampaign = mongoose.models.NewsletterCampaign || mongoose.model('NewsletterCampaign', newsletterCampaignSchema);
+
+export default NewsletterCampaign;

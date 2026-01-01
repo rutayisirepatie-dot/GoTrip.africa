@@ -1,4 +1,4 @@
-// Go Trip - Complete Professional Tourism System
+// Go Trip
 (function() {
     'use strict';
     
@@ -56,6 +56,69 @@
     };
 
     // ===============================
+    // DATA SYNC MANAGER 
+    // ===============================
+    class DataSyncManager {
+        constructor() {
+            this.pendingOperations = [];
+            this.isOnline = true;
+        }
+
+        async syncToBackend(type, data, method = 'POST') {
+            try {
+                let endpoint;
+                
+                switch(type) {
+                    case 'booking':
+                        endpoint = config.endpoints.bookings.submit;
+                        break;
+                    case 'trip_plan':
+                        endpoint = config.endpoints.tripPlan;
+                        break;
+                    case 'update_profile':
+                        endpoint = config.endpoints.dashboard.updateProfile;
+                        method = 'PUT';
+                        break;
+                    case 'cancel_booking':
+                        endpoint = `${config.endpoints.dashboard.cancelBooking}/${data.bookingId}`;
+                        method = 'PUT';
+                        break;
+                    case 'confirm_booking':
+                        endpoint = `${config.endpoints.dashboard.cancelBooking}/${data.bookingId}/confirm`;
+                        method = 'PUT';
+                        break;
+                    default:
+                        return { success: false };
+                }
+
+                const token = getAuthToken();
+                const response = await fetch(`${config.baseUrl}${endpoint}`, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.log('Sync failed, will retry later:', error);
+                this.queueOperation(type, data, method);
+                return { success: false };
+            }
+        }
+
+        queueOperation(type, data, method) {
+            this.pendingOperations.push({ type, data, method, timestamp: Date.now() });
+        }
+    }
+
+    // Initialize Data Sync Manager
+    const dataSync = new DataSyncManager();
+
+    // ===============================
     // MOCK DATA
     // ===============================
     const mockData = {
@@ -68,10 +131,10 @@
                 experience: "8 years experience",
                 rating: 4.9,
                 price: "$150/day",
-                dailyRate: 180,
-                image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                dailyRate: 150,
+                image: "#",
                 certifications: ["Wildlife First Aid", "CPR Certified"],
-                languageCount: 4,
+                languageCount: 3,
                 experienceYears: 8,
                 available: true,
                 description: "Expert guide specializing in gorilla trekking with extensive knowledge of Volcanoes National Park."
@@ -85,7 +148,7 @@
                 rating: 4.8,
                 price: "$160/day",
                 dailyRate: 160,
-                image: "",
+                image: "#",
                 certifications: ["Cultural Heritage", "Anthropology Degree"],
                 languageCount: 4,
                 experienceYears: 6,
@@ -100,10 +163,10 @@
                 experience: "10 years experience",
                 rating: 4.9,
                 price: "$180/day",
-                dailyRate: 200,
-                image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                dailyRate: 180,
+                image: "#",
                 certifications: ["Ornithology Certified", "Photography Expert"],
-                languageCount: 4,
+                languageCount: 3,
                 experienceYears: 10,
                 available: true,
                 description: "Specialized bird watching guide with extensive knowledge of avian species."
@@ -116,10 +179,10 @@
                 experience: "7 years experience",
                 rating: 4.7,
                 price: "$150/day",
-                dailyRate: 170,
-                image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                dailyRate: 150,
+                image: "#",
                 certifications: ["Mountain Guide", "Wilderness First Responder"],
-                languageCount: 4,
+                languageCount: 3,
                 experienceYears: 7,
                 available: true,
                 description: "Experienced hiking guide for mountain trails and adventure tours."
@@ -133,7 +196,7 @@
                 rating: 4.6,
                 price: "$140/day",
                 dailyRate: 140,
-                image: "",
+                image: "#",
                 certifications: ["History Degree", "Cultural Expert"],
                 languageCount: 3,
                 experienceYears: 5,
@@ -144,14 +207,14 @@
                 _id: 6, 
                 name: "Grace U.", 
                 specialty: "Family Tour Specialist", 
-                languages: ["English", "French", "Swahili" , "Kinyarwanda"],
+                languages: ["English", "French", "Swahili", "Kinyarwanda"],
                 experience: "4 years experience",
                 rating: 4.5,
                 price: "$130/day",
                 dailyRate: 130,
-                image: "",
+                image: "#",
                 certifications: ["Child Safety Certified", "Family Specialist"],
-                languageCount: 3,
+                languageCount: 4,
                 experienceYears: 4,
                 available: true,
                 description: "Family-friendly guide specializing in tours suitable for all ages."
@@ -182,7 +245,7 @@
                 rating: 4.8,
                 price: "$150/day",
                 dailyRate: 150,
-                image: "",
+                image: "#",
                 experience: "8 years experience",
                 certifications: ["Medical Translator", "Technical Certification"],
                 languageCount: 5,
@@ -198,7 +261,7 @@
                 rating: 4.7,
                 price: "$130/day",
                 dailyRate: 130,
-                image: "",
+                image: "#",
                 experience: "6 years experience",
                 certifications: ["Legal Translator", "Government Experience", "Diplomatic Experience"],
                 languageCount: 5,
@@ -214,7 +277,7 @@
                 rating: 4.8,
                 price: "$145/day",
                 dailyRate: 145,
-                image: "",
+                image: "#",
                 experience: "7 years experience",
                 certifications: ["Conference Interpreter", "Event Management"],
                 languageCount: 5,
@@ -230,7 +293,7 @@
                 rating: 4.6,
                 price: "$90/day",
                 dailyRate: 90,
-                image: "",
+                image: "#",
                 experience: "3 years experience",
                 certifications: ["Basic Translation", "Tourism Focus"],
                 languageCount: 3,
@@ -246,7 +309,7 @@
                 rating: 4.9,
                 price: "$160/day",
                 dailyRate: 160,
-                image: "",
+                image: "#",
                 experience: "9 years experience",
                 certifications: ["Advanced Translator", "Language Degree"],
                 languageCount: 6,
@@ -432,7 +495,7 @@
                 _id: 1, 
                 title: "Complete Guide to Gorilla Trekking in Rwanda", 
                 excerpt: "Everything you need to know about mountain gorilla trekking in Volcanoes National Park, including permits, preparation, and what to expect.",
-                date: "May 15, 2024",
+                date: "December 25, 2025",
                 category: "Adventure",
                 image: "./images/gorilla-trekk-rwanda.jpg",
                 readTime: "8 min read",
@@ -440,13 +503,13 @@
                 content: "Full article content here...",
                 tags: ["Gorilla Trekking", "Wildlife", "Adventure", "Rwanda"],
                 views: 1250,
-                createdAt: "2024-05-15T10:00:00.000Z"
+                createdAt: "2025-12-15T10:00:00.000Z"
             },
             { 
                 _id: 2, 
                 title: "Best Time to Visit Rwanda: Weather & Seasons Guide", 
                 excerpt: "Planning your trip? Here's when to visit Rwanda for the best wildlife viewing, hiking conditions, and cultural experiences.",
-                date: "April 28, 2024",
+                date: "December 28, 2025",
                 category: "Travel Tips",
                 image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
                 readTime: "6 min read",
@@ -454,13 +517,13 @@
                 content: "Full article content here...",
                 tags: ["Travel Tips", "Weather", "Seasons", "Planning"],
                 views: 980,
-                createdAt: "2024-04-28T09:30:00.000Z"
+                createdAt: "2025-12-28T09:30:00.000Z"
             },
             { 
                 _id: 3, 
                 title: "Rwandan Culture: Traditions, Food & Etiquette", 
                 excerpt: "Discover the rich cultural heritage of Rwanda, from traditional dances and ceremonies to delicious local cuisine.",
-                date: "April 15, 2024",
+                date: "December 15, 2025",
                 category: "Culture",
                 image: "./images/intore-dancers.jpg",
                 readTime: "7 min read",
@@ -468,13 +531,13 @@
                 content: "Full article content here...",
                 tags: ["Culture", "Traditions", "Food", "Etiquette"],
                 views: 1120,
-                createdAt: "2024-04-15T11:15:00.000Z"
+                createdAt: "2025-12-15T11:15:00.000Z"
             },
             { 
                 _id: 4, 
                 title: "Top 10 Hiking Trails in the Land of a Thousand Hills", 
                 excerpt: "Explore Rwanda's breathtaking landscapes through these incredible hiking trails suitable for all fitness levels.",
-                date: "March 30, 2024",
+                date: "October 30, 2025",
                 category: "Hiking",
                 image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
                 readTime: "9 min read",
@@ -482,13 +545,13 @@
                 content: "Full article content here...",
                 tags: ["Hiking", "Trails", "Outdoors", "Adventure"],
                 views: 890,
-                createdAt: "2024-03-30T14:20:00.000Z"
+                createdAt: "2025-10-30T14:20:00.000Z"
             },
             { 
                 _id: 5, 
                 title: "Bird Watching in Rwanda: A Birder's Paradise", 
                 excerpt: "With over 700 bird species, Rwanda offers incredible bird watching opportunities across its national parks and forests.",
-                date: "March 15, 2024",
+                date: "October 15, 2025",
                 category: "Wildlife",
                 image: "https://images.unsplash.com/photo-1452570053594-1b985d6ea890?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
                 readTime: "5 min read",
@@ -496,13 +559,13 @@
                 content: "Full article content here...",
                 tags: ["Bird Watching", "Wildlife", "Nature", "Photography"],
                 views: 750,
-                createdAt: "2024-03-15T13:45:00.000Z"
+                createdAt: "2025-10-15T13:45:00.000Z"
             },
             { 
                 _id: 6, 
                 title: "Sustainable Tourism in Rwanda: Making a Positive Impact", 
                 excerpt: "Learn how Rwanda is leading the way in sustainable tourism and how you can travel responsibly in this beautiful country.",
-                date: "February 28, 2024",
+                date: "September 28, 2025",
                 category: "Sustainability",
                 image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
                 readTime: "6 min read",
@@ -510,7 +573,7 @@
                 content: "Full article content here...",
                 tags: ["Sustainability", "Eco-Tourism", "Responsible Travel", "Conservation"],
                 views: 1050,
-                createdAt: "2024-02-28T16:00:00.000Z"
+                createdAt: "2025-09-28T16:00:00.000Z"
             }
         ]
     };
@@ -593,7 +656,7 @@
                     travelers: 4,
                     duration: 2,
                     status: 'pending',
-                    totalAmount: 360,
+                    totalAmount: 300,
                     createdAt: new Date().toISOString(),
                     notes: 'Need a gorilla trekking expert'
                 }
@@ -637,7 +700,7 @@
         }
 
         // User methods
-        registerUser(userData) {
+        async registerUser(userData) {
             const existingUser = this.users.find(u => u.email === userData.email);
             if (existingUser) {
                 throw new Error('User already exists');
@@ -654,27 +717,66 @@
 
             this.users.push(newUser);
             this.saveUsers();
+            
+            // Try to register with backend
+            try {
+                const response = await fetch(`${config.baseUrl}${config.endpoints.auth.register}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                const result = await response.json();
+                console.log('Backend registration result:', result);
+            } catch (error) {
+                console.log('Backend registration failed, using local only');
+            }
+            
             return newUser;
         }
 
-        authenticateUser(email, password) {
+        async authenticateUser(email, password) {
+            // Try backend authentication first
+            try {
+                const response = await fetch(`${config.baseUrl}${config.endpoints.auth.login}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        return result.user;
+                    }
+                }
+            } catch (error) {
+                console.log('Backend auth failed, trying local');
+            }
+            
+            // Fallback to local authentication
             const user = this.users.find(u => 
                 u.email === email && u.password === password && u.status === 'active'
             );
             
             if (user) {
-                user.lastLogin = new Date().toISOString();
+                const { password, ...userWithoutPassword } = user;
+                userWithoutPassword.lastLogin = new Date().toISOString();
                 this.saveUsers();
-                return user;
+                return userWithoutPassword;
             }
+            
             return null;
         }
 
-        updateUser(userId, updates) {
+        async updateUser(userId, updates) {
             const index = this.users.findIndex(u => u._id === userId);
             if (index !== -1) {
                 this.users[index] = { ...this.users[index], ...updates };
                 this.saveUsers();
+                
+                // Sync to MongoDB in background
+                dataSync.syncToBackend('update_profile', { userId, ...updates });
+                
                 return this.users[index];
             }
             return null;
@@ -687,7 +789,7 @@
         }
 
         // Booking methods
-        createBooking(bookingData) {
+        async createBooking(bookingData) {
             const bookingId = `BOOK-${Date.now().toString().slice(-6)}`;
             const booking = {
                 _id: bookingId,
@@ -696,8 +798,13 @@
                 status: 'pending'
             };
 
+            // Save to local storage immediately
             this.bookings.push(booking);
             this.saveBookings();
+            
+            // Sync to MongoDB in background
+            dataSync.syncToBackend('booking', booking);
+            
             return booking;
         }
 
@@ -711,12 +818,22 @@
             return null;
         }
 
-        cancelBooking(bookingId) {
-            return this.updateBooking(bookingId, { status: 'cancelled' });
+        async cancelBooking(bookingId) {
+            const booking = this.updateBooking(bookingId, { status: 'cancelled' });
+            if (booking) {
+                // Sync to MongoDB in background
+                dataSync.syncToBackend('cancel_booking', { bookingId });
+            }
+            return booking;
         }
 
-        confirmBooking(bookingId) {
-            return this.updateBooking(bookingId, { status: 'confirmed' });
+        async confirmBooking(bookingId) {
+            const booking = this.updateBooking(bookingId, { status: 'confirmed' });
+            if (booking) {
+                // Sync to MongoDB in background
+                dataSync.syncToBackend('confirm_booking', { bookingId });
+            }
+            return booking;
         }
 
         getUserBookings(userId) {
@@ -724,7 +841,7 @@
         }
 
         // Trip Plan methods
-        createTripPlan(tripData) {
+        async createTripPlan(tripData) {
             const tripId = `TRIP-${Date.now().toString().slice(-6)}`;
             const trip = {
                 _id: tripId,
@@ -733,8 +850,13 @@
                 status: 'review'
             };
 
+            // Save to local storage immediately
             this.tripPlans.push(trip);
             this.saveTripPlans();
+            
+            // Sync to MongoDB in background
+            dataSync.syncToBackend('trip_plan', trip);
+            
             return trip;
         }
 
@@ -1062,8 +1184,8 @@
                             }
                         };
                     } else {
-                        const userBookings = userManager.getUserBookings(currentUser._id);
-                        const userTripPlans = userManager.tripPlans.filter(t => t.userId === currentUser._id);
+                        const userBookings = userManager.getUserBookings(currentUser?._id || 2);
+                        const userTripPlans = userManager.tripPlans.filter(t => t.userId === (currentUser?._id || 2));
                         
                         response = {
                             success: true,
@@ -1120,7 +1242,7 @@
 
     async function login(email, password) {
         try {
-            const user = userManager.authenticateUser(email, password);
+            const user = await userManager.authenticateUser(email, password);
             if (user) {
                 const { password, ...userWithoutPassword } = user;
                 
@@ -1152,7 +1274,7 @@
 
     async function register(userData) {
         try {
-            const newUser = userManager.registerUser(userData);
+            const newUser = await userManager.registerUser(userData);
             
             // Remove password from user object before storing
             const { password, ...userWithoutPassword } = newUser;
@@ -1276,15 +1398,18 @@
             case 'admin':
                 loadAdminDashboard();
                 break;
+            default:
+                loadHomePage();
+                break;
         }
     }
 
     // ===============================
-    // ENHANCED DASHBOARD FUNCTIONS
+    // DASHBOARD FUNCTIONS
     // ===============================
     
     async function loadDashboard() {
-        console.log('Loading enhanced user dashboard...');
+        console.log('Loading user dashboard...');
         
         const dashboard = document.getElementById('dashboard');
         if (!dashboard) return;
@@ -2066,7 +2191,7 @@
                 const data = Object.fromEntries(formData.entries());
                 
                 try {
-                    const updatedUser = userManager.updateUser(currentUser._id, data);
+                    const updatedUser = await userManager.updateUser(currentUser._id, data);
                     if (updatedUser) {
                         currentUser = updatedUser;
                         saveUserData(currentUser);
@@ -3657,7 +3782,7 @@
             data.endDate = endDate.toISOString();
             
             try {
-                const booking = userManager.createBooking(data);
+                const booking = await userManager.createBooking(data);
                 
                 // Show success message and generate invoice
                 showNotification(`✅ Booking created successfully! Reference: ${booking._id}`, 'success');
@@ -3834,7 +3959,7 @@
             data.status = 'review';
             
             try {
-                const tripPlan = userManager.createTripPlan(data);
+                const tripPlan = await userManager.createTripPlan(data);
                 
                 showNotification(`✅ Trip plan submitted! Our team will review it and get back to you within 24 hours. Reference: ${tripPlan._id}`, 'success');
                 closeModal();
@@ -4128,8 +4253,11 @@
                     document.querySelectorAll('.dashboard-tab-link').forEach(l => l.classList.remove('active'));
                     document.querySelectorAll('.dashboard-tab-container').forEach(c => c.classList.remove('active'));
                     
-                    document.querySelector(`.dashboard-tab-link[data-tab="${tab}"]`).classList.add('active');
-                    document.getElementById(`dashboard-${tab}`).classList.add('active');
+                    const tabLink = document.querySelector(`.dashboard-tab-link[data-tab="${tab}"]`);
+                    const tabElement = document.getElementById(`dashboard-${tab}`);
+                    
+                    if (tabLink) tabLink.classList.add('active');
+                    if (tabElement) tabElement.classList.add('active');
                 }
             }
         });
@@ -4601,7 +4729,7 @@
                         <button class="btn btn-primary" onclick="downloadBookingInvoice('${booking._id}')">
                             <i class="fas fa-download"></i> Download Invoice
                         </button>
-                        ${currentUser.role === 'admin' && booking.status === 'pending' ? `
+                        ${currentUser?.role === 'admin' && booking.status === 'pending' ? `
                             <button class="btn btn-success" onclick="confirmBooking('${booking._id}')">
                                 <i class="fas fa-check"></i> Confirm Booking
                             </button>
@@ -4609,7 +4737,7 @@
                                 <i class="fas fa-times"></i> Cancel Booking
                             </button>
                         ` : ''}
-                        ${currentUser.role === 'user' && booking.status === 'pending' ? `
+                        ${currentUser?.role === 'user' && booking.status === 'pending' ? `
                             <button class="btn btn-danger" onclick="cancelBooking('${booking._id}')">
                                 <i class="fas fa-times"></i> Cancel Booking
                             </button>
@@ -4682,7 +4810,7 @@
                 </div>
                 
                 <div class="footer">
-                    <p>Thank you for choosing Go Trip Rwanda!</p>
+                    <p>Thank you for choosing Go Trip!</p>
                     <p>For any queries, contact: info@gotrip.africa | +250 787 407 051</p>
                 </div>
             </body>
@@ -4730,7 +4858,7 @@
             
             // Refresh dashboard
             setTimeout(() => {
-                if (currentUser.role === 'admin') {
+                if (currentUser?.role === 'admin') {
                     loadAdminDashboard();
                 } else {
                     loadDashboard();
@@ -4978,8 +5106,6 @@
         }
         
         showTripPlanModal();
-        // Note: For simplicity, we're just showing the trip plan modal again
-        // In a real application, you would populate the form with existing data
     }
 
     function cancelTripPlan(tripId) {
@@ -5029,18 +5155,18 @@
                     <p><strong>Budget:</strong> ${trip.budget}</p>
                 </div>
                 
-                ${trip.itinerary.days.map(day => `
+                ${trip.itinerary.days ? trip.itinerary.days.map(day => `
                     <div class="day-section">
                         <h3>Day ${day.day}: ${day.title}</h3>
-                        ${day.activities.map(activity => `
+                        ${day.activities ? day.activities.map(activity => `
                             <div class="activity">
                                 <h4>${activity.time}</h4>
                                 <p><strong>${activity.description}</strong></p>
                                 ${activity.location ? `<p><i>Location:</i> ${activity.location}</p>` : ''}
                             </div>
-                        `).join('')}
+                        `).join('') : ''}
                     </div>
-                `).join('')}
+                `).join('') : ''}
                 
                 ${trip.itinerary.total_cost ? `
                     <div class="cost-summary">
@@ -5050,7 +5176,7 @@
                 ` : ''}
                 
                 <div class="footer">
-                    <p>Thank you for choosing Go Trip Rwanda!</p>
+                    <p>Thank you for choosing Go Trip!</p>
                     <p>For any queries, contact: info@gotrip.africa | +250 787 407 051</p>
                 </div>
             </body>
@@ -5139,17 +5265,17 @@
             </head>
             <body>
                 <div class="report-header">
-                    <h1>GO TRIP RWANDA</h1>
+                    <h1>GO TRIP</h1>
                     <h2>${reportTitle}</h2>
                     <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
-                    <p><strong>Generated by:</strong> ${currentUser.name}</p>
+                    <p><strong>Generated by:</strong> ${currentUser?.name || 'System'}</p>
                 </div>
                 
                 ${renderReportContent(type, reportData)}
                 
                 <div class="footer">
                     <p>This report was generated automatically by the Go Trip system.</p>
-                    <p>© ${new Date().getFullYear()} Go Trip Rwanda. All rights reserved.</p>
+                    <p>© ${new Date().getFullYear()} Go Trip. All rights reserved.</p>
                 </div>
             </body>
             </html>
@@ -5684,7 +5810,7 @@
     // ===============================
     
     async function init() {
-        console.log('Initializing Go Trip Professional System...');
+        console.log('Initializing Go Trip System...');
         
         // Hide loading overlay immediately
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -5721,7 +5847,7 @@
             }
         }, 1000);
         
-        console.log('Go Trip Professional System initialized successfully');
+        console.log('Go Trip System initialized successfully');
     }
 
     // ===============================

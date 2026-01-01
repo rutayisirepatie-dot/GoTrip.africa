@@ -1,10 +1,19 @@
+// backend/server.js
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import path from 'path';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 
-// Import routes
+// ====================
+// Load .env
+// ====================
+dotenv.config({ path: path.resolve('backend/.env') });
+
+// ====================
+// Import Routes
+// ====================
 import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
 import bookingRoutes from './routes/booking.js';
@@ -17,29 +26,21 @@ import tripPlanRoutes from './routes/tripPlan.js';
 import newsletterRoutes from './routes/newsletter.js';
 import contactRoutes from './routes/contact.js';
 import dashboardRoutes from './routes/dashboard.js';
-import dataRoutes from './routes/data.js';
+import blogRoutes from './routes/blog.js';
 
-dotenv.config();
+// ====================
+// Initialize App
+// ====================
 const app = express();
 
 // ====================
 // Middleware
 // ====================
-const limiter = rateLimit({
-  windowMs: (parseInt(process.env.RATE_LIMIT_WINDOW) || 15) * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX) || 100,
-  message: {
-    success: false,
-    message: 'Too many requests from this IP, please try again later'
-  }
-});
-app.use('/api/', limiter);
+app.use(express.json({ limit: process.env.MAX_FILE_SIZE || '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: process.env.MAX_FILE_SIZE || '10mb' }));
 
-const corsOrigins = process.env.CORS_ORIGIN?.split(',') || [
-  'http://localhost:3000',
-  'http://127.0.0.1:5500',
-  'http://localhost:5500'
-];
+// CORS
+const corsOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'];
 app.use(cors({
   origin: corsOrigins,
   credentials: true,
@@ -47,49 +48,56 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-app.use(express.json({ limit: process.env.MAX_FILE_SIZE || '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: process.env.MAX_FILE_SIZE || '10mb' }));
+// Rate limiter
+const limiter = rateLimit({
+  windowMs: (parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000),
+  max: parseInt(process.env.RATE_LIMIT_MAX) || 100,
+  message: { success: false, message: 'Too many requests from this IP, try again later' }
+});
+app.use('/api/', limiter);
 
 // ====================
 // MongoDB Connection
 // ====================
-const mongoOptions = {
+const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/gotrip';
+mongoose.connect(mongoUri, {
   maxPoolSize: parseInt(process.env.MONGODB_MAX_POOL_SIZE) || 10,
   minPoolSize: 5,
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
+  serverSelectionTimeoutMS: parseInt(process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS) || 10000,
+  socketTimeoutMS: parseInt(process.env.MONGODB_SOCKET_TIMEOUT_MS) || 45000,
   family: 4
-};
-
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/gotrip', mongoOptions)
-  .then(() => console.log(`✅ MongoDB connected to ${process.env.DB_NAME || 'gotrip_db'}`))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+})
+.then(() => console.log(`✅ MongoDB connected to ${process.env.DB_NAME || 'gotrip_db'}`))
+.catch(err => console.error('❌ MongoDB connection error:', err));
 
 // ====================
-// Routes
+// Health Check
 // ====================
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
-    message: `${process.env.APP_NAME || 'Go Trip'} API v${process.env.APP_VERSION || '1.0.0'} is running`,
-    environment: process.env.NODE_ENV,
+    message: `${process.env.APP_NAME || 'Go Trip'} API is running`,
+    environment: process.env.NODE_ENV || 'development',
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     uptime: process.uptime(),
     timestamp: new Date().toISOString()
   });
 });
 
+// ====================
+// Routes
+// ====================
 // Public routes
 app.use('/api/auth', authRoutes);
 app.use('/api/guides', guideRoutes);
 app.use('/api/destinations', destinationRoutes);
 app.use('/api/translators', translatorRoutes);
 app.use('/api/accommodations', accommodationRoutes);
-app.use('/api/blog', dataRoutes); // Using data.js for blog routes
+app.use('/api/blog', blogRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/contact', contactRoutes);
 
-// Protected routes (require authentication)
+// Protected routes
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/tripPlan', tripPlanRoutes);
 app.use('/api/user', userRoutes);
@@ -99,7 +107,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
 
 // ====================
-// Error Handling
+// 404 Handler
 // ====================
 app.use((req, res) => {
   res.status(404).json({
@@ -108,13 +116,21 @@ app.use((req, res) => {
   });
 });
 
+// ====================
+// Global Error Handler
+// ====================
 app.use((err, req, res, next) => {
   console.error('🔥 Error:', err);
-  res.status(err.statusCode || 500).json({
+
+  const response = {
     success: false,
     message: process.env.NODE_ENV === 'production' ? 'Something went wrong!' : err.message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    timestamp: new Date().toISOString(),
+    path: req.originalUrl
+  };
+
+  res.status(err.statusCode || 500).json(response);
 });
 
 // ====================
@@ -122,8 +138,5 @@ app.use((err, req, res, next) => {
 // ====================
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 ${process.env.APP_NAME || 'Go Trip'} Server v${process.env.APP_VERSION || '1.0.0'}`);
-  console.log(`📡 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🌐 Server running on: http://localhost:${PORT}`);
-  console.log(`🔗 API Base: http://localhost:${PORT}/api`);
+  console.log(`🚀 ${process.env.APP_NAME || 'Go Trip'} Server running on http://localhost:${PORT}`);
 });

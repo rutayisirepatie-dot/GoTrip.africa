@@ -111,5 +111,6 @@ newsletterSchema.methods.verify = async function () {
   await this.save();
 };
 
-// ✅ ESM export
-export default mongoose.model('Newsletter', newsletterSchema);
+// ✅ Hot-reload safe export
+const Newsletter = mongoose.models.Newsletter || mongoose.model('Newsletter', newsletterSchema);
+export default Newsletter;
