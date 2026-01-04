@@ -1,4 +1,3 @@
-// backend/server.js
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -7,12 +6,59 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 
 // ====================
-// Load .env
+// Load ENV
 // ====================
 dotenv.config({ path: path.resolve('backend/.env') });
 
 // ====================
-// Import Routes
+// App Init
+// ====================
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// ====================
+// Middleware
+// ====================
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// ====================
+// CORS (PRODUCTION SAFE)
+// ====================
+const corsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['http://localhost:3000'];
+
+app.use(cors({
+  origin: corsOrigins,
+  credentials: true,
+}));
+
+// ====================
+// Health Check (NO RATE LIMIT)
+// ====================
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    app: process.env.APP_NAME || 'Go Trip',
+    environment: process.env.NODE_ENV || 'development',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ====================
+// Rate Limiting (AFTER HEALTH)
+// ====================
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+app.use('/api/', limiter);
+
+// ====================
+// Routes
 // ====================
 import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
@@ -28,66 +74,6 @@ import contactRoutes from './routes/contact.js';
 import dashboardRoutes from './routes/dashboard.js';
 import blogRoutes from './routes/blog.js';
 
-// ====================
-// Initialize App
-// ====================
-const app = express();
-
-// ====================
-// Middleware
-// ====================
-app.use(express.json({ limit: process.env.MAX_FILE_SIZE || '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: process.env.MAX_FILE_SIZE || '10mb' }));
-
-// CORS
-const corsOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'];
-app.use(cors({
-  origin: corsOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
-
-// Rate limiter
-const limiter = rateLimit({
-  windowMs: (parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000),
-  max: parseInt(process.env.RATE_LIMIT_MAX) || 100,
-  message: { success: false, message: 'Too many requests from this IP, try again later' }
-});
-app.use('/api/', limiter);
-
-// ====================
-// MongoDB Connection
-// ====================
-const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/gotrip';
-mongoose.connect(mongoUri, {
-  maxPoolSize: parseInt(process.env.MONGODB_MAX_POOL_SIZE) || 10,
-  minPoolSize: 5,
-  serverSelectionTimeoutMS: parseInt(process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS) || 10000,
-  socketTimeoutMS: parseInt(process.env.MONGODB_SOCKET_TIMEOUT_MS) || 45000,
-  family: 4
-})
-.then(() => console.log(`✅ MongoDB connected to ${process.env.DB_NAME || 'gotrip_db'}`))
-.catch(err => console.error('❌ MongoDB connection error:', err));
-
-// ====================
-// Health Check
-// ====================
-app.get('/api/health', (req, res) => {
-  res.json({
-    success: true,
-    message: `${process.env.APP_NAME || 'Go Trip'} API is running`,
-    environment: process.env.NODE_ENV || 'development',
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString()
-  });
-});
-
-// ====================
-// Routes
-// ====================
-// Public routes
 app.use('/api/auth', authRoutes);
 app.use('/api/guides', guideRoutes);
 app.use('/api/destinations', destinationRoutes);
@@ -96,47 +82,47 @@ app.use('/api/accommodations', accommodationRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/contact', contactRoutes);
-
-// Protected routes
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/tripPlan', tripPlanRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-
-// Admin routes
 app.use('/api/admin', adminRoutes);
 
 // ====================
-// 404 Handler
+// 404
 // ====================
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: `Endpoint ${req.method} ${req.url} not found`
+    message: `Route ${req.method} ${req.url} not found`,
   });
 });
 
 // ====================
-// Global Error Handler
+// Error Handler
 // ====================
 app.use((err, req, res, next) => {
   console.error('🔥 Error:', err);
-
-  const response = {
+  res.status(err.statusCode || 500).json({
     success: false,
-    message: process.env.NODE_ENV === 'production' ? 'Something went wrong!' : err.message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-    timestamp: new Date().toISOString(),
-    path: req.originalUrl
-  };
-
-  res.status(err.statusCode || 500).json(response);
+    message: err.message || 'Server error',
+  });
 });
 
 // ====================
-// Start Server
+// MongoDB + Server Start
 // ====================
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 ${process.env.APP_NAME || 'Go Trip'} Server running on http://localhost:${PORT}`);
-});
+const mongoUri = process.env.MONGO_URI;
+
+mongoose
+  .connect(mongoUri)
+  .then(() => {
+    console.log('✅ MongoDB connected');
+    app.listen(PORT, () =>
+      console.log(`🚀 Server running on http://localhost:${PORT}`)
+    );
+  })
+  .catch((err) => {
+    console.error('❌ MongoDB failed:', err.message);
+    process.exit(1);
+  });

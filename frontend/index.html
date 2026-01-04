@@ -1,124 +1,252 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Go Trip - Discover Rwanda, the Land of a Thousand Hills. Experience unforgettable adventures, culture, and natural beauty.">
-    <meta name="keywords" content="Rwanda tourism, adventure travel, tour guides, translators, accommodation, gorilla trekking">
+    
+    <!-- Primary SEO Meta Tags -->
+    <title>Go Trip | Discover Rwanda - The Land of a Thousand Hills</title>
+    <meta name="description" content="Go Trip offers complete travel solutions for Rwanda: expert tour guides, professional translators, premium accommodations, and unforgettable travel experiences.">
+    <meta name="keywords" content="Go Trip, Rwanda tourism, Rwanda travel, Rwanda tour guides, Rwanda translators, Rwanda accommodation, Rwanda safari, gorilla trekking, Rwanda adventure tours">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="Go Trip | Discover Rwanda - The Land of a Thousand Hills">
+    <meta property="og:description" content="Complete Rwanda travel solutions: tour guides, translators, accommodation, and custom itineraries. Experience unforgettable Rwanda adventures.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gotrip.africa">
+    <meta property="og:image" content="https://gotrip.africa/images/og-image.jpg">
+    <meta property="og:site_name" content="Go Trip">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Go Trip | Discover Rwanda - The Land of a Thousand Hills">
+    <meta name="twitter:description" content="Complete Rwanda travel solutions: tour guides, translators, accommodation, and custom itineraries.">
+    <meta name="twitter:image" content="https://gotrip.africa/images/twitter-card.jpg">
+    
+    <!-- Additional Meta Tags -->
     <meta name="author" content="Go Trip">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="geo.region" content="RW">
+    <meta name="geo.placename" content="Kigali">
+    <meta name="geo.position" content="-1.9441;30.0619">
+    <meta name="ICBM" content="-1.9441, 30.0619">
     
-    <title>Go Trip - Discover the Land of a Thousand Hills</title>
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://gotrip.africa">
     
-    <!-- Preload Font Awesome CDN-->
+    <!-- Preload critical resources -->
+    <link rel="preload" href="style.css" as="style">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" as="style">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Structured Data / JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TravelAgency",
+        "name": "Go Trip",
+        "description": "Complete travel solutions for Rwanda tourism including tour guides, translators, and accommodation",
+        "url": "https://gotrip.africa",
+        "logo": "https://gotrip.africa/images/logo.png",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "KG 7 Ave",
+            "addressLocality": "Kigali",
+            "addressCountry": "RW"
+        },
+        "telephone": "+250787407051",
+        "email": "info@gotrip.africa",
+        "openingHours": "Mo-Fr 08:00-18:00",
+        "areaServed": ["RW"],
+        "sameAs": [
+            "https://www.linkedin.com/in/patience-rutayisire/",
+            "https://web.facebook.com/patience.rutayisire/",
+            "https://x.com/0011111olen",
+            "https://www.instagram.com/patierutayisire/",
+            "https://www.youtube.com/@adventurehillbound"
+        ]
+    }
+    </script>
     
     <!-- Main stylesheet -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" media="all">
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- No-JS fallback -->
+    <noscript>
+        <style>
+            .no-js-warning {
+                display: block;
+                background: #ff6b6b;
+                color: white;
+                padding: 10px;
+                text-align: center;
+            }
+            .js-dependent {
+                display: none;
+            }
+        </style>
+    </noscript>
 </head>
-<body>
+<body itemscope itemtype="https://schema.org/WebPage">
+    <!-- No-JS Warning -->
+    <noscript>
+        <div class="no-js-warning" role="alert">
+            <p>⚠️ JavaScript is disabled. Some features may not work properly.</p>
+        </div>
+    </noscript>
+    
     <!-- Skip to main content button -->
     <a href="#main-content" class="skip-to-content" id="skip-to-main">
-        <i class="fas fa-arrow-right"></i> Skip to Main Content
+        <i class="fas fa-arrow-right" aria-hidden="true"></i> Skip to Main Content
     </a>
     
     <!-- Navigation -->
-    <header>
-        <nav class="main-nav" aria-label="Main Navigation">
+    <header role="banner" class="site-header">
+        <nav class="main-nav" aria-label="Main Navigation" itemscope itemtype="https://schema.org/SiteNavigationElement">
             <div class="container nav-container">
-                <a href="#home" class="logo" aria-label="Go Trip Home">
+                <!-- Logo -->
+                <a href="/" class="logo" aria-label="Go Trip Home" itemprop="url">
                     <span>Go</span> <span>Trip</span>
                 </a>
                 
-                <button class="mobile-menu-btn" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="nav-links">
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="nav-links">
                     <span class="hamburger-icon" aria-hidden="true"></span>
                     <span class="sr-only">Menu</span>
                 </button>
                 
-                <div class="nav-links" id="nav-links">
+                <!-- Navigation Links -->
+                <div class="nav-links" id="nav-links" role="navigation" aria-label="Primary navigation">
                     <ul role="menubar">
-                        <li role="none"><a href="#home" class="nav-link active" role="menuitem" data-page="home">Home</a></li>
-                        <li role="none"><a href="#destinations" class="nav-link" role="menuitem" data-page="destinations">Destinations</a></li>
-                        <li role="none"><a href="#guides" class="nav-link" role="menuitem" data-page="guides">Tour Guides</a></li>
-                        <li role="none"><a href="#translators" class="nav-link" role="menuitem" data-page="translators">Translators</a></li>
-                        <li role="none"><a href="#accommodations" class="nav-link" role="menuitem" data-page="accommodations">Accommodations</a></li>
-                        <li role="none"><a href="#blog" class="nav-link" role="menuitem" data-page="blog">Blog</a></li>
-                        <li role="none"><a href="#contact" class="nav-link" role="menuitem" data-page="contact">Contact</a></li>
+                        <li role="none" itemprop="name"><a href="/" class="nav-link active" role="menuitem" data-page="home" itemprop="url">Home</a></li>
+                        <li role="none" itemprop="name"><a href="/destinations" class="nav-link" role="menuitem" data-page="destinations" itemprop="url">Destinations</a></li>
+                        <li role="none" itemprop="name"><a href="/guides" class="nav-link" role="menuitem" data-page="guides" itemprop="url">Tour Guides</a></li>
+                        <li role="none" itemprop="name"><a href="/translators" class="nav-link" role="menuitem" data-page="translators" itemprop="url">Translators</a></li>
+                        <li role="none" itemprop="name"><a href="/accommodations" class="nav-link" role="menuitem" data-page="accommodations" itemprop="url">Accommodations</a></li>
+                        <li role="none" itemprop="name"><a href="/blog" class="nav-link" role="menuitem" data-page="blog" itemprop="url">Blog</a></li>
+                        <li role="none" itemprop="name"><a href="/contact" class="nav-link" role="menuitem" data-page="contact" itemprop="url">Contact</a></li>
                     </ul>
                 </div>
                 
+                <!-- Desktop Navigation Buttons -->
                 <div class="nav-buttons">
-                    <div class="auth-dropdown">
-                        <button class="btn btn-ghost auth-toggle" id="auth-toggle" 
-                                aria-label="Account menu" 
-                                aria-expanded="false" 
-                                aria-controls="auth-dropdown-menu">
-                            <i class="fas fa-user" aria-hidden="true"></i>
-                            <span>Account</span>
-                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
-                        </button>
-                        <div class="auth-dropdown-menu" id="auth-dropdown-menu" aria-labelledby="auth-toggle">
-                            <!-- Dynamic content will be loaded here -->
-                        </div>
-                    </div>
+                    <!-- Plan Your Trip Button -->
+                    <button class="btn btn-primary plan-trip-nav-btn" aria-label="Plan your trip">
+                        <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+                        <span class="nav-button-text">Plan Your Trip</span>
+                    </button>
+                    
+                    <!-- Search Button -->
+                    <button class="btn btn-ghost search-btn" id="search-btn-desktop" aria-label="Open search">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <span class="nav-button-text">Search</span>
+                    </button>
                 </div>
             </div>
         </nav>
     </header>
 
     <!-- Main Content -->
-    <main id="main-content">
+    <main id="main-content" role="main" class="main-content">
         <!-- Home Page -->
-        <section id="home" class="page active">
+        <section id="home-page" class="page active" data-page="home">
             <!-- Hero Section -->
-            <div class="hero" aria-label="Hero Section">
-                <div class="hero-content animate-fade-in">
-                    <h1>Discover Rwanda</h1>
+            <div class="hero" role="banner" aria-label="Welcome to Go Trip">
+                <!-- Welcome Banner -->
+                <div class="hero-welcome-banner" id="hero-welcome-banner" role="region" aria-label="Important messages">
+                    <div class="hero-welcome-content">
+                        <div class="hero-messages" role="list">
+                            <div class="hero-message active" role="listitem">
+                                <i class="fas fa-star" aria-hidden="true"></i>
+                                <span>Welcome to Go Trip! Discover Rwanda's breathtaking beauty and adventure.</span>
+                            </div>
+                            <div class="hero-message" role="listitem">
+                                <i class="fas fa-globe-africa" aria-hidden="true"></i>
+                                <span>Experience authentic Rwandan culture and hospitality</span>
+                            </div>
+                            <div class="hero-message" role="listitem">
+                                <i class="fas fa-mountain" aria-hidden="true"></i>
+                                <span>Gorilla trekking permits available - Book now!</span>
+                            </div>
+                            <div class="hero-message" role="listitem">
+                                <i class="fas fa-award" aria-hidden="true"></i>
+                                <span>Award-winning tour guides and translators</span>
+                            </div>
+                        </div>
+                        <div class="hero-message-controls">
+                            <button class="hero-message-prev" aria-label="Previous message" title="Previous message">‹</button>
+                            <button class="hero-message-next" aria-label="Next message" title="Next message">›</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hero Content -->
+                <div class="hero-content">
+                    <h1 class="hero-title">Discover Rwanda</h1>
                     <p class="hero-subtitle">The Land of a Thousand Hills awaits. Experience unforgettable adventures, culture, and natural beauty.</p>
+                    
                     <div class="hero-buttons">
-                        <a href="#destinations" class="btn btn-primary" data-page="destinations">Explore Destinations</a>
-                        <button class="btn btn-outline plan-trip-btn" type="button" data-modal="plan-trip">Plan Your Trip</button>
+                        <a href="/destinations" class="btn btn-primary explore-destinations-btn" data-page="destinations" aria-label="Explore destinations in Rwanda">
+                            <i class="fas fa-compass" aria-hidden="true"></i> Explore Destinations
+                        </a>
+                        <button class="btn btn-outline plan-trip-hero-btn" type="button" aria-label="Plan your trip to Rwanda">
+                            <i class="fas fa-map-marked-alt" aria-hidden="true"></i> Plan Your Trip
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- Services Section -->
-            <section class="section" id="services" aria-labelledby="services-heading">
+            <section class="section services-section" id="services" aria-labelledby="services-heading">
                 <div class="container">
                     <header class="section-header">
                         <h2 id="services-heading">Our Services</h2>
-                        <p>Everything you need for a perfect Rwanda adventure</p>
+                        <p class="section-subtitle">Everything you need for a perfect Rwanda adventure</p>
                     </header>
-                    <div class="services-grid" role="list">
-                        <div class="service-card" role="listitem">
-                            <i class="fas fa-language service-icon" aria-hidden="true"></i>
-                            <h3>Professional Translators</h3>
-                            <p>Connect with experienced translators speaking multiple languages.</p>
-                            <a href="#translators" class="service-link" data-page="translators">Learn more</a>
+                    <div class="services-grid" role="list" aria-label="List of services">
+                        <div class="service-card" role="listitem" itemscope itemtype="https://schema.org/Service">
+                            <div class="service-icon-wrapper">
+                                <i class="fas fa-language service-icon" aria-hidden="true"></i>
+                            </div>
+                            <h3 class="service-title" itemprop="name">Professional Translators</h3>
+                            <p class="service-description" itemprop="description">Connect with experienced translators speaking multiple languages.</p>
+                            <a href="/translators" class="service-link" data-page="translators" aria-label="Learn more about translation services">Learn more →</a>
                         </div>
-                        <div class="service-card" role="listitem">
-                            <i class="fas fa-user-tie service-icon" aria-hidden="true"></i>
-                            <h3>Expert Tour Guides</h3>
-                            <p>Discover Rwanda with experienced local and international tour guides.</p>
-                            <a href="#guides" class="service-link" data-page="guides">Learn more</a>
+                        <div class="service-card" role="listitem" itemscope itemtype="https://schema.org/Service">
+                            <div class="service-icon-wrapper">
+                                <i class="fas fa-user-tie service-icon" aria-hidden="true"></i>
+                            </div>
+                            <h3 class="service-title" itemprop="name">Expert Tour Guides</h3>
+                            <p class="service-description" itemprop="description">Discover Rwanda with experienced local and international tour guides.</p>
+                            <a href="/guides" class="service-link" data-page="guides" aria-label="Learn more about tour guides">Learn more →</a>
                         </div>
-                        <div class="service-card" role="listitem">
-                            <i class="fas fa-hotel service-icon" aria-hidden="true"></i>
-                            <h3>Accommodation</h3>
-                            <p>From luxury hotels to cozy guesthouses and eco-lodges.</p>
-                            <a href="#accommodations" class="service-link" data-page="accommodations">Learn more</a>
+                        <div class="service-card" role="listitem" itemscope itemtype="https://schema.org/Service">
+                            <div class="service-icon-wrapper">
+                                <i class="fas fa-hotel service-icon" aria-hidden="true"></i>
+                            </div>
+                            <h3 class="service-title" itemprop="name">Accommodation</h3>
+                            <p class="service-description" itemprop="description">From luxury hotels to cozy guesthouses and eco-lodges.</p>
+                            <a href="/accommodations" class="service-link" data-page="accommodations" aria-label="Learn more about accommodations">Learn more →</a>
                         </div>
-                        <div class="service-card" role="listitem">
-                            <i class="fas fa-map-marked-alt service-icon" aria-hidden="true"></i>
-                            <h3>Destinations</h3>
-                            <p>Must-visit locations across Rwanda with custom itineraries</p>
-                            <a href="#destinations" class="service-link" data-page="destinations">Learn more</a>
+                        <div class="service-card" role="listitem" itemscope itemtype="https://schema.org/Service">
+                            <div class="service-icon-wrapper">
+                                <i class="fas fa-map-marked-alt service-icon" aria-hidden="true"></i>
+                            </div>
+                            <h3 class="service-title" itemprop="name">Destinations</h3>
+                            <p class="service-description" itemprop="description">Must-visit locations across Rwanda with custom itineraries</p>
+                            <a href="/destinations" class="service-link" data-page="destinations" aria-label="Learn more about destinations">Learn more →</a>
                         </div>
                     </div>
                 </div>
@@ -129,54 +257,61 @@
                 <div class="container">
                     <header class="section-header">
                         <h2 id="destinations-heading">Featured Destinations</h2>
-                        <p>Must-visit locations across Rwanda</p>
+                        <p class="section-subtitle">Must-visit locations across Rwanda</p>
                     </header>
-                    <div class="destinations-grid" role="list" aria-label="List of destinations">
+                    <div class="destinations-grid" role="list" aria-label="List of featured destinations">
                         <!-- Populated by JavaScript -->
+                        <div class="destinations-placeholder">
+                            <p>Loading destinations...</p>
+                        </div>
                     </div>
                     <div class="section-footer">
-                        <a href="#destinations" class="btn btn-primary btn-large" data-page="destinations">
-                            <i class="fas fa-map-marked-alt"></i> View All Destinations
+                        <a href="/destinations" class="btn btn-primary btn-large view-all-btn" data-page="destinations" aria-label="View all destinations">
+                            <i class="fas fa-map-marked-alt" aria-hidden="true"></i> View All Destinations
                         </a>
                     </div>
                 </div>
             </section>
 
             <!-- Blog Preview -->
-            <section class="section" id="preview-blog" aria-labelledby="blog-heading">
+            <section class="section blog-preview-section" id="preview-blog" aria-labelledby="blog-heading">
                 <div class="container">
                     <header class="section-header">
                         <h2 id="blog-heading">Latest Travel News</h2>
-                        <p>Tips, stories, and insights to help you plan the perfect Rwanda adventure</p>
+                        <p class="section-subtitle">Tips, stories, and insights to help you plan the perfect Rwanda adventure</p>
                     </header>
                     <div class="blog-grid" role="list" aria-label="Latest blog posts">
                         <!-- Populated by JavaScript -->
+                        <div class="blog-placeholder">
+                            <p>Loading blog posts...</p>
+                        </div>
                     </div>
                     <div class="section-footer">
-                        <a href="#blog" class="btn btn-primary btn-large" data-page="blog">
-                            <i class="fas fa-newspaper"></i> Read More Stories
+                        <a href="/blog" class="btn btn-primary btn-large view-all-btn" data-page="blog" aria-label="Read more blog posts">
+                            <i class="fas fa-newspaper" aria-hidden="true"></i> Read More Stories
                         </a>
                     </div>
                 </div>
             </section>
 
             <!-- Newsletter -->
-            <section class="section" id="newsletter" aria-labelledby="newsletter-heading">
+            <section class="section newsletter-section" id="newsletter" aria-labelledby="newsletter-heading">
                 <div class="container">
                     <div class="newsletter-card">
                         <h2 id="newsletter-heading">Stay Updated</h2>
-                        <p>Subscribe to our newsletter for travel tips, news and special offers.</p>
-                        <form id="newsletter-form" class="newsletter-form" method="POST" novalidate>
+                        <p class="newsletter-description">Subscribe to our newsletter for travel tips, news and special offers.</p>
+                        <form id="newsletter-form" class="newsletter-form" method="POST" novalidate aria-label="Newsletter subscription form">
                             <div class="form-group newsletter-group">
                                 <label for="newsletter-email" class="sr-only">Your email address</label>
                                 <input type="email" id="newsletter-email" name="email" class="newsletter-input" 
                                        placeholder="Enter your email address" required
-                                       aria-label="Enter your email for newsletter subscription">
-                                <button type="submit" class="btn btn-primary subscribe-btn">
-                                    <i class="fas fa-paper-plane"></i> Subscribe
+                                       aria-label="Enter your email for newsletter subscription"
+                                       aria-required="true">
+                                <button type="submit" class="btn btn-primary subscribe-btn" aria-label="Subscribe to newsletter">
+                                    <i class="fas fa-paper-plane" aria-hidden="true"></i> Subscribe
                                 </button>
                             </div>
-                            <div class="error-message" id="newsletter-error" aria-live="polite"></div>
+                            <div class="form-error" id="newsletter-error" role="alert" hidden></div>
                         </form>
                         <p class="newsletter-note">Join 5,000+ travelers who get our weekly updates</p>
                     </div>
@@ -185,11 +320,11 @@
         </section>
 
         <!-- Destinations Page -->
-        <section id="destinations" class="page">
+        <section id="destinations-page" class="page" data-page="destinations" hidden>
             <div class="page-header">
                 <div class="container">
-                    <h1><i class="fas fa-map-marked-alt"></i> Destinations in Rwanda</h1>
-                    <p>Explore the most beautiful places in the Land of a Thousand Hills</p>
+                    <h1><i class="fas fa-map-marked-alt" aria-hidden="true"></i> Destinations in Rwanda</h1>
+                    <p class="page-subtitle">Explore the most beautiful places in the Land of a Thousand Hills</p>
                 </div>
             </div>
             <div class="container">
@@ -200,45 +335,41 @@
         </section>
 
         <!-- Guides Page -->
-        <section id="guides" class="page">
+        <section id="guides-page" class="page" data-page="guides" hidden>
             <div class="page-header">
                 <div class="container">
-                    <h1><i class="fas fa-user-tie"></i> Tour Guides</h1>
-                    <p>Meet our experienced local and international Guides.</p>
+                    <h1><i class="fas fa-user-tie" aria-hidden="true"></i> Tour Guides</h1>
+                    <p class="page-subtitle">Meet our experienced local and international Guides.</p>
                 </div>
             </div>
             <div class="container">
-                <div class="guides-section">
-                    <div class="guides-grid-full" role="list" aria-label="All tour guides">
-                        <!-- Populated by JavaScript -->
-                    </div>
+                <div class="guides-grid-full" role="list" aria-label="All tour guides">
+                    <!-- Populated by JavaScript -->
                 </div>
             </div>
         </section>
 
         <!-- Translators Page -->
-        <section id="translators" class="page">
+        <section id="translators-page" class="page" data-page="translators" hidden>
             <div class="page-header">
                 <div class="container">
-                    <h1><i class="fas fa-language"></i> Professional Translators</h1>
-                    <p>Connect with experienced translators speaking multiple languages.</p>
+                    <h1><i class="fas fa-language" aria-hidden="true"></i> Professional Translators</h1>
+                    <p class="page-subtitle">Connect with experienced translators speaking multiple languages.</p>
                 </div>
             </div>
             <div class="container">
-                <div class="translators-section">
-                    <div class="translators-grid-full" role="list" aria-label="All translators">
-                        <!-- Populated by JavaScript -->
-                    </div>
+                <div class="translators-grid-full" role="list" aria-label="All translators">
+                    <!-- Populated by JavaScript -->
                 </div>
             </div>
         </section>
 
         <!-- Accommodations Page -->
-        <section id="accommodations" class="page">
+        <section id="accommodations-page" class="page" data-page="accommodations" hidden>
             <div class="page-header">
                 <div class="container">
-                    <h1><i class="fas fa-hotel"></i> Premium Accommodation</h1>
-                    <p>From luxury hotels to cozy guesthouses and eco-lodges</p>
+                    <h1><i class="fas fa-hotel" aria-hidden="true"></i> Premium Accommodation</h1>
+                    <p class="page-subtitle">From luxury hotels to cozy guesthouses and eco-lodges</p>
                 </div>
             </div>
             <div class="container">
@@ -249,11 +380,11 @@
         </section>
 
         <!-- Blog Page -->
-        <section id="blog" class="page">
+        <section id="blog-page" class="page" data-page="blog" hidden>
             <div class="page-header">
                 <div class="container">
-                    <h1><i class="fas fa-newspaper"></i> Travel Blog</h1>
-                    <p>Latest stories, tips, and insights about Rwanda</p>
+                    <h1><i class="fas fa-newspaper" aria-hidden="true"></i> Travel Blog</h1>
+                    <p class="page-subtitle">Latest stories, tips, and insights about Rwanda</p>
                 </div>
             </div>
             <div class="container">
@@ -264,143 +395,142 @@
         </section>
 
         <!-- Contact Page -->
-        <section id="contact" class="page">
+        <section id="contact-page" class="page" data-page="contact" hidden>
             <div class="page-header">
                 <div class="container">
-                    <h1><i class="fas fa-envelope"></i> Contact Us</h1>
-                    <p>We'd love to hear from you! Reach out with your questions or inquiries</p>
+                    <h1><i class="fas fa-envelope" aria-hidden="true"></i> Contact Us</h1>
+                    <p class="page-subtitle">We'd love to hear from you! Reach out with your questions or inquiries</p>
                 </div>
             </div>
             <div class="container">
                 <div class="contact-container">
-                    <div class="contact-info">
+                    <div class="contact-info" itemscope itemtype="https://schema.org/TravelAgency">
                         <h2>Get in Touch</h2>
                         <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div>
+                            <i class="fas fa-map-marker-alt contact-icon" aria-hidden="true"></i>
+                            <div class="contact-details">
                                 <h3>Address</h3>
-                                <p>KG 7 Ave<br>Kigali, Rwanda</p>
+                                <p itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                                    <span itemprop="streetAddress">KG 7 Ave</span><br>
+                                    <span itemprop="addressLocality">Kigali</span>, 
+                                    <span itemprop="addressCountry">Rwanda</span>
+                                </p>
                             </div>
                         </div>
                         <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <div>
+                            <i class="fas fa-phone contact-icon" aria-hidden="true"></i>
+                            <div class="contact-details">
                                 <h3>Phone</h3>
-                                <p>+250 787 407 051<br>+250 727 514 970</p>
+                                <p itemprop="telephone">+250 787 407 051<br>+250 727 514 970</p>
                             </div>
                         </div>
                         <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <div>
+                            <i class="fas fa-envelope contact-icon" aria-hidden="true"></i>
+                            <div class="contact-details">
                                 <h3>Email</h3>
-                                <p>info@gotrip.africa<br>rutayisirepatie@gmail.com</p>
+                                <p itemprop="email">info@gotrip.africa<br>rutayisirepatie@gmail.com</p>
                             </div>
                         </div>
                         <div class="contact-item">
-                            <i class="fas fa-clock"></i>
-                            <div>
+                            <i class="fas fa-clock contact-icon" aria-hidden="true"></i>
+                            <div class="contact-details">
                                 <h3>Working Hours</h3>
                                 <p>Monday - Friday: 8am - 6pm<br>Saturday: 9am - 4pm</p>
                             </div>
                         </div>
                         
                         <h3 class="social-title">Connect With Us</h3>
-                        <div class="contact-social">
-                            <a href="https://www.linkedin.com/in/patience-rutayisire/" class="social-icon linkedin" aria-label="LinkedIn">
+                        <div class="contact-social" role="list" aria-label="Social media links">
+                            <a href="https://www.linkedin.com/in/patience-rutayisire/" class="social-icon linkedin" aria-label="LinkedIn profile" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-linkedin-in"></i>
-                                <span>LinkedIn</span>
                             </a>
-                            <a href="https://web.facebook.com/patience.rutayisire/" class="social-icon facebook" aria-label="Facebook">
+                            <a href="https://web.facebook.com/patience.rutayisire/" class="social-icon facebook" aria-label="Facebook profile" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-facebook-f"></i>
-                                <span>Facebook</span>
                             </a>
-                            <a href="https://x.com/0011111olen" class="social-icon twitter" aria-label="Twitter">
+                            <a href="https://x.com/0011111olen" class="social-icon twitter" aria-label="Twitter profile" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-twitter"></i>
-                                <span>X</span>
                             </a>
-                            <a href="https://www.instagram.com/patierutayisire/" class="social-icon instagram" aria-label="Instagram">
+                            <a href="https://www.instagram.com/patierutayisire/" class="social-icon instagram" aria-label="Instagram profile" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-instagram"></i>
-                                <span>Instagram</span>
                             </a>
-                            <a href="https://www.youtube.com/@adventurehillbound" class="social-icon youtube" aria-label="YouTube">
+                            <a href="https://www.youtube.com/@adventurehillbound" class="social-icon youtube" aria-label="YouTube channel" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-youtube"></i>
-                                <span>YouTube</span>
                             </a>
-                            <a href="https://wa.me/+250787407051" class="social-icon whatsapp" aria-label="WhatsApp">
+                            <a href="https://wa.me/+250787407051" class="social-icon whatsapp" aria-label="WhatsApp contact" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-whatsapp"></i>
-                                <span>WhatsApp</span>
                             </a>
                         </div>
                     </div>
+                    
                     <div class="contact-form-wrapper">
                         <h2>Send us a Message</h2>
-                        <form id="contact-form" method="POST" novalidate>
+                        <form id="contact-form" method="POST" novalidate aria-label="Contact form">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="contact-name">Your Name *</label>
-                                    <input type="text" id="contact-name" name="name" placeholder="Enter your full name" required>
+                                    <label for="contact-name">Your Name <span class="required">*</span></label>
+                                    <input type="text" id="contact-name" name="name" placeholder="Enter your full name" required
+                                           aria-label="Your full name" aria-required="true">
                                 </div>
                                 <div class="form-group">
-                                    <label for="contact-email">Your Email *</label>
-                                    <input type="email" id="contact-email" name="email" placeholder="Enter your email address" required>
+                                    <label for="contact-email">Your Email <span class="required">*</span></label>
+                                    <input type="email" id="contact-email" name="email" placeholder="Enter your email address" required
+                                           aria-label="Your email address" aria-required="true">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="contact-subject">Subject *</label>
-                                <input type="text" id="contact-subject" name="subject" placeholder="What is this regarding?" required>
+                                <label for="contact-subject">Subject <span class="required">*</span></label>
+                                <input type="text" id="contact-subject" name="subject" placeholder="What is this regarding?" required
+                                       aria-label="Message subject" aria-required="true">
                             </div>
                             <div class="form-group">
-                                <label for="contact-message">Your Message *</label>
-                                <textarea id="contact-message" name="message" placeholder="Tell us about your inquiry or request..." rows="6" required></textarea>
+                                <label for="contact-message">Your Message <span class="required">*</span></label>
+                                <textarea id="contact-message" name="message" placeholder="Tell us about your inquiry or request..." 
+                                          rows="6" required aria-label="Your message" aria-required="true"></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-large">
-                                <i class="fas fa-paper-plane"></i> Send Message
-                            </button>
+                            <div class="form-group">
+                                <div class="form-options">
+                                    <button type="submit" class="btn btn-primary btn-large">
+                                        <i class="fas fa-paper-plane" aria-hidden="true"></i> Send Message
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-success" id="contact-success" role="alert" hidden></div>
+                            <div class="form-error" id="contact-error" role="alert" hidden></div>
                         </form>
                     </div>
                 </div>
             </div>
         </section>
-
-        <!-- Dashboard Page -->
-        <section id="dashboard" class="page">
-            <!-- Content will be loaded by JavaScript -->
-        </section>
-
-        <!-- Admin Dashboard Page -->
-        <section id="admin" class="page">
-            <!-- Content will be loaded by JavaScript -->
-        </section>
     </main>
 
     <!-- Footer -->
-    <footer class="main-footer" aria-label="Footer">
+    <footer class="main-footer" aria-label="Footer" role="contentinfo">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
                     <h3 class="footer-logo">
                         <span>Go</span> <span>Trip</span>
                     </h3>
-                    <p>Discover the Land of a Thousand Hills. Your gateway to unforgettable experiences in Rwanda.</p>
+                    <p class="footer-description">Discover the Land of a Thousand Hills. Your gateway to unforgettable experiences in Rwanda.</p>
                     <div class="footer-social">
                         <h4>Connect With Us</h4>
-                        <div class="social-links">
-                            <a href="https://www.linkedin.com/in/patience-rutayisire/" class="social-link linkedin" aria-label="LinkedIn profile">
+                        <div class="social-links" role="list" aria-label="Social media links">
+                            <a href="https://www.linkedin.com/in/patience-rutayisire/" class="social-link linkedin" aria-label="LinkedIn profile" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-linkedin-in"></i>
                             </a>
-                            <a href="https://web.facebook.com/patience.rutayisire/" class="social-link facebook" aria-label="Facebook page">
+                            <a href="https://web.facebook.com/patience.rutayisire/" class="social-link facebook" aria-label="Facebook page" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
-                            <a href="https://x.com/0011111olen" class="social-link twitter" aria-label="Twitter profile">
+                            <a href="https://x.com/0011111olen" class="social-link twitter" aria-label="Twitter profile" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-twitter"></i>
                             </a>
-                            <a href="https://www.instagram.com/patierutayisire/" class="social-link instagram" aria-label="Instagram profile">
+                            <a href="https://www.instagram.com/patierutayisire/" class="social-link instagram" aria-label="Instagram profile" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-instagram"></i>
                             </a>
-                            <a href="https://www.youtube.com/@adventurehillbound" class="social-link youtube" aria-label="YouTube channel">
+                            <a href="https://www.youtube.com/@adventurehillbound" class="social-link youtube" aria-label="YouTube channel" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-youtube"></i>
                             </a>
-                            <a href="https://wa.me/+250787407051" class="social-link whatsapp" aria-label="WhatsApp">
+                            <a href="https://wa.me/+250787407051" class="social-link whatsapp" aria-label="WhatsApp contact" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
                         </div>
@@ -410,66 +540,141 @@
                 <div class="footer-column">
                     <h4>Quick Links</h4>
                     <ul class="footer-links" role="list">
-                        <li><a href="#home" data-page="home"><i class="fas fa-home"></i> Home</a></li>
-                        <li><a href="#destinations" data-page="destinations"><i class="fas fa-map-marked-alt"></i> Destinations</a></li>
-                        <li><a href="#guides" data-page="guides"><i class="fas fa-user-tie"></i> Tour Guides</a></li>
-                        <li><a href="#translators" data-page="translators"><i class="fas fa-language"></i> Translators</a></li>
-                        <li><a href="#accommodations" data-page="accommodations"><i class="fas fa-hotel"></i> Accommodations</a></li>
+                        <li><a href="/" data-page="home" aria-label="Go to homepage"><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
+                        <li><a href="/destinations" data-page="destinations" aria-label="View destinations"><i class="fas fa-map-marked-alt" aria-hidden="true"></i> Destinations</a></li>
+                        <li><a href="/guides" data-page="guides" aria-label="Find tour guides"><i class="fas fa-user-tie" aria-hidden="true"></i> Tour Guides</a></li>
+                        <li><a href="/translators" data-page="translators" aria-label="Find translators"><i class="fas fa-language" aria-hidden="true"></i> Translators</a></li>
+                        <li><a href="/accommodations" data-page="accommodations" aria-label="Find accommodations"><i class="fas fa-hotel" aria-hidden="true"></i> Accommodations</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-column">
                     <h4>Our Services</h4>
                     <ul class="footer-links" role="list">
-                        <li><a href="#guides" data-page="guides"><i class="fas fa-user-tie"></i> Tour Guides</a></li>
-                        <li><a href="#translators" data-page="translators"><i class="fas fa-language"></i> Translators</a></li>
-                        <li><a href="#accommodations" data-page="accommodations"><i class="fas fa-hotel"></i> Accommodation</a></li>
-                        <li><a href="#" class="plan-trip-btn"><i class="fas fa-map-marked-alt"></i> Custom Tours</a></li>
-                        <li><a href="#contact" data-page="contact"><i class="fas fa-headset"></i> Travel Support</a></li>
+                        <li><a href="/guides" data-page="guides" aria-label="Tour guide services"><i class="fas fa-user-tie" aria-hidden="true"></i> Tour Guides</a></li>
+                        <li><a href="/translators" data-page="translators" aria-label="Translation services"><i class="fas fa-language" aria-hidden="true"></i> Translators</a></li>
+                        <li><a href="/accommodations" data-page="accommodations" aria-label="Accommodation services"><i class="fas fa-hotel" aria-hidden="true"></i> Accommodation</a></li>
+                        <li><a href="#" class="plan-trip-footer-btn" aria-label="Plan your trip"><i class="fas fa-map-marked-alt" aria-hidden="true"></i> Plan Your Trip</a></li>
+                        <li><a href="/contact" data-page="contact" aria-label="Contact us"><i class="fas fa-headset" aria-hidden="true"></i> Contact Us</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-column">
                     <h4>Stay Updated</h4>
                     <p>Subscribe to our newsletter for travel tips, news and special offers.</p>
-                    <form class="footer-newsletter-form" method="POST" novalidate>
+                    <form class="footer-newsletter-form" method="POST" novalidate aria-label="Footer newsletter subscription">
                         <div class="form-group footer-newsletter-group">
                             <label for="footer-newsletter-email" class="sr-only">Your email address</label>
                             <input type="email" id="footer-newsletter-email" name="email" 
                                    placeholder="Your email address" required
-                                   aria-label="Enter your email for newsletter subscription">
-                            <button type="submit" class="btn btn-outline footer-subscribe-btn">
+                                   aria-label="Enter your email for newsletter subscription"
+                                   aria-required="true">
+                            <button type="submit" class="btn btn-outline footer-subscribe-btn" aria-label="Subscribe">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
                     </form>
-                    <p class="footer-newsletter-note">Join 5,000+ travelers</p>
                     <div class="footer-contact">
-                        <p><i class="fas fa-envelope"></i> info@gotrip.africa</p>
-                        <p><i class="fas fa-phone"></i> +250 787 407 051</p>
+                        <p><i class="fas fa-envelope" aria-hidden="true"></i> info@gotrip.africa</p>
+                        <p><i class="fas fa-phone" aria-hidden="true"></i> +250 787 407 051</p>
                     </div>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; <span id="current-year">2025</span> Go Trip.</p>
+                <p>&copy; <span id="current-year">2025</span> Go Trip. All rights reserved.</p>
                 <ul class="footer-legal" role="list">
-                    <li><a href="/privacy-policy" target="_blank">Privacy Policy</a></li>
-                    <li><a href="/terms" target="_blank">Terms of Service</a></li>
-                    <li><a href="/cookies" target="_blank">Cookie Policy</a></li>
-                    <li><a href="/sitemap" target="_blank">Sitemap</a></li>
+                    <li><a href="#" class="legal-link" data-legal="privacy-policy" aria-label="Privacy Policy">Privacy Policy</a></li>
+                    <li><a href="#" class="legal-link" data-legal="terms-of-service" aria-label="Terms of Service">Terms of Service</a></li>
+                    <li><a href="#" class="legal-link" data-legal="cookie-policy" aria-label="Cookie Policy">Cookie Policy</a></li>
                 </ul>
             </div>
         </div>
     </footer>
 
+    <!-- Search Modal -->
+    <div id="search-modal" class="search-modal" role="dialog" aria-modal="true" aria-label="Search" hidden>
+        <div class="search-modal-content">
+            <div class="search-header">
+                <h3><i class="fas fa-search" aria-hidden="true"></i> Search Go Trip</h3>
+                <button class="search-close" aria-label="Close search">&times;</button>
+            </div>
+            <div class="search-body">
+                <form id="search-form" class="search-form" aria-label="Search form">
+                    <div class="search-input-group">
+                        <label for="search-input" class="sr-only">Search</label>
+                        <input type="search" id="search-input" placeholder="Search destinations, guides, accommodations, blog..." 
+                               autocomplete="off" aria-label="Search input">
+                        <button type="submit" class="search-submit" aria-label="Search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="search-results" id="search-results" role="region" aria-live="polite">
+                    <div class="no-results">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <p>Enter your search terms above to find destinations, guides, accommodations, and articles.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay" aria-hidden="true" aria-label="Loading">
-        <div class="loading-spinner"></div>
+    <div id="loading-overlay" class="loading-overlay" aria-hidden="true" aria-label="Loading content" hidden>
+        <div class="loading-spinner" aria-hidden="true"></div>
         <p>Loading Go Trip...</p>
     </div>
 
+    <!-- Modal Container -->
+    <div id="modal-container" class="modal-container"></div>
+
     <!-- Scripts -->
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
+    
+    <!-- Additional Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Go Trip",
+        "image": "https://gotrip.africa/images/business-logo.jpg",
+        "@id": "https://gotrip.africa",
+        "url": "https://gotrip.africa",
+        "telephone": "+250787407051",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "KG 7 Ave",
+            "addressLocality": "Kigali",
+            "addressRegion": "Kigali",
+            "postalCode": "00000",
+            "addressCountry": "RW"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": -1.9441,
+            "longitude": 30.0619
+        },
+        "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "opens": "08:00",
+            "closes": "18:00"
+        },
+        "sameAs": [
+            "https://www.linkedin.com/in/patience-rutayisire/",
+            "https://web.facebook.com/patience.rutayisire/",
+            "https://x.com/0011111olen",
+            "https://www.instagram.com/patierutayisire/",
+            "https://www.youtube.com/@adventurehillbound"
+        ]
+    }
+    </script>
+    
+    <!-- Remove no-js class once JS loads -->
+    <script>
+        document.documentElement.classList.remove('no-js');
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
