@@ -1,4 +1,4 @@
-// Go Trip
+// Go Trip Frontend Application v3.0 (API-Only)
 (function() {
     'use strict';
     
@@ -6,10 +6,10 @@
     // CONFIGURATION
     // ===============================
     const config = {
-        baseUrl: 'https://gotrip-backend-uwhn.onrender.com/api',
+        baseUrl: window.location.hostname.includes('onrender.com') 
+            ? 'https://gotrip-backend-uwhn.onrender.com/api'
+            : 'http://localhost:5000/api',
         debug: true,
-        useMockMode: false,
-        enableCache: true,
         cacheDuration: 300000, // 5 minutes
         
         heroMessages: [
@@ -30,17 +30,23 @@
     let currentHeroMessageIndex = 0;
     let heroMessageTimer = null;
     let isModalOpen = false;
-    let apiHealth = true;
+    let apiHealth = false;
+    let isInitialized = false;
+    let connectionStatus = 'checking';
 
     // ===============================
-    // API SERVICE (MongoDB Integration)
+    // API SERVICE
     // ===============================
     const apiService = {
         /**
-         * Send API request to MongoDB backend
+         * Send API request with timeout and fallback support
          */
         async request(endpoint, options = {}) {
             const url = `${config.baseUrl}${endpoint}`;
+            
+            // Create abort controller for timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
             
             const headers = {
                 'Content-Type': 'application/json',
@@ -51,10 +57,13 @@
             try {
                 const response = await fetch(url, {
                     ...options,
+                    signal: controller.signal,
                     headers,
                     credentials: 'include',
                     mode: 'cors'
                 });
+
+                clearTimeout(timeoutId);
 
                 if (!response.ok) {
                     const error = await response.json().catch(() => ({
@@ -67,98 +76,87 @@
                 const data = await response.json();
                 
                 if (config.debug && endpoint !== '/health') {
-                    console.log(`API ${options.method || 'GET'} ${endpoint}:`, data);
+                    console.log(`✅ API ${options.method || 'GET'} ${endpoint}:`, data);
                 }
                 
                 return data;
                 
             } catch (error) {
-                console.error(`API request failed for ${endpoint}:`, error);
+                clearTimeout(timeoutId);
                 
-                if (options.method && options.method !== 'GET') {
-                    apiHealth = false;
+                // Network error or CORS issue
+                if (error.name === 'TypeError' || error.message.includes('Failed to fetch')) {
+                    console.warn(`🌐 Network error for ${endpoint}:`, error.message);
+                    throw new Error('Cannot connect to server. Please check your connection.');
                 }
                 
+                // Timeout error (Render cold start)
+                if (error.name === 'AbortError') {
+                    console.warn(`⏰ Timeout for ${endpoint} (Server may be starting up)`);
+                    throw new Error('Server is starting up. Please try again.');
+                }
+                
+                console.error(`❌ API request failed for ${endpoint}:`, error);
                 throw error;
             }
         },
 
-        // === MONGODB CRUD OPERATIONS ===
+        // === CREATE OPERATIONS ===
         
-        // Create new booking (saves to MongoDB)
         async createBooking(bookingData) {
-            return this.request('/bookings', {
+            return await this.request('/bookings', {
                 method: 'POST',
                 body: JSON.stringify(bookingData)
             });
         },
 
-        // Create custom trip plan (saves to MongoDB)
         async createTripPlan(tripPlanData) {
-            return this.request('/tripPlan', {
+            return await this.request('/tripPlan', {
                 method: 'POST',
                 body: JSON.stringify(tripPlanData)
             });
         },
 
-        // Subscribe to newsletter (saves to MongoDB)
         async subscribeNewsletter(emailData) {
-            return this.request('/newsletter/subscribe', {
+            return await this.request('/newsletter/subscribe', {
                 method: 'POST',
                 body: JSON.stringify(emailData)
             });
         },
 
-        // Send contact message (saves to MongoDB)
         async sendContactMessage(contactData) {
-            return this.request('/contact', {
+            return await this.request('/contact', {
                 method: 'POST',
                 body: JSON.stringify(contactData)
             });
         },
 
-        // === DATA RETRIEVAL FROM MONGODB ===
+        // === READ OPERATIONS ===
         
-        // Get all guides from MongoDB
         async getGuides() {
-            return this.request('/guides');
+            return await this.request('/guides');
         },
 
-        // Get all destinations from MongoDB
         async getDestinations() {
-            return this.request('/destinations');
+            return await this.request('/destinations');
         },
 
-        // Get all translators from MongoDB
         async getTranslators() {
-            return this.request('/translators');
+            return await this.request('/translators');
         },
 
-        // Get all accommodations from MongoDB
         async getAccommodations() {
-            return this.request('/accommodations');
+            return await this.request('/accommodations');
         },
 
-        // Get all blog posts from MongoDB
         async getBlogPosts() {
-            return this.request('/blog');
+            return await this.request('/blog');
         },
 
         // === DASHBOARD DATA ===
         
-        // Get dashboard statistics
         async getDashboardStats() {
-            return this.request('/dashboard/stats');
-        },
-
-        // Get recent bookings for dashboard
-        async getRecentBookings() {
-            return this.request('/dashboard/recent-bookings');
-        },
-
-        // Get recent trip plans for dashboard
-        async getRecentTripPlans() {
-            return this.request('/dashboard/recent-trip-plans');
+            return await this.request('/dashboard/stats');
         },
 
         // === HEALTH CHECK ===
@@ -166,279 +164,14 @@
             try {
                 const health = await this.request('/health');
                 apiHealth = health.success;
+                connectionStatus = health.database === 'connected' ? 'online' : 'limited';
                 return health;
             } catch (error) {
                 apiHealth = false;
+                connectionStatus = 'offline';
                 throw error;
             }
         }
-    };
-
-    // ===============================
-    // MOCK DATA FALLBACK
-    // ===============================
-    const mockData = {
-        guides: [
-            { 
-                _id: "1", 
-                name: "Jean Claude N.", 
-                specialty: "Gorilla Trekking Expert", 
-                languages: ["English", "French", "Swahili"],
-                experience: "8 years experience",
-                rating: 4.9,
-                price: "$150/day",
-                image: "./images/jean-claude.jpg",
-                description: "Expert guide specializing in gorilla trekking with extensive knowledge of Volcanoes National Park.",
-                status: "available",
-                createdAt: new Date().toISOString()
-            },
-            { 
-                _id: "2", 
-                name: "Marie Aimee K.", 
-                specialty: "Cultural Tour Guide", 
-                languages: ["English", "Swahili", "Kinyarwanda", "French"],
-                experience: "6 years experience",
-                rating: 4.8,
-                price: "$160/day",
-                image: "./images/marie-aimee.jpg",
-                description: "Cultural expert providing deep insights into Rwandan traditions and history.",
-                status: "available",
-                createdAt: new Date().toISOString()
-            },
-            { 
-                _id: "3", 
-                name: "David M.", 
-                specialty: "Bird Watching Specialist", 
-                languages: ["English", "German", "French"],
-                experience: "10 years experience",
-                rating: 4.9,
-                price: "$180/day",
-                image: "./images/david-m.jpg",
-                description: "Specialized bird watching guide with extensive knowledge of avian species.",
-                status: "available",
-                createdAt: new Date().toISOString()
-            },
-            { 
-                _id: "4", 
-                name: "Sarah T.", 
-                specialty: "Adventure Hiking Guide", 
-                languages: ["English", "French", "Spanish"],
-                experience: "7 years experience",
-                rating: 4.7,
-                price: "$150/day",
-                image: "./images/sarah-t.jpg",
-                description: "Experienced hiking guide for mountain trails and adventure tours.",
-                status: "available",
-                createdAt: new Date().toISOString()
-            }
-        ],
-        translators: [
-            { 
-                _id: "1", 
-                name: "Patience Rutayisire", 
-                languages: ["English", "German", "Spanish", "French", "Swahili", "Chinese", "Kinyarwanda"],
-                specialty: "Tourism & Business Translation",
-                rating: 4.9,
-                price: "$140/day",
-                image: "./images/Patie.png",
-                experience: "5 years experience",
-                description: "Professional translator specializing in tourism and business communications.",
-                status: "available",
-                createdAt: new Date().toISOString()
-            },
-            { 
-                _id: "2", 
-                name: "Eric M.", 
-                languages: ["English", "German", "Chinese", "Kinyarwanda", "French"],
-                specialty: "Medical & Technical Translation",
-                rating: 4.8,
-                price: "$150/day",
-                image: "./images/eric-m.jpg",
-                experience: "8 years experience",
-                description: "Specialized in medical and technical translations",
-                status: "available",
-                createdAt: new Date().toISOString()
-            },
-            { 
-                _id: "3", 
-                name: "Grace U.", 
-                languages: ["English", "Spanish", "Portuguese", "Kinyarwanda", "French"],
-                specialty: "Legal & Government Translation",
-                rating: 4.7,
-                price: "$130/day",
-                image: "./images/grace-u.jpg",
-                experience: "6 years experience",
-                description: "Expert in legal documents and government communications translation.",
-                status: "available",
-                createdAt: new Date().toISOString()
-            }
-        ],
-        destinations: [
-            {
-                _id: "1",
-                name: "Volcanoes National Park",
-                location: "Northern Province, Rwanda",
-                description: "Home to the endangered mountain gorillas, this UNESCO World Heritage site offers unforgettable gorilla trekking experiences in the Virunga Mountains.",
-                image: "./images/mount-bisoke-rwanda.jpg",
-                features: ["Gorilla Trekking", "Mountain Hiking", "Bird Watching", "Cultural Villages"],
-                rating: 4.9,
-                price: "From $1,500",
-                category: "National Park",
-                popularity: 95,
-                createdAt: new Date().toISOString()
-            },
-            {
-                _id: "2",
-                name: "Lake Kivu",
-                location: "Western Province, Rwanda",
-                description: "One of Africa's Great Lakes, offering stunning views, water sports, beautiful beaches, and relaxing hot springs along its shores.",
-                image: "./images/ruanda-lake-kivu-aussicht.jpg",
-                features: ["Beaches", "Boating", "Swimming", "Hot Springs"],
-                rating: 4.7,
-                price: "From $300",
-                category: "Lake",
-                popularity: 85,
-                createdAt: new Date().toISOString()
-            },
-            {
-                _id: "3",
-                name: "Nyungwe Forest National Park",
-                location: "Southern Province, Rwanda",
-                description: "Ancient rainforest with canopy walkway, home to chimpanzees and over 300 bird species. One of Africa's oldest forests.",
-                image: "./images/nyungwe-weather.jpg",
-                features: ["Canopy Walk", "Chimpanzee Tracking", "Hiking", "Waterfalls"],
-                rating: 4.8,
-                price: "From $600",
-                category: "National Park",
-                popularity: 90,
-                createdAt: new Date().toISOString()
-            },
-            {
-                _id: "4",
-                name: "Kigali City",
-                location: "Kigali, Rwanda",
-                description: "The vibrant capital city known for its cleanliness, safety, and rich cultural experiences including museums, markets, and memorial sites.",
-                image: "./images/mount-jali-hike.jpg",
-                features: ["City Tours", "Cultural Museums", "Markets", "Nightlife"],
-                rating: 4.8,
-                price: "From $100",
-                category: "City",
-                popularity: 88,
-                createdAt: new Date().toISOString()
-            }
-        ],
-        accommodations: [
-            { 
-                _id: "1", 
-                name: "Bisate Lodge", 
-                location: "Volcanoes National Park",
-                type: "Luxury Eco-Lodge",
-                description: "Award-winning eco-lodge with stunning views of the volcanoes, offering luxury accommodation and direct gorilla trekking access.",
-                image: "./images/Bisate-Lodge-Rwanda-Exterior.jpg",
-                features: ["Private Villas", "Gorilla Views", "Spa", "Fine Dining"],
-                price: "$2,500/night",
-                rating: 4.9,
-                availability: "available",
-                createdAt: new Date().toISOString()
-            },
-            { 
-                _id: "2", 
-                name: "Lake Kivu Serena Hotel", 
-                location: "Gisenyi, Lake Kivu",
-                type: "5-Star Hotel",
-                description: "Luxury resort on the shores of Lake Kivu with private beach, water sports, and panoramic lake views.",
-                image: "./images/aeriel-view-serena.jpg",
-                features: ["Lake View", "Private Beach", "Spa", "Water Sports"],
-                price: "$450/night",
-                rating: 4.7,
-                availability: "available",
-                createdAt: new Date().toISOString()
-            },
-            { 
-                _id: "3", 
-                name: "Kigali Marriott Hotel", 
-                location: "Kigali City Center",
-                type: "Business Hotel",
-                description: "Modern luxury hotel in the heart of Kigali, perfect for business travelers and tourists alike.",
-                image: "./images/mariot-kigali.png",
-                features: ["City Center", "Business Center", "Pool", "Multiple Restaurants"],
-                price: "$350/night",
-                rating: 4.6,
-                availability: "available",
-                createdAt: new Date().toISOString()
-            },
-            { 
-                _id: "4", 
-                name: "One&Only Gorilla's Nest", 
-                location: "Volcanoes National Park",
-                type: "Luxury Resort",
-                description: "Ultra-luxurious resort offering bespoke gorilla trekking experiences and unparalleled comfort.",
-                image: "./images/one-and-only-kinigi.jpg",
-                features: ["Butler Service", "Private Trekking", "Helicopter Transfer", "Fine Dining"],
-                price: "$3,500/night",
-                rating: 4.9,
-                availability: "available",
-                createdAt: new Date().toISOString()
-            }
-        ],
-        blog: [
-            { 
-                _id: "1", 
-                title: "Complete Guide to Gorilla Trekking in Rwanda", 
-                excerpt: "Everything you need to know about mountain gorilla trekking in Volcanoes National Park, including permits, preparation, and what to expect.",
-                date: "December 25, 2025",
-                category: "Adventure",
-                image: "./images/gorilla-trekk-rwanda.jpg",
-                readTime: "8 min read",
-                author: "Jean Claude",
-                content: "Volcanoes National Park in Rwanda is home to the endangered mountain gorillas. Trekking to see these magnificent creatures is a once-in-a-lifetime experience that requires proper planning and preparation. The park offers various trekking packages suitable for different fitness levels. Permits must be obtained in advance through authorized tour operators like Go Trip.",
-                views: 1250,
-                likes: 89,
-                createdAt: new Date().toISOString()
-            },
-            { 
-                _id: "2", 
-                title: "Best Time to Visit Rwanda: Weather & Seasons Guide", 
-                excerpt: "Planning your trip? Here's when to visit Rwanda for the best wildlife viewing, hiking conditions, and cultural experiences.",
-                date: "December 28, 2025",
-                category: "Travel Tips",
-                image: "./images/rwanda-landscape.jpg",
-                readTime: "6 min read",
-                author: "Travel Team",
-                content: "Rwanda's climate varies throughout the year, affecting wildlife viewing and trekking conditions. The dry seasons from June to September and December to February are ideal for gorilla trekking and hiking. The wet seasons offer lush green landscapes and fewer tourists.",
-                views: 980,
-                likes: 76,
-                createdAt: new Date().toISOString()
-            },
-            { 
-                _id: "3", 
-                title: "Rwandan Culture: Traditions, Food & Etiquette", 
-                excerpt: "Discover the rich cultural heritage of Rwanda, from traditional dances and ceremonies to delicious local cuisine.",
-                date: "December 15, 2025",
-                category: "Culture",
-                image: "./images/intore-dancers.jpg",
-                readTime: "7 min read",
-                author: "Marie Aimee",
-                content: "Rwanda's culture is as diverse as its landscapes. From the vibrant Intore dance performances to the unique culinary traditions, visitors are welcomed with warm hospitality. Understanding local customs and etiquette enhances your travel experience.",
-                views: 1120,
-                likes: 92,
-                createdAt: new Date().toISOString()
-            },
-            { 
-                _id: "4", 
-                title: "Top 10 Hiking Trails in the Land of a Thousand Hills", 
-                excerpt: "Explore Rwanda's breathtaking landscapes through these incredible hiking trails suitable for all fitness levels.",
-                date: "October 30, 2025",
-                category: "Hiking",
-                image: "./images/rwanda-hiking.jpg",
-                readTime: "9 min read",
-                author: "Sarah T.",
-                content: "Rwanda's nickname 'Land of a Thousand Hills' is well-deserved. From the challenging Mount Karisimbi to the scenic Congo Nile Trail, there are hiking opportunities for everyone. Each trail offers unique views of Rwanda's stunning landscapes.",
-                views: 870,
-                likes: 67,
-                createdAt: new Date().toISOString()
-            }
-        ]
     };
 
     // ===============================
@@ -455,44 +188,44 @@
         },
 
         async fetchAllData() {
+            console.log('📥 Fetching data from backend...');
+            
             try {
-                // Try to fetch from MongoDB backend
-                const [guides, translators, destinations, accommodations, blog] = await Promise.all([
-                    apiService.getGuides().catch(() => ({ data: mockData.guides })),
-                    apiService.getTranslators().catch(() => ({ data: mockData.translators })),
-                    apiService.getDestinations().catch(() => ({ data: mockData.destinations })),
-                    apiService.getAccommodations().catch(() => ({ data: mockData.accommodations })),
-                    apiService.getBlogPosts().catch(() => ({ data: mockData.blog }))
+                const [guides, destinations, translators, accommodations, blog] = await Promise.allSettled([
+                    apiService.getGuides(),
+                    apiService.getDestinations(),
+                    apiService.getTranslators(),
+                    apiService.getAccommodations(),
+                    apiService.getBlogPosts()
                 ]);
 
                 this.cache = {
-                    guides: guides.data || guides || mockData.guides,
-                    translators: translators.data || translators || mockData.translators,
-                    destinations: destinations.data || destinations || mockData.destinations,
-                    accommodations: accommodations.data || accommodations || mockData.accommodations,
-                    blog: blog.data || blog || mockData.blog,
+                    guides: guides.status === 'fulfilled' ? guides.value.data : [],
+                    destinations: destinations.status === 'fulfilled' ? destinations.value.data : [],
+                    translators: translators.status === 'fulfilled' ? translators.value.data : [],
+                    accommodations: accommodations.status === 'fulfilled' ? accommodations.value.data : [],
+                    blog: blog.status === 'fulfilled' ? blog.value.data : [],
                     timestamp: Date.now()
                 };
 
+                console.log(`✅ Data loaded from backend`);
                 return this.cache;
                 
             } catch (error) {
-                console.warn('Using mock data due to API error:', error);
-                this.cache = {
-                    ...mockData,
+                console.error('❌ Failed to fetch data:', error);
+                return {
+                    guides: [],
+                    translators: [],
+                    destinations: [],
+                    accommodations: [],
+                    blog: [],
                     timestamp: Date.now()
                 };
-                return this.cache;
             }
         },
 
         getData(type) {
-            if (config.enableCache && 
-                this.cache[type] && 
-                Date.now() - this.cache.timestamp < config.cacheDuration) {
-                return this.cache[type];
-            }
-            return mockData[type];
+            return this.cache[type] || [];
         },
 
         async refreshData() {
@@ -517,6 +250,7 @@
     
     function showNotification(message, type = 'info', duration = 3000) {
         try {
+            // Remove existing notifications
             document.querySelectorAll('.notification-toast').forEach(n => n.remove());
             
             const notification = document.createElement('div');
@@ -524,24 +258,29 @@
             notification.setAttribute('role', 'alert');
             notification.setAttribute('aria-live', 'assertive');
             
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+            
             notification.innerHTML = `
                 <div class="notification-content">
-                    <span class="notification-message">${message}</span>
+                    <span class="notification-message">${icon} ${message}</span>
                     <button class="notification-close" aria-label="Close notification">&times;</button>
                 </div>
             `;
             
             document.body.appendChild(notification);
             
+            // Animate in
             requestAnimationFrame(() => {
                 notification.classList.add('show');
             });
             
+            // Auto remove after duration
             const removeTimer = setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => notification.remove(), 300);
             }, duration);
             
+            // Close on click
             notification.querySelector('.notification-close').addEventListener('click', () => {
                 clearTimeout(removeTimer);
                 notification.classList.remove('show');
@@ -564,6 +303,8 @@
     }
 
     function showLoading(element, show = true) {
+        if (!element) return;
+        
         if (show) {
             element.classList.add('loading');
             element.disabled = true;
@@ -645,10 +386,12 @@
         try {
             const elementId = pageIdMap[pageId] || 'home-page';
             
+            // Hide all pages
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.remove('active');
             });
             
+            // Show target page
             const targetPage = document.getElementById(elementId);
             if (!targetPage) {
                 console.warn(`Page ${elementId} not found, redirecting to home`);
@@ -658,6 +401,7 @@
             targetPage.classList.add('active');
             updateActiveNavLink(pageId);
             
+            // Close mobile menu if open
             const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
             const navLinks = document.querySelector('.nav-links');
             if (mobileMenuBtn && navLinks && navLinks.classList.contains('active')) {
@@ -666,8 +410,10 @@
                 document.body.style.overflow = '';
             }
             
+            // Load page content
             loadPageContent(pageId);
             
+            // Scroll to top
             window.scrollTo({
                 top: 0,
                 behavior: smooth ? 'smooth' : 'auto'
@@ -711,7 +457,7 @@
             }
         } catch (error) {
             console.error('Error loading page content:', error);
-            showNotification('Error loading content. Please refresh the page.', 'error');
+            showNotification('Error loading content. Please try again.', 'error');
         }
     }
 
@@ -723,79 +469,115 @@
         try {
             const data = await dataManager.fetchAllData();
             
+            // Load destinations
             const destinationsGrid = document.querySelector('#home-page .destinations-grid');
             if (destinationsGrid) {
                 const featuredDestinations = data.destinations.slice(0, 3);
-                destinationsGrid.innerHTML = featuredDestinations.map(dest => `
-                    <div class="destination-card">
-                        <div class="destination-image">
-                            <img src="${dest.image}" alt="${dest.name}" loading="lazy">
-                            <div class="destination-rating">
-                                <i class="fas fa-star" aria-hidden="true"></i> ${dest.rating}
+                
+                if (featuredDestinations.length === 0) {
+                    destinationsGrid.innerHTML = `
+                        <div class="no-data-message">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <h3>No destinations available</h3>
+                            <p>Check back soon for featured destinations.</p>
+                        </div>
+                    `;
+                } else {
+                    destinationsGrid.innerHTML = featuredDestinations.map(dest => `
+                        <div class="destination-card">
+                            <div class="destination-image">
+                                <img src="${dest.image}" alt="${dest.name}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
+                                <div class="destination-rating">
+                                    <i class="fas fa-star" aria-hidden="true"></i> ${dest.rating || 'N/A'}
+                                </div>
+                            </div>
+                            <div class="destination-content">
+                                <h3>${dest.name}</h3>
+                                <div class="destination-location">
+                                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${dest.location}
+                                </div>
+                                <p>${dest.description?.substring(0, 100) || ''}...</p>
+                                <button class="btn btn-primary book-now" 
+                                        data-type="destination" 
+                                        data-id="${dest._id}"
+                                        data-name="${dest.name}"
+                                        aria-label="Book ${dest.name}">
+                                    Book Now
+                                </button>
                             </div>
                         </div>
-                        <div class="destination-content">
-                            <h3>${dest.name}</h3>
-                            <div class="destination-location">
-                                <i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${dest.location}
-                            </div>
-                            <p>${dest.description.substring(0, 100)}...</p>
-                            <button class="btn btn-primary book-now" 
-                                    data-type="destination" 
-                                    data-id="${dest._id}"
-                                    data-name="${dest.name}"
-                                    aria-label="Book ${dest.name}">
-                                Book Now
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+                    `).join('');
+                }
             }
             
+            // Load blog posts
             const blogGrid = document.querySelector('#home-page .blog-grid');
             if (blogGrid) {
                 const featuredBlogs = data.blog.slice(0, 3);
-                blogGrid.innerHTML = featuredBlogs.map(blog => `
-                    <article class="blog-card">
-                        <div class="blog-image">
-                            <img src="${blog.image}" alt="${blog.title}" loading="lazy">
-                            <span class="blog-category">${blog.category}</span>
+                
+                if (featuredBlogs.length === 0) {
+                    blogGrid.innerHTML = `
+                        <div class="no-data-message">
+                            <i class="fas fa-newspaper"></i>
+                            <h3>No blog posts available</h3>
+                            <p>Check back soon for travel stories and tips.</p>
                         </div>
-                        <div class="blog-content">
-                            <div class="blog-meta">
-                                <span class="blog-date">
-                                    <i class="far fa-calendar" aria-hidden="true"></i> ${blog.date}
-                                </span>
-                                <span class="blog-read-time">${blog.readTime}</span>
+                    `;
+                } else {
+                    blogGrid.innerHTML = featuredBlogs.map(blog => `
+                        <article class="blog-card">
+                            <div class="blog-image">
+                                <img src="${blog.image}" alt="${blog.title}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
+                                <span class="blog-category">${blog.category || 'Travel'}</span>
                             </div>
-                            <h3>${blog.title}</h3>
-                            <p>${blog.excerpt.substring(0, 120)}...</p>
-                            <a href="#" class="view-article-link read-more-link" data-id="${blog._id}">
-                                Read More →
-                            </a>
-                        </div>
-                    </article>
-                `).join('');
+                            <div class="blog-content">
+                                <div class="blog-meta">
+                                    <span class="blog-date">
+                                        <i class="far fa-calendar" aria-hidden="true"></i> ${blog.date || new Date().toLocaleDateString()}
+                                    </span>
+                                    <span class="blog-read-time">${blog.readTime || '5 min read'}</span>
+                                </div>
+                                <h3>${blog.title}</h3>
+                                <p>${blog.excerpt?.substring(0, 120) || ''}...</p>
+                                <a href="#" class="view-article-link read-more-link" data-id="${blog._id}">
+                                    Read More →
+                                </a>
+                            </div>
+                        </article>
+                    `).join('');
+                }
             }
             
         } catch (error) {
             console.error('Error loading home page:', error);
-            showNotification('Error loading data. Please refresh the page.', 'error');
+            showNotification('Error loading homepage content. Please try again.', 'error');
         }
     }
 
     async function loadDestinations() {
         try {
-            const data = dataManager.getData('destinations');
+            const response = await apiService.getDestinations();
+            const data = response.data || [];
             const grid = document.querySelector('#destinations-page .destinations-grid-full');
             if (!grid) return;
+            
+            if (data.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <h3>No destinations found</h3>
+                        <p>Check back soon for available destinations.</p>
+                    </div>
+                `;
+                return;
+            }
             
             grid.innerHTML = data.map(dest => `
                 <div class="destination-card" data-id="${dest._id}">
                     <div class="destination-image">
-                        <img src="${dest.image}" alt="${dest.name}" loading="lazy">
+                        <img src="${dest.image}" alt="${dest.name}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
                         <div class="destination-rating">
-                            <i class="fas fa-star" aria-hidden="true"></i> ${dest.rating}
+                            <i class="fas fa-star" aria-hidden="true"></i> ${dest.rating || 'N/A'}
                         </div>
                     </div>
                     <div class="destination-content">
@@ -805,9 +587,9 @@
                         </div>
                         <p>${dest.description}</p>
                         <div class="destination-features">
-                            ${dest.features.map(f => `<span class="feature">${f}</span>`).join('')}
+                            ${(dest.features || []).map(f => `<span class="feature">${f}</span>`).join('')}
                         </div>
-                        <div class="destination-price">${dest.price}</div>
+                        <div class="destination-price">${dest.price || 'Price on request'}</div>
                         <button class="btn btn-primary book-now" 
                                 data-type="destination" 
                                 data-id="${dest._id}"
@@ -827,19 +609,31 @@
 
     async function loadGuides() {
         try {
-            const data = dataManager.getData('guides');
+            const response = await apiService.getGuides();
+            const data = response.data || [];
             const grid = document.querySelector('#guides-page .guides-grid-full');
             if (!grid) return;
+            
+            if (data.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-user-tie"></i>
+                        <h3>No tour guides available</h3>
+                        <p>Check back soon for available guides.</p>
+                    </div>
+                `;
+                return;
+            }
             
             grid.innerHTML = data.map(guide => `
                 <div class="guide-card" data-id="${guide._id}">
                     <div class="guide-avatar">
-                        <img src="${guide.image}" alt="${guide.name}" loading="lazy">
+                        <img src="${guide.image}" alt="${guide.name}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
                     </div>
                     
                     <div class="guide-info">
                         <h3>${guide.name}</h3>
-                        <p class="specialty">${guide.specialty}</p>
+                        <p class="specialty">${guide.specialty || 'Tour Guide'}</p>
                         
                         <div class="languages-section">
                             <div class="languages-header">
@@ -847,22 +641,22 @@
                                 <strong>Languages:</strong>
                             </div>
                             <div class="languages-list">
-                                ${guide.languages.map(lang => `
+                                ${(guide.languages || []).map(lang => `
                                     <span class="language-tag">${lang}</span>
                                 `).join('')}
                             </div>
                         </div>
                         
                         <p class="experience">
-                            <i class="fas fa-briefcase" aria-hidden="true"></i> ${guide.experience}
+                            <i class="fas fa-briefcase" aria-hidden="true"></i> ${guide.experience || 'Experienced guide'}
                         </p>
                         
                         <div class="rating">
-                            ${'★'.repeat(Math.floor(guide.rating))}${guide.rating % 1 ? '½' : ''}
-                            <span>${guide.rating}</span>
+                            ${'★'.repeat(Math.floor(guide.rating || 0))}${(guide.rating || 0) % 1 ? '½' : ''}
+                            <span>${guide.rating || 'N/A'}</span>
                         </div>
                         
-                        <div class="price">${guide.price}</div>
+                        <div class="price">${guide.price || 'Price on request'}</div>
                         
                         <button class="btn btn-primary hire-now" 
                                 data-type="guide" 
@@ -883,19 +677,31 @@
 
     async function loadTranslators() {
         try {
-            const data = dataManager.getData('translators');
+            const response = await apiService.getTranslators();
+            const data = response.data || [];
             const grid = document.querySelector('#translators-page .translators-grid-full');
             if (!grid) return;
+            
+            if (data.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-language"></i>
+                        <h3>No translators available</h3>
+                        <p>Check back soon for available translators.</p>
+                    </div>
+                `;
+                return;
+            }
             
             grid.innerHTML = data.map(translator => `
                 <div class="translator-card" data-id="${translator._id}">
                     <div class="guide-avatar">
-                        <img src="${translator.image}" alt="${translator.name}" loading="lazy">
+                        <img src="${translator.image}" alt="${translator.name}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
                     </div>
                     
                     <div class="guide-info">
                         <h3>${translator.name}</h3>
-                        <p class="specialty">${translator.specialty}</p>
+                        <p class="specialty">${translator.specialty || 'Translator'}</p>
                         
                         <div class="languages-section">
                             <div class="languages-header">
@@ -903,22 +709,22 @@
                                 <strong>Languages:</strong>
                             </div>
                             <div class="languages-list">
-                                ${translator.languages.map(lang => `
+                                ${(translator.languages || []).map(lang => `
                                     <span class="language-tag">${lang}</span>
                                 `).join('')}
                             </div>
                         </div>
                         
                         <p class="experience">
-                            <i class="fas fa-briefcase" aria-hidden="true"></i> ${translator.experience}
+                            <i class="fas fa-briefcase" aria-hidden="true"></i> ${translator.experience || 'Experienced translator'}
                         </p>
                         
                         <div class="rating">
-                            ${'★'.repeat(Math.floor(translator.rating))}${translator.rating % 1 ? '½' : ''}
-                            <span>${translator.rating}</span>
+                            ${'★'.repeat(Math.floor(translator.rating || 0))}${(translator.rating || 0) % 1 ? '½' : ''}
+                            <span>${translator.rating || 'N/A'}</span>
                         </div>
                         
-                        <div class="price">${translator.price}</div>
+                        <div class="price">${translator.price || 'Price on request'}</div>
                         
                         <button class="btn btn-primary hire-now" 
                                 data-type="translator" 
@@ -939,26 +745,38 @@
 
     async function loadAccommodations() {
         try {
-            const data = dataManager.getData('accommodations');
+            const response = await apiService.getAccommodations();
+            const data = response.data || [];
             const grid = document.querySelector('#accommodations-page .accommodations-grid-full');
             if (!grid) return;
+            
+            if (data.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-hotel"></i>
+                        <h3>No accommodations available</h3>
+                        <p>Check back soon for available accommodations.</p>
+                    </div>
+                `;
+                return;
+            }
             
             grid.innerHTML = data.map(acc => `
                 <div class="accommodation-card" data-id="${acc._id}">
                     <div class="accommodation-image">
-                        <img src="${acc.image}" alt="${acc.name}" loading="lazy">
+                        <img src="${acc.image}" alt="${acc.name}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
                     </div>
                     <div class="accommodation-content">
-                        <span class="type">${acc.type}</span>
+                        <span class="type">${acc.type || 'Accommodation'}</span>
                         <h3>${acc.name}</h3>
                         <div class="location">
                             <i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${acc.location}
                         </div>
-                        <p>${acc.description.substring(0, 120)}...</p>
+                        <p>${acc.description?.substring(0, 120) || ''}...</p>
                         <div class="features">
-                            ${acc.features.slice(0, 3).map(f => `<span class="feature-tag">${f}</span>`).join('')}
+                            ${(acc.features || []).slice(0, 3).map(f => `<span class="feature-tag">${f}</span>`).join('')}
                         </div>
-                        <div class="price-tag">${acc.price}</div>
+                        <div class="price-tag">${acc.price || 'Price on request'}</div>
                         <button class="btn btn-primary book-now" 
                                 data-type="accommodation" 
                                 data-id="${acc._id}"
@@ -978,26 +796,38 @@
 
     async function loadBlog() {
         try {
-            const data = dataManager.getData('blog');
+            const response = await apiService.getBlogPosts();
+            const data = response.data || [];
             const grid = document.querySelector('#blog-page .blog-grid-full');
             if (!grid) return;
+            
+            if (data.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-newspaper"></i>
+                        <h3>No blog posts available</h3>
+                        <p>Check back soon for travel stories and tips.</p>
+                    </div>
+                `;
+                return;
+            }
             
             grid.innerHTML = data.map(blog => `
                 <article class="blog-card" data-id="${blog._id}">
                     <div class="blog-image">
-                        <img src="${blog.image}" alt="${blog.title}" loading="lazy">
-                        <span class="blog-category">${blog.category}</span>
+                        <img src="${blog.image}" alt="${blog.title}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
+                        <span class="blog-category">${blog.category || 'Travel'}</span>
                     </div>
                     <div class="blog-content">
                         <div class="blog-meta">
                             <span class="blog-date">
-                                <i class="fas fa-calendar" aria-hidden="true"></i> ${blog.date}
+                                <i class="fas fa-calendar" aria-hidden="true"></i> ${blog.date || new Date().toLocaleDateString()}
                             </span>
-                            <span class="blog-read-time">${blog.readTime}</span>
+                            <span class="blog-read-time">${blog.readTime || '5 min read'}</span>
                         </div>
                         <h3>${blog.title}</h3>
                         <p>${blog.excerpt}</p>
-                        <p class="author"><i class="fas fa-user" aria-hidden="true"></i> ${blog.author}</p>
+                        <p class="author"><i class="fas fa-user" aria-hidden="true"></i> ${blog.author || 'Go Trip Team'}</p>
                         <a href="#" class="view-article-link read-more-link" data-id="${blog._id}">
                             Read Full Article →
                         </a>
@@ -1039,7 +869,7 @@
                             </div>
                         </div>
                         <div class="article-image">
-                            <img src="${article.image}" alt="${article.title}" loading="lazy">
+                            <img src="${article.image}" alt="${article.title}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
                         </div>
                         <div class="article-content">
                             <p>${article.content}</p>
@@ -1248,170 +1078,177 @@
     }
 
     // ===============================
-    // MONGODB FORM HANDLERS
+    // FORM HANDLERS
     // ===============================
     
     async function showBookingModal(serviceType, serviceId, serviceName) {
-        const data = dataManager.getData(serviceType + 's');
-        let service = data.find(item => item._id == serviceId);
-        
-        if (!service) {
-            showNotification('Service not found. Please try again.', 'error');
-            return;
-        }
-        
-        const modalContent = `
-            <div class="modal-header">
-                <h2><i class="fas fa-calendar-check" aria-hidden="true"></i> Book ${service.name}</h2>
-                <button class="modal-close" aria-label="Close modal">&times;</button>
-            </div>
+        try {
+            // Fetch service details from API
+            let service = { name: serviceName, price: 'Price on request', rating: 'N/A' };
             
-            <div class="modal-body">
-                <div class="modal-intro">
-                    <p>Complete this form to book <strong>${service.name}</strong>. Your booking will be saved to our database.</p>
+            // Try to get specific service details
+            if (serviceId) {
+                try {
+                    const endpoint = `/${serviceType}s/${serviceId}`;
+                    const response = await apiService.request(endpoint);
+                    if (response.success && response.data) {
+                        service = response.data;
+                    }
+                } catch (error) {
+                    console.warn('Could not fetch service details:', error.message);
+                }
+            }
+            
+            const modalContent = `
+                <div class="modal-header">
+                    <h2><i class="fas fa-calendar-check" aria-hidden="true"></i> Book ${service.name}</h2>
+                    <button class="modal-close" aria-label="Close modal">&times;</button>
                 </div>
                 
-                <form id="booking-form" novalidate>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="booking-name">Your Name *</label>
-                            <input type="text" id="booking-name" name="name" required 
-                                   placeholder="Your full name" autocomplete="name">
-                        </div>
-                        <div class="form-group">
-                            <label for="booking-email">Your Email *</label>
-                            <input type="email" id="booking-email" name="email" required 
-                                   placeholder="Your email address" autocomplete="email">
+                <div class="modal-body">
+                    <div class="modal-intro">
+                        <p>Complete this form to book <strong>${service.name}</strong>. Your booking will be processed soon.</p>
+                        <div class="service-info">
+                            <span class="service-price">Price: ${service.price}</span>
+                            <span class="service-rating">Rating: ${service.rating}</span>
                         </div>
                     </div>
                     
-                    <div class="form-row">
+                    <form id="booking-form" novalidate>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="booking-name">Your Name *</label>
+                                <input type="text" id="booking-name" name="name" required 
+                                       placeholder="Your full name" autocomplete="name">
+                            </div>
+                            <div class="form-group">
+                                <label for="booking-email">Your Email *</label>
+                                <input type="email" id="booking-email" name="email" required 
+                                       placeholder="Your email address" autocomplete="email">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="booking-phone">Phone Number *</label>
+                                <input type="tel" id="booking-phone" name="phone" required 
+                                       placeholder="Your phone number" autocomplete="tel">
+                            </div>
+                            <div class="form-group">
+                                <label for="booking-dates">Preferred Dates *</label>
+                                <input type="text" id="booking-dates" name="dates" required 
+                                       placeholder="e.g., June 15-25, 2024">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="booking-travelers">Number of Travelers *</label>
+                                <select id="booking-travelers" name="travelers" required>
+                                    <option value="">Select</option>
+                                    <option value="1">1 person</option>
+                                    <option value="2">2 people</option>
+                                    <option value="3-4">3-4 people</option>
+                                    <option value="5-6">5-6 people</option>
+                                    <option value="7+">7+ people</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="booking-country">Country</label>
+                                <input type="text" id="booking-country" name="country" 
+                                       placeholder="Your country" autocomplete="country">
+                            </div>
+                        </div>
+                        
                         <div class="form-group">
-                            <label for="booking-phone">Phone Number *</label>
-                            <input type="tel" id="booking-phone" name="phone" required 
-                                   placeholder="Your phone number" autocomplete="tel">
+                            <label for="booking-message">Special Requests or Requirements</label>
+                            <textarea id="booking-message" name="message" 
+                                      placeholder="Any special requirements or additional information..." 
+                                      rows="4"></textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="booking-dates">Preferred Dates *</label>
-                            <input type="text" id="booking-dates" name="dates" required 
-                                   placeholder="e.g., June 15-25, 2024">
+                        
+                        <div class="modal-footer">
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary btn-large">
+                                    <i class="fas fa-save" aria-hidden="true"></i> Submit Booking
+                                </button>
+                            </div>
+                            <p class="form-note">
+                                Your booking will be processed and you will receive a confirmation email.
+                            </p>
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="booking-travelers">Number of Travelers *</label>
-                            <select id="booking-travelers" name="travelers" required>
-                                <option value="">Select</option>
-                                <option value="1">1 person</option>
-                                <option value="2">2 people</option>
-                                <option value="3-4">3-4 people</option>
-                                <option value="5-6">5-6 people</option>
-                                <option value="7+">7+ people</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="booking-country">Country</label>
-                            <input type="text" id="booking-country" name="country" 
-                                   placeholder="Your country" autocomplete="country">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="booking-message">Special Requests or Requirements</label>
-                        <textarea id="booking-message" name="message" 
-                                  placeholder="Any special requirements or additional information..." 
-                                  rows="4"></textarea>
-                    </div>
-                    
-                    <div class="modal-footer">
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary btn-large">
-                                <i class="fas fa-save" aria-hidden="true"></i> Save Booking to Database
-                            </button>
-                        </div>
-                        <p class="form-note">
-                            Your booking will be saved to our MongoDB database and appear in the dashboard.
-                        </p>
-                    </div>
-                </form>
-            </div>
-        `;
-        
-        const modal = createModal(modalContent);
-        if (!modal) return;
-        
-        const form = modal.querySelector('#booking-form');
-        const submitBtn = form.querySelector('button[type="submit"]');
-        
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+                    </form>
+                </div>
+            `;
             
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
+            const modal = createModal(modalContent);
+            if (!modal) return;
             
-            if (!data.name || !data.email || !data.phone || !data.dates || !data.travelers) {
-                showNotification('❌ Please fill in all required fields.', 'error');
-                return;
-            }
+            const form = modal.querySelector('#booking-form');
+            const submitBtn = form.querySelector('button[type="submit"]');
             
-            if (!validateEmail(data.email)) {
-                showNotification('❌ Please enter a valid email address.', 'error');
-                return;
-            }
-            
-            if (!validatePhone(data.phone)) {
-                showNotification('❌ Please enter a valid phone number.', 'error');
-                return;
-            }
-            
-            // Prepare MongoDB document structure
-            const bookingData = {
-                serviceType,
-                serviceId,
-                serviceName: service.name,
-                servicePrice: service.price,
-                serviceRating: service.rating,
-                customerName: data.name,
-                customerEmail: data.email,
-                customerPhone: data.phone,
-                country: data.country || 'Not specified',
-                travelDates: data.dates,
-                numberOfTravelers: data.travelers,
-                specialRequests: data.message || 'None',
-                status: 'pending',
-                paymentStatus: 'unpaid',
-                bookingDate: new Date().toISOString(),
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-            
-            showLoading(submitBtn, true);
-            
-            try {
-                const response = await apiService.createBooking(bookingData);
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
                 
-                if (response.success) {
-                    showNotification('✅ Booking saved to database! You can view it in the dashboard.', 'success');
-                    closeModal();
-                    
-                    // Log to console for debugging
-                    if (config.debug) {
-                        console.log('Booking saved to MongoDB:', {
-                            id: response.data?._id || response.id,
-                            ...bookingData
-                        });
-                    }
-                } else {
-                    showNotification(`❌ ${response.message || 'Failed to save booking to database'}`, 'error');
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                
+                if (!data.name || !data.email || !data.phone || !data.dates || !data.travelers) {
+                    showNotification('❌ Please fill in all required fields.', 'error');
+                    return;
                 }
-            } catch (error) {
-                console.error('MongoDB booking save error:', error);
-                showNotification('❌ Failed to save booking. Please try again.', 'error');
-            } finally {
-                showLoading(submitBtn, false);
-            }
-        });
+                
+                if (!validateEmail(data.email)) {
+                    showNotification('❌ Please enter a valid email address.', 'error');
+                    return;
+                }
+                
+                if (!validatePhone(data.phone)) {
+                    showNotification('❌ Please enter a valid phone number.', 'error');
+                    return;
+                }
+                
+                const bookingData = {
+                    serviceType,
+                    serviceId,
+                    serviceName: service.name,
+                    servicePrice: service.price,
+                    serviceRating: service.rating,
+                    customerName: data.name,
+                    customerEmail: data.email,
+                    customerPhone: data.phone,
+                    country: data.country || 'Not specified',
+                    travelDates: data.dates,
+                    numberOfTravelers: data.travelers,
+                    specialRequests: data.message || 'None',
+                    status: 'pending',
+                    paymentStatus: 'unpaid',
+                    bookingDate: new Date().toISOString()
+                };
+                
+                showLoading(submitBtn, true);
+                
+                try {
+                    const response = await apiService.createBooking(bookingData);
+                    
+                    if (response.success) {
+                        showNotification('✅ Booking submitted successfully!', 'success');
+                        closeModal();
+                    } else {
+                        showNotification(`❌ ${response.message || 'Failed to save booking'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Booking error:', error);
+                    showNotification('❌ Failed to save booking. Please try again.', 'error');
+                } finally {
+                    showLoading(submitBtn, false);
+                }
+            });
+            
+        } catch (error) {
+            console.error('Error creating booking modal:', error);
+            showNotification('Error loading booking form. Please try again.', 'error');
+        }
     }
 
     function showTripPlanningModal() {
@@ -1558,11 +1395,11 @@
                     <div class="modal-footer">
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary btn-large">
-                                <i class="fas fa-save" aria-hidden="true"></i> Save Itinerary to Database
+                                <i class="fas fa-save" aria-hidden="true"></i> Submit Trip Plan
                             </button>
                         </div>
                         <p class="form-note">
-                            Your itinerary request will be saved to MongoDB and appear in the dashboard.
+                            Your itinerary request will be processed and you will receive a response within 24 hours.
                         </p>
                     </div>
                 </form>
@@ -1607,7 +1444,6 @@
                 return;
             }
             
-            // Prepare MongoDB document structure
             const tripPlanData = {
                 customerName: data.name,
                 customerEmail: data.email,
@@ -1620,11 +1456,7 @@
                 interests: interests,
                 specialRequirements: data.requirements || 'None',
                 tripDescription: data.message,
-                status: 'pending',
-                assignedTo: null,
-                estimatedCost: null,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
+                status: 'pending'
             };
             
             showLoading(submitBtn, true);
@@ -1633,21 +1465,13 @@
                 const response = await apiService.createTripPlan(tripPlanData);
                 
                 if (response.success) {
-                    showNotification('✅ Itinerary saved to database! You can view it in the dashboard.', 'success');
+                    showNotification('✅ Trip plan submitted successfully!', 'success');
                     closeModal();
-                    
-                    // Log to console for debugging
-                    if (config.debug) {
-                        console.log('Trip plan saved to MongoDB:', {
-                            id: response.data?._id || response.id,
-                            ...tripPlanData
-                        });
-                    }
                 } else {
-                    showNotification(`❌ ${response.message || 'Failed to save itinerary to database'}`, 'error');
+                    showNotification(`❌ ${response.message || 'Failed to save itinerary'}`, 'error');
                 }
             } catch (error) {
-                console.error('MongoDB trip plan save error:', error);
+                console.error('Trip plan error:', error);
                 showNotification('❌ Failed to save itinerary. Please try again.', 'error');
             } finally {
                 showLoading(submitBtn, false);
@@ -1656,11 +1480,11 @@
     }
 
     // ===============================
-    // FORM HANDLERS (MongoDB)
+    // FORM HANDLERS
     // ===============================
     
     function setupFormHandlers() {
-        // Newsletter form - Save to MongoDB
+        // Newsletter form
         const newsletterForm = document.getElementById('newsletter-form');
         if (newsletterForm) {
             const submitBtn = newsletterForm.querySelector('button[type="submit"]');
@@ -1680,13 +1504,11 @@
                 try {
                     const response = await apiService.subscribeNewsletter({ 
                         email,
-                        subscribedAt: new Date().toISOString(),
-                        status: 'active',
-                        source: 'website'
+                        subscribedAt: new Date().toISOString()
                     });
                     
                     if (response.success) {
-                        showNotification('✅ Thank you for subscribing! Your email has been saved to our database.', 'success');
+                        showNotification('✅ Subscribed successfully!', 'success');
                         newsletterForm.reset();
                     } else {
                         showNotification(`❌ ${response.message || 'Subscription failed'}`, 'error');
@@ -1700,7 +1522,7 @@
             });
         }
         
-        // Contact form - Save to MongoDB
+        // Contact form
         const contactForm = document.getElementById('contact-form');
         if (contactForm) {
             const submitBtn = contactForm.querySelector('button[type="submit"]');
@@ -1727,11 +1549,7 @@
                     name,
                     email,
                     subject,
-                    message,
-                    status: 'unread',
-                    source: 'contact-form',
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
+                    message
                 };
                 
                 showLoading(submitBtn, true);
@@ -1740,7 +1558,7 @@
                     const response = await apiService.sendContactMessage(contactData);
                     
                     if (response.success) {
-                        showNotification('✅ Message saved to database! We\'ll get back to you soon.', 'success');
+                        showNotification('✅ Message sent successfully!', 'success');
                         contactForm.reset();
                     } else {
                         showNotification(`❌ ${response.message || 'Failed to save message'}`, 'error');
@@ -1832,6 +1650,12 @@
                 if (page) {
                     navigateTo('/' + page);
                 }
+            }
+            
+            else if (target.matches('.back-to-blog-link') ||
+                    target.closest('.back-to-blog-link')) {
+                e.preventDefault();
+                navigateTo('/blog');
             }
         });
     }
@@ -1941,57 +1765,76 @@
     // ===============================
     
     async function init() {
-        console.log('🚀 Initializing Go Trip System v2.1 (MongoDB Integrated)...');
-        console.log('📡 Backend URL:', config.baseUrl);
-        console.log('🗄️  Data Storage: MongoDB');
-        console.log('📊 Dashboard: Enabled');
+        if (isInitialized) return;
+        isInitialized = true;
         
+        console.log('🚀 Initializing Go Trip System v3.0');
+        console.log('📡 Backend URL:', config.baseUrl);
+        console.log('🌍 Environment:', window.location.hostname.includes('onrender.com') ? 'Render' : 'Local');
+        
+        // Hide loading overlay immediately
         const loadingOverlay = document.getElementById('loading-overlay');
         if (loadingOverlay) {
-            loadingOverlay.style.display = 'none';
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 500);
         }
         
+        // Set current year in footer
         const yearElement = document.getElementById('current-year');
         if (yearElement) {
             yearElement.textContent = new Date().getFullYear();
         }
         
-        // Check MongoDB backend health
-        try {
-            const health = await apiService.checkHealth();
-            console.log('✅ MongoDB Backend Health:', health);
-            apiHealth = true;
-            
-            if (health.database === 'connected') {
-                console.log('🗄️  MongoDB Connection: Connected');
-            } else {
-                console.warn('⚠️  MongoDB Connection:', health.database);
-            }
-        } catch (error) {
-            console.warn('⚠️ Backend not ready yet:', error);
-            apiHealth = false;
-            showNotification('⚠️ Backend is waking up. Please wait a moment.', 'warning');
-        }
-        
+        // Initialize UI components immediately
         setupMobileMenu();
         setupSearchModal();
         setupEventDelegation();
         setupFormHandlers();
         initializeHeroWelcomeBanner();
         
+        // Handle browser navigation
         window.addEventListener('popstate', () => {
             const path = getCurrentPath();
             const pageId = getPageFromPath(path);
             showPage(pageId, false);
         });
         
+        // Load initial page
         const initialPath = getCurrentPath();
         const initialPage = getPageFromPath(initialPath);
         showPage(initialPage, false);
         
-        console.log('✅ Go Trip System initialized successfully');
-        console.log('📊 All form data will be saved to MongoDB');
-        console.log('👁️  View data in your dashboard at:', config.baseUrl.replace('/api', '/dashboard'));
+        // Check backend health in background
+        setTimeout(async () => {
+            try {
+                console.log('🩺 Checking backend health...');
+                const health = await apiService.checkHealth();
+                console.log('✅ Backend Health:', health);
+                apiHealth = health.success;
+                connectionStatus = health.database === 'connected' ? 'online' : 'limited';
+                
+                if (health.database === 'connected') {
+                    showNotification('✅ Connected to backend server', 'success', 2000);
+                } else if (apiHealth) {
+                    showNotification('⚠️ Backend online, database offline', 'warning', 3000);
+                }
+                
+                // Pre-fetch data if backend is available
+                if (apiHealth) {
+                    await dataManager.fetchAllData();
+                }
+                
+            } catch (error) {
+                console.warn('⚠️ Backend check failed:', error.message);
+                apiHealth = false;
+                connectionStatus = 'offline';
+                showNotification('⚠️ Backend unavailable. Some features may not work.', 'warning', 3000);
+            }
+        }, 1000);
+        
+        console.log('✅ Go Trip System initialized');
     }
 
     // ===============================
@@ -2006,7 +1849,9 @@
         showBookingModal,
         apiService,
         dataManager,
-        config
+        config,
+        getApiHealth: () => apiHealth,
+        getConnectionStatus: () => connectionStatus
     };
 
     // ===============================
@@ -2015,7 +1860,13 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
+        // DOM already loaded
         setTimeout(init, 100);
     }
+
+    // Handle window load event
+    window.addEventListener('load', () => {
+        console.log('📄 Page fully loaded');
+    });
 
 })();
