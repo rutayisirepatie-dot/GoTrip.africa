@@ -47,11 +47,12 @@ const performanceMetricSchema = new mongoose.Schema({
   }
 });
 
-// Indexes
+// -------------------- INDEXES --------------------
 performanceMetricSchema.index({ metricType: 1, timestamp: -1 });
 performanceMetricSchema.index({ endpoint: 1, timestamp: -1 });
 
-// Static methods for performance analysis
+// -------------------- STATIC METHODS --------------------
+// Aggregate performance metrics over time
 performanceMetricSchema.statics.getPerformanceMetrics = async function(startDate, endDate, metricType = null) {
   const matchStage = { timestamp: { $gte: startDate, $lte: endDate } };
   if (metricType) matchStage.metricType = metricType;
@@ -76,7 +77,11 @@ performanceMetricSchema.statics.getPerformanceMetrics = async function(startDate
         maxDuration: 1,
         count: 1,
         errorRate: {
-          $cond: [{ $eq: ['$count', 0] }, 0, { $round: [{ $multiply: [{ $divide: ['$errorCount', '$count'] }, 100] }, 2] }]
+          $cond: [
+            { $eq: ['$count', 0] },
+            0,
+            { $round: [{ $multiply: [{ $divide: ['$errorCount', '$count'] }, 100] }, 2] }
+          ]
         }
       }
     },
@@ -84,7 +89,7 @@ performanceMetricSchema.statics.getPerformanceMetrics = async function(startDate
   ]);
 };
 
-// Static method to get slow endpoints
+// Get slowest endpoints exceeding a threshold
 performanceMetricSchema.statics.getSlowEndpoints = async function(startDate, endDate, threshold = 1000) {
   return this.aggregate([
     {

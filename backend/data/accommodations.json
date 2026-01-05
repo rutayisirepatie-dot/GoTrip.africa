@@ -1,0 +1,12 @@
+[
+  {
+    "_id": "64f8c01f1c9d440000000201",
+    "name": "Gorilla Lodge",
+    "destination": "Volcanoes National Park",
+    "address": "Kigali, Rwanda",
+    "type": "hotel",
+    "dailyRate": 250,
+    "priceRange": {"min": 200, "max": 300},
+    "available": true
+  }
+]

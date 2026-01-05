@@ -37,7 +37,6 @@
     
     <!-- Preload critical resources -->
     <link rel="preload" href="style.css" as="style">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" as="style">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     
@@ -73,15 +72,14 @@
     <!-- Main stylesheet -->
     <link rel="stylesheet" href="style.css" media="all">
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- Font Awesome (FIXED - removed crossorigin for CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     
     <!-- No-JS fallback -->
     <noscript>
@@ -98,8 +96,195 @@
             }
         </style>
     </noscript>
+    
+    <!-- Connection Status CSS -->
+    <style>
+        .connection-status {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .connection-status.online {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .connection-status.offline {
+            background: #f44336;
+            color: white;
+        }
+        
+        .connection-status.checking {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .connection-status i {
+            font-size: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-left: 4px solid #4caf50;
+            max-width: 350px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+        
+        .notification-toast.error {
+            border-left-color: #f44336;
+        }
+        
+        .notification-toast.warning {
+            border-left-color: #ff9800;
+        }
+        
+        .notification-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4caf50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .modal-container.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-container.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .no-data-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .no-data-message i {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body itemscope itemtype="https://schema.org/WebPage">
+    <!-- Connection Status Display -->
+    <div id="connection-status" class="connection-status checking">
+        <i class="fas fa-circle" aria-hidden="true"></i>
+        <span>Checking connection...</span>
+    </div>
+    
     <!-- No-JS Warning -->
     <noscript>
         <div class="no-js-warning" role="alert">
@@ -170,19 +355,19 @@
                         <div class="hero-messages" role="list">
                             <div class="hero-message active" role="listitem">
                                 <i class="fas fa-star" aria-hidden="true"></i>
-                                <span>Welcome to Go Trip! Discover Rwanda's breathtaking beauty and adventure.</span>
+                                <span>You are very welcome to GoTrip!</span>
                             </div>
                             <div class="hero-message" role="listitem">
                                 <i class="fas fa-globe-africa" aria-hidden="true"></i>
-                                <span>Experience authentic Rwandan culture and hospitality</span>
+                                <span>Experience authentic Rwandan culture, beauty and hospitality</span>
                             </div>
                             <div class="hero-message" role="listitem">
                                 <i class="fas fa-mountain" aria-hidden="true"></i>
-                                <span>Gorilla trekking permits available - Book now!</span>
+                                <span>Enjoy adventurous journeys with us!</span>
                             </div>
                             <div class="hero-message" role="listitem">
                                 <i class="fas fa-award" aria-hidden="true"></i>
-                                <span>Award-winning tour guides and translators</span>
+                                <span>Meet award-winning tour guides and translators</span>
                             </div>
                         </div>
                         <div class="hero-message-controls">

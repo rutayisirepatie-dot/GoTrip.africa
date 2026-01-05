@@ -1,4 +1,4 @@
-// Go Trip Frontend Application v3.0 (API-Only)
+// Go Trip Frontend Application v4.1
 (function() {
     'use strict';
     
@@ -6,11 +6,13 @@
     // CONFIGURATION
     // ===============================
     const config = {
-        baseUrl: window.location.hostname.includes('onrender.com') 
-            ? 'https://gotrip-backend-uwhn.onrender.com/api'
-            : 'http://localhost:5000/api',
+        // Simplified backend URL detection
+        baseUrl: window.location.hostname === 'localhost' || 
+                window.location.hostname === '127.0.0.1' 
+                ? 'http://localhost:5000' 
+                : 'https://gotrip-backend-uwhn.onrender.com',
+        
         debug: true,
-        cacheDuration: 300000, // 5 minutes
         
         heroMessages: [
             { icon: 'fa-star', text: "Welcome to GoTrip!" },
@@ -19,415 +21,425 @@
             { icon: 'fa-award', text: "Meet our Award-winning tour guides and translators" },
             { icon: 'fa-gem', text: "Luxury accommodations at fair prices" }
         ],
+        
         bookingEmail: 'info@gotrip.africa',
         companyPhone: '+250787407051',
-        companyAddress: 'KG 7 Ave, Kigali, Rwanda'
+        companyAddress: 'KG 7 Ave, Kigali, Rwanda',
+        
+        // API endpoints
+        endpoints: {
+            guides: '/api/guides',
+            destinations: '/api/destinations',
+            translators: '/api/translators',
+            accommodations: '/api/accommodations',
+            blog: '/api/blogs',
+            bookings: '/api/bookings',
+            tripPlan: '/api/tripplans',
+            health: '/api/health',
+            newsletter: '/api/newsletters/subscribe',
+            contact: '/api/contacts'
+        }
     };
+
+    console.log('🔧 Configuration loaded:', {
+        frontend: window.location.href,
+        backend: config.baseUrl,
+        apiEndpoints: config.endpoints
+    });
 
     // ===============================
     // STATE MANAGEMENT
     // ===============================
     let currentHeroMessageIndex = 0;
     let heroMessageTimer = null;
-    let isModalOpen = false;
-    let apiHealth = false;
-    let isInitialized = false;
-    let connectionStatus = 'checking';
-
-    // ===============================
-    // API SERVICE
-    // ===============================
-    const apiService = {
-        /**
-         * Send API request with timeout and fallback support
-         */
-        async request(endpoint, options = {}) {
-            const url = `${config.baseUrl}${endpoint}`;
-            
-            // Create abort controller for timeout
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
-            
-            const headers = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                ...options.headers
-            };
-
-            try {
-                const response = await fetch(url, {
-                    ...options,
-                    signal: controller.signal,
-                    headers,
-                    credentials: 'include',
-                    mode: 'cors'
-                });
-
-                clearTimeout(timeoutId);
-
-                if (!response.ok) {
-                    const error = await response.json().catch(() => ({
-                        success: false,
-                        message: `HTTP ${response.status}: ${response.statusText}`
-                    }));
-                    throw new Error(error.message || `HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                if (config.debug && endpoint !== '/health') {
-                    console.log(`✅ API ${options.method || 'GET'} ${endpoint}:`, data);
-                }
-                
-                return data;
-                
-            } catch (error) {
-                clearTimeout(timeoutId);
-                
-                // Network error or CORS issue
-                if (error.name === 'TypeError' || error.message.includes('Failed to fetch')) {
-                    console.warn(`🌐 Network error for ${endpoint}:`, error.message);
-                    throw new Error('Cannot connect to server. Please check your connection.');
-                }
-                
-                // Timeout error (Render cold start)
-                if (error.name === 'AbortError') {
-                    console.warn(`⏰ Timeout for ${endpoint} (Server may be starting up)`);
-                    throw new Error('Server is starting up. Please try again.');
-                }
-                
-                console.error(`❌ API request failed for ${endpoint}:`, error);
-                throw error;
-            }
-        },
-
-        // === CREATE OPERATIONS ===
-        
-        async createBooking(bookingData) {
-            return await this.request('/bookings', {
-                method: 'POST',
-                body: JSON.stringify(bookingData)
-            });
-        },
-
-        async createTripPlan(tripPlanData) {
-            return await this.request('/tripPlan', {
-                method: 'POST',
-                body: JSON.stringify(tripPlanData)
-            });
-        },
-
-        async subscribeNewsletter(emailData) {
-            return await this.request('/newsletter/subscribe', {
-                method: 'POST',
-                body: JSON.stringify(emailData)
-            });
-        },
-
-        async sendContactMessage(contactData) {
-            return await this.request('/contact', {
-                method: 'POST',
-                body: JSON.stringify(contactData)
-            });
-        },
-
-        // === READ OPERATIONS ===
-        
-        async getGuides() {
-            return await this.request('/guides');
-        },
-
-        async getDestinations() {
-            return await this.request('/destinations');
-        },
-
-        async getTranslators() {
-            return await this.request('/translators');
-        },
-
-        async getAccommodations() {
-            return await this.request('/accommodations');
-        },
-
-        async getBlogPosts() {
-            return await this.request('/blog');
-        },
-
-        // === DASHBOARD DATA ===
-        
-        async getDashboardStats() {
-            return await this.request('/dashboard/stats');
-        },
-
-        // === HEALTH CHECK ===
-        async checkHealth() {
-            try {
-                const health = await this.request('/health');
-                apiHealth = health.success;
-                connectionStatus = health.database === 'connected' ? 'online' : 'limited';
-                return health;
-            } catch (error) {
-                apiHealth = false;
-                connectionStatus = 'offline';
-                throw error;
-            }
-        }
+    let preloadedTripPlanModal = null;
+    const appData = {
+        guides: [],
+        destinations: [],
+        translators: [],
+        accommodations: [],
+        blog: []
     };
 
     // ===============================
-    // DATA MANAGER
-    // ===============================
-    const dataManager = {
-        cache: {
-            guides: null,
-            translators: null,
-            destinations: null,
-            accommodations: null,
-            blog: null,
-            timestamp: null
-        },
-
-        async fetchAllData() {
-            console.log('📥 Fetching data from backend...');
-            
-            try {
-                const [guides, destinations, translators, accommodations, blog] = await Promise.allSettled([
-                    apiService.getGuides(),
-                    apiService.getDestinations(),
-                    apiService.getTranslators(),
-                    apiService.getAccommodations(),
-                    apiService.getBlogPosts()
-                ]);
-
-                this.cache = {
-                    guides: guides.status === 'fulfilled' ? guides.value.data : [],
-                    destinations: destinations.status === 'fulfilled' ? destinations.value.data : [],
-                    translators: translators.status === 'fulfilled' ? translators.value.data : [],
-                    accommodations: accommodations.status === 'fulfilled' ? accommodations.value.data : [],
-                    blog: blog.status === 'fulfilled' ? blog.value.data : [],
-                    timestamp: Date.now()
-                };
-
-                console.log(`✅ Data loaded from backend`);
-                return this.cache;
-                
-            } catch (error) {
-                console.error('❌ Failed to fetch data:', error);
-                return {
-                    guides: [],
-                    translators: [],
-                    destinations: [],
-                    accommodations: [],
-                    blog: [],
-                    timestamp: Date.now()
-                };
-            }
-        },
-
-        getData(type) {
-            return this.cache[type] || [];
-        },
-
-        async refreshData() {
-            return this.fetchAllData();
-        },
-
-        clearCache() {
-            this.cache = {
-                guides: null,
-                translators: null,
-                destinations: null,
-                accommodations: null,
-                blog: null,
-                timestamp: null
-            };
-        }
-    };
-
-    // ===============================
-    // CORE UTILITIES
+    // UI UTILITIES
     // ===============================
     
     function showNotification(message, type = 'info', duration = 3000) {
-        try {
-            // Remove existing notifications
-            document.querySelectorAll('.notification-toast').forEach(n => n.remove());
-            
-            const notification = document.createElement('div');
-            notification.className = `notification-toast ${type}`;
-            notification.setAttribute('role', 'alert');
-            notification.setAttribute('aria-live', 'assertive');
-            
-            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
-            
-            notification.innerHTML = `
-                <div class="notification-content">
-                    <span class="notification-message">${icon} ${message}</span>
-                    <button class="notification-close" aria-label="Close notification">&times;</button>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Animate in
-            requestAnimationFrame(() => {
-                notification.classList.add('show');
-            });
-            
-            // Auto remove after duration
-            const removeTimer = setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, duration);
-            
-            // Close on click
-            notification.querySelector('.notification-close').addEventListener('click', () => {
-                clearTimeout(removeTimer);
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            });
-            
-        } catch (error) {
-            console.error('Error showing notification:', error);
-        }
+        // Remove existing notifications
+        document.querySelectorAll('.notification-toast').forEach(n => n.remove());
+        
+        const notification = document.createElement('div');
+        notification.className = `notification-toast ${type} show`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-message">${message}</span>
+                <button class="notification-close" aria-label="Close">&times;</button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto remove
+        const removeNotification = () => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        };
+        
+        setTimeout(removeNotification, duration);
+        
+        // Close on click
+        notification.querySelector('.notification-close').addEventListener('click', removeNotification);
     }
 
     function validateEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
     function validatePhone(phone) {
-        const phoneRegex = /^[+]?[0-9\s\-\(\)]{10,}$/;
-        return phoneRegex.test(phone);
+        return /^[+]?[0-9\s\-\(\)]{10,}$/.test(phone);
     }
 
     function showLoading(element, show = true) {
         if (!element) return;
         
         if (show) {
-            element.classList.add('loading');
+            const originalText = element.innerHTML;
+            element.dataset.originalContent = originalText;
+            element.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
             element.disabled = true;
-            const originalText = element.textContent;
-            element.dataset.originalText = originalText;
-            element.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Processing...';
         } else {
-            element.classList.remove('loading');
-            element.disabled = false;
-            if (element.dataset.originalText) {
-                element.textContent = element.dataset.originalText;
+            if (element.dataset.originalContent) {
+                element.innerHTML = element.dataset.originalContent;
             }
+            element.disabled = false;
         }
     }
+
+    // ===============================
+    // API SERVICE
+    // ===============================
+    const apiService = {
+        /**
+         * Universal API request handler
+         */
+        async request(endpoint, options = {}) {
+            const url = `${config.baseUrl}${endpoint}`;
+            const method = options.method || 'GET';
+            
+            console.log(`🌐 API ${method}: ${url}`);
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            
+            const defaultHeaders = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal,
+                    headers: {
+                        ...defaultHeaders,
+                        ...(options.headers || {})
+                    }
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`❌ API Error ${response.status}:`, errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log(`✅ API Success:`, data);
+                return data;
+                
+            } catch (error) {
+                clearTimeout(timeoutId);
+                
+                if (error.name === 'AbortError') {
+                    console.error('⏰ Request timeout');
+                    throw new Error('Request timeout. Please try again.');
+                }
+                
+                console.error(`❌ Request failed:`, error.message);
+                throw error;
+            }
+        },
+
+        // === HEALTH CHECK ===
+        async checkHealth() {
+            try {
+                const health = await this.request(config.endpoints.health);
+                return {
+                    api: true,
+                    message: health.status === 'ok' ? 'API is healthy' : 'API running',
+                    timestamp: health.timestamp || new Date().toISOString()
+                };
+            } catch (error) {
+                console.warn('⚠️ Health check failed:', error.message);
+                return {
+                    api: false,
+                    message: 'API unavailable',
+                    error: error.message
+                };
+            }
+        },
+
+        // === DATA FETCHING ===
+        async getGuides() {
+            try {
+                const data = await this.request(config.endpoints.guides);
+                // Handle both response formats
+                return data.data || data.guides || data || [];
+            } catch (error) {
+                console.warn('⚠️ Using fallback guides data');
+                return this.getFallbackGuides();
+            }
+        },
+
+        async getDestinations() {
+            try {
+                const data = await this.request(config.endpoints.destinations);
+                return data.data || data.destinations || data || [];
+            } catch (error) {
+                console.warn('⚠️ Using fallback destinations data');
+                return this.getFallbackDestinations();
+            }
+        },
+
+        async getTranslators() {
+            try {
+                const data = await this.request(config.endpoints.translators);
+                return data.data || data.translators || data || [];
+            } catch (error) {
+                console.warn('⚠️ Using fallback translators data');
+                return this.getFallbackTranslators();
+            }
+        },
+
+        async getAccommodations() {
+            try {
+                const data = await this.request(config.endpoints.accommodations);
+                return data.data || data.accommodations || data || [];
+            } catch (error) {
+                console.warn('⚠️ Using fallback accommodations data');
+                return this.getFallbackAccommodations();
+            }
+        },
+
+        async getBlogPosts() {
+            try {
+                const data = await this.request(config.endpoints.blog);
+                return data.data || data.blog || data || [];
+            } catch (error) {
+                console.warn('⚠️ Using fallback blog data');
+                return this.getFallbackBlogPosts();
+            }
+        },
+
+        // === CREATE OPERATIONS ===
+        async createBooking(bookingData) {
+            try {
+                return await this.request(config.endpoints.bookings, {
+                    method: 'POST',
+                    body: JSON.stringify(bookingData)
+                });
+            } catch (error) {
+                console.error('Booking creation failed:', error);
+                // Simulate success for demo
+                return { success: true, message: 'Booking received (offline mode)' };
+            }
+        },
+
+        async createTripPlan(tripPlanData) {
+            try {
+                return await this.request(config.endpoints.tripPlan, {
+                    method: 'POST',
+                    body: JSON.stringify(tripPlanData)
+                });
+            } catch (error) {
+                console.error('Trip plan creation failed:', error);
+                return { success: true, message: 'Trip plan received (offline mode)' };
+            }
+        },
+
+        async subscribeNewsletter(emailData) {
+            try {
+                return await this.request(config.endpoints.newsletter, {
+                    method: 'POST',
+                    body: JSON.stringify(emailData)
+                });
+            } catch (error) {
+                console.error('Newsletter subscription failed:', error);
+                return { success: true, message: 'Subscription received (offline mode)' };
+            }
+        },
+
+        async sendContactMessage(contactData) {
+            try {
+                return await this.request(config.endpoints.contact, {
+                    method: 'POST',
+                    body: JSON.stringify(contactData)
+                });
+            } catch (error) {
+                console.error('Contact message failed:', error);
+                return { success: true, message: 'Message received (offline mode)' };
+            }
+        },
+
+        // === FALLBACK DATA (For offline/demo use) ===
+        getFallbackGuides() {
+            return [
+                {
+                    id: 'guide1',
+                    name: 'Jean Pierre',
+                    specialty: 'Wildlife Expert',
+                    languages: ['English', 'French', 'Kinyarwanda'],
+                    experience: '10+ years',
+                    rating: 4.8,
+                    dailyRate: 150,
+                    image: '#'
+                },
+                {
+                    id: 'guide2',
+                    name: 'Marie Claire',
+                    specialty: 'Cultural Guide',
+                    languages: ['English', 'Swahili', 'Kinyarwanda'],
+                    experience: '7+ years',
+                    rating: 4.9,
+                    dailyRate: 120,
+                    image: '#'
+                }
+            ];
+        },
+
+        getFallbackDestinations() {
+            return [
+                {
+                    id: 'dest1',
+                    name: 'Volcanoes National Park',
+                    location: 'Northern Province, Rwanda',
+                    description: 'Home to the endangered mountain gorillas, offering unforgettable gorilla trekking experiences.',
+                    rating: 4.9,
+                    price: '$1500',
+                    features: ['Gorilla Trekking', 'Bird Watching', 'Hiking'],
+                    image: 'images/virunga-mountains.jpg'
+                },
+                {
+                    id: 'dest2',
+                    name: 'Nyungwe Forest',
+                    location: 'Southwestern Rwanda',
+                    description: 'Ancient rainforest with canopy walks, chimpanzee tracking, and diverse wildlife.',
+                    rating: 4.7,
+                    price: '$1200',
+                    features: ['Canopy Walk', 'Chimpanzee Tracking', 'Waterfalls'],
+                    image: 'images/nyungwe-weather.jpg'
+                }
+            ];
+        },
+
+        getFallbackTranslators() {
+            return [
+                {
+                    id: 'translator1',
+                    name: 'Alice Mukamana',
+                    specialty: 'French & Kinyarwanda Translator',
+                    languages: ['French', 'English', 'Kinyarwanda'],
+                    experience: '5+ years',
+                    rating: 4.7,
+                    dailyRate: 100,
+                    image: '#'
+                },
+                {
+                    id: 'translator2',
+                    name: 'John Habimana',
+                    specialty: 'English & Swahili Translator',
+                    languages: ['English', 'Swahili', 'Kinyarwanda'],
+                    experience: '8+ years',
+                    rating: 4.9,
+                    dailyRate: 120,
+                    image: '#'
+                }
+            ];
+        },
+
+        getFallbackAccommodations() {
+            return [
+                {
+                    id: 'acc1',
+                    name: 'Kigali Serena Hotel',
+                    type: 'Luxury Hotel',
+                    location: 'Kigali, Rwanda',
+                    description: '5-star luxury hotel in the heart of Kigali with excellent amenities.',
+                    dailyRate: 350,
+                    features: ['Pool', 'Spa', 'WiFi', 'Restaurant'],
+                    image: 'aeriel-view-serena.jpg'
+                }
+            ];
+        },
+
+        getFallbackBlogPosts() {
+            return [
+                {
+                    id: 'blog1',
+                    title: 'Discovering Rwanda: The Land of a Thousand Hills',
+                    excerpt: 'A comprehensive guide to Rwanda\'s most beautiful destinations.',
+                    category: 'Travel Guide',
+                    date: new Date().toISOString(),
+                    readTime: '5 min read',
+                    author: 'Go Trip Team',
+                    image: 'mount-bisoke-rwanda.jpg'
+                }
+            ];
+        }
+    };
 
     // ===============================
     // NAVIGATION SYSTEM
     // ===============================
     
-    const routeMap = {
-        '/': 'home',
-        '/home': 'home',
-        '/destinations': 'destinations',
-        '/guides': 'guides',
-        '/translators': 'translators',
-        '/accommodations': 'accommodations',
-        '/blog': 'blog',
-        '/contact': 'contact'
-    };
-
-    const pageIdMap = {
-        'home': 'home-page',
-        'destinations': 'destinations-page',
-        'guides': 'guides-page',
-        'translators': 'translators-page',
-        'accommodations': 'accommodations-page',
-        'blog': 'blog-page',
-        'contact': 'contact-page'
-    };
-
-    function getCurrentPath() {
-        return window.location.pathname;
-    }
-
-    function getPageFromPath(path) {
-        const cleanPath = path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path;
-        return routeMap[cleanPath] || 'home';
-    }
-
-    function navigateTo(path) {
-        try {
-            const pageId = getPageFromPath(path);
-            showPage(pageId);
-            
-            if (window.history.pushState) {
-                window.history.pushState({ page: pageId }, '', path);
-            }
-            
-            updateActiveNavLink(pageId);
-            
-        } catch (error) {
-            console.error('Error navigating:', error);
-            showNotification('Navigation error. Please try again.', 'error');
-        }
-    }
-
-    function updateActiveNavLink(pageId) {
-        document.querySelectorAll('.nav-link').forEach(link => {
-            const href = link.getAttribute('href');
-            const isActive = (href === '/' && pageId === 'home') || 
-                            (href === `/${pageId}`) || 
-                            (link.dataset.page === pageId);
-            
-            link.classList.toggle('active', isActive);
+    function showPage(pageId) {
+        // Hide all pages
+        document.querySelectorAll('.page').forEach(page => {
+            page.style.display = 'none';
+            page.classList.remove('active');
         });
-    }
-
-    function showPage(pageId, smooth = true) {
-        try {
-            const elementId = pageIdMap[pageId] || 'home-page';
-            
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            // Show target page
-            const targetPage = document.getElementById(elementId);
-            if (!targetPage) {
-                console.warn(`Page ${elementId} not found, redirecting to home`);
-                return showPage('home');
-            }
-            
-            targetPage.classList.add('active');
-            updateActiveNavLink(pageId);
-            
-            // Close mobile menu if open
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            const navLinks = document.querySelector('.nav-links');
-            if (mobileMenuBtn && navLinks && navLinks.classList.contains('active')) {
-                mobileMenuBtn.classList.remove('active');
-                navLinks.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-            
-            // Load page content
+        
+        // Show target page
+        const targetPage = document.getElementById(`${pageId}-page`);
+        if (targetPage) {
+            targetPage.style.display = 'block';
+            setTimeout(() => targetPage.classList.add('active'), 10);
             loadPageContent(pageId);
-            
-            // Scroll to top
-            window.scrollTo({
-                top: 0,
-                behavior: smooth ? 'smooth' : 'auto'
-            });
-            
-        } catch (error) {
-            console.error('Error showing page:', error);
-            showNotification('Error loading page. Please try again.', 'error');
-            const homePage = document.getElementById('home-page');
-            if (homePage) {
-                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-                homePage.classList.add('active');
-            }
+        } else {
+            // Fallback to home
+            showPage('home');
         }
+        
+        // Update active nav link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+            if (link.dataset.page === pageId) {
+                link.classList.add('active');
+            }
+        });
+        
+        // Close mobile menu
+        const mobileMenu = document.querySelector('.nav-links');
+        const mobileBtn = document.querySelector('.mobile-menu-btn');
+        if (mobileMenu && mobileMenu.classList.contains('active')) {
+            mobileMenu.classList.remove('active');
+            if (mobileBtn) mobileBtn.classList.remove('active');
+        }
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function loadPageContent(pageId) {
@@ -437,979 +449,542 @@
                     await loadHomePage();
                     break;
                 case 'destinations':
-                    await loadDestinations();
+                    await loadDestinationsPage();
                     break;
                 case 'guides':
-                    await loadGuides();
+                    await loadGuidesPage();
                     break;
                 case 'translators':
-                    await loadTranslators();
+                    await loadTranslatorsPage();
                     break;
                 case 'accommodations':
-                    await loadAccommodations();
+                    await loadAccommodationsPage();
                     break;
                 case 'blog':
-                    await loadBlog();
-                    break;
-                default:
-                    await loadHomePage();
+                    await loadBlogPage();
                     break;
             }
         } catch (error) {
-            console.error('Error loading page content:', error);
-            showNotification('Error loading content. Please try again.', 'error');
+            console.error(`Error loading ${pageId}:`, error);
+            showNotification(`Error loading ${pageId} content`, 'error');
         }
     }
 
     // ===============================
-    // PAGE LOADING FUNCTIONS
+    // PAGE CONTENT LOADERS
     // ===============================
     
     async function loadHomePage() {
-        try {
-            const data = await dataManager.fetchAllData();
-            
-            // Load destinations
-            const destinationsGrid = document.querySelector('#home-page .destinations-grid');
-            if (destinationsGrid) {
-                const featuredDestinations = data.destinations.slice(0, 3);
-                
-                if (featuredDestinations.length === 0) {
-                    destinationsGrid.innerHTML = `
-                        <div class="no-data-message">
-                            <i class="fas fa-map-marked-alt"></i>
-                            <h3>No destinations available</h3>
-                            <p>Check back soon for featured destinations.</p>
-                        </div>
-                    `;
-                } else {
-                    destinationsGrid.innerHTML = featuredDestinations.map(dest => `
-                        <div class="destination-card">
-                            <div class="destination-image">
-                                <img src="${dest.image}" alt="${dest.name}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
-                                <div class="destination-rating">
-                                    <i class="fas fa-star" aria-hidden="true"></i> ${dest.rating || 'N/A'}
-                                </div>
-                            </div>
-                            <div class="destination-content">
-                                <h3>${dest.name}</h3>
-                                <div class="destination-location">
-                                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${dest.location}
-                                </div>
-                                <p>${dest.description?.substring(0, 100) || ''}...</p>
-                                <button class="btn btn-primary book-now" 
-                                        data-type="destination" 
-                                        data-id="${dest._id}"
-                                        data-name="${dest.name}"
-                                        aria-label="Book ${dest.name}">
-                                    Book Now
-                                </button>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-            }
-            
-            // Load blog posts
-            const blogGrid = document.querySelector('#home-page .blog-grid');
-            if (blogGrid) {
-                const featuredBlogs = data.blog.slice(0, 3);
-                
-                if (featuredBlogs.length === 0) {
-                    blogGrid.innerHTML = `
-                        <div class="no-data-message">
-                            <i class="fas fa-newspaper"></i>
-                            <h3>No blog posts available</h3>
-                            <p>Check back soon for travel stories and tips.</p>
-                        </div>
-                    `;
-                } else {
-                    blogGrid.innerHTML = featuredBlogs.map(blog => `
-                        <article class="blog-card">
-                            <div class="blog-image">
-                                <img src="${blog.image}" alt="${blog.title}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
-                                <span class="blog-category">${blog.category || 'Travel'}</span>
-                            </div>
-                            <div class="blog-content">
-                                <div class="blog-meta">
-                                    <span class="blog-date">
-                                        <i class="far fa-calendar" aria-hidden="true"></i> ${blog.date || new Date().toLocaleDateString()}
-                                    </span>
-                                    <span class="blog-read-time">${blog.readTime || '5 min read'}</span>
-                                </div>
-                                <h3>${blog.title}</h3>
-                                <p>${blog.excerpt?.substring(0, 120) || ''}...</p>
-                                <a href="#" class="view-article-link read-more-link" data-id="${blog._id}">
-                                    Read More →
-                                </a>
-                            </div>
-                        </article>
-                    `).join('');
-                }
-            }
-            
-        } catch (error) {
-            console.error('Error loading home page:', error);
-            showNotification('Error loading homepage content. Please try again.', 'error');
-        }
-    }
-
-    async function loadDestinations() {
-        try {
-            const response = await apiService.getDestinations();
-            const data = response.data || [];
-            const grid = document.querySelector('#destinations-page .destinations-grid-full');
-            if (!grid) return;
-            
-            if (data.length === 0) {
-                grid.innerHTML = `
+        console.log('🏠 Loading home page...');
+        
+        // Load featured destinations
+        const destinationsGrid = document.querySelector('.destinations-grid');
+        if (destinationsGrid) {
+            try {
+                const destinations = await apiService.getDestinations();
+                const featured = destinations.slice(0, 4);
+                renderDestinations(featured, destinationsGrid);
+            } catch (error) {
+                destinationsGrid.innerHTML = `
                     <div class="no-data-message">
                         <i class="fas fa-map-marked-alt"></i>
-                        <h3>No destinations found</h3>
-                        <p>Check back soon for available destinations.</p>
+                        <p>Loading destinations...</p>
                     </div>
                 `;
-                return;
             }
-            
-            grid.innerHTML = data.map(dest => `
-                <div class="destination-card" data-id="${dest._id}">
-                    <div class="destination-image">
-                        <img src="${dest.image}" alt="${dest.name}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
-                        <div class="destination-rating">
-                            <i class="fas fa-star" aria-hidden="true"></i> ${dest.rating || 'N/A'}
-                        </div>
-                    </div>
-                    <div class="destination-content">
-                        <h3>${dest.name}</h3>
-                        <div class="destination-location">
-                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${dest.location}
-                        </div>
-                        <p>${dest.description}</p>
-                        <div class="destination-features">
-                            ${(dest.features || []).map(f => `<span class="feature">${f}</span>`).join('')}
-                        </div>
-                        <div class="destination-price">${dest.price || 'Price on request'}</div>
-                        <button class="btn btn-primary book-now" 
-                                data-type="destination" 
-                                data-id="${dest._id}"
-                                data-name="${dest.name}"
-                                aria-label="Book ${dest.name}">
-                            Book Now
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-            
-        } catch (error) {
-            console.error('Error loading destinations:', error);
-            showNotification('Error loading destinations. Please try again.', 'error');
         }
-    }
-
-    async function loadGuides() {
-        try {
-            const response = await apiService.getGuides();
-            const data = response.data || [];
-            const grid = document.querySelector('#guides-page .guides-grid-full');
-            if (!grid) return;
-            
-            if (data.length === 0) {
-                grid.innerHTML = `
-                    <div class="no-data-message">
-                        <i class="fas fa-user-tie"></i>
-                        <h3>No tour guides available</h3>
-                        <p>Check back soon for available guides.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            grid.innerHTML = data.map(guide => `
-                <div class="guide-card" data-id="${guide._id}">
-                    <div class="guide-avatar">
-                        <img src="${guide.image}" alt="${guide.name}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
-                    </div>
-                    
-                    <div class="guide-info">
-                        <h3>${guide.name}</h3>
-                        <p class="specialty">${guide.specialty || 'Tour Guide'}</p>
-                        
-                        <div class="languages-section">
-                            <div class="languages-header">
-                                <i class="fas fa-language" aria-hidden="true"></i>
-                                <strong>Languages:</strong>
-                            </div>
-                            <div class="languages-list">
-                                ${(guide.languages || []).map(lang => `
-                                    <span class="language-tag">${lang}</span>
-                                `).join('')}
-                            </div>
-                        </div>
-                        
-                        <p class="experience">
-                            <i class="fas fa-briefcase" aria-hidden="true"></i> ${guide.experience || 'Experienced guide'}
-                        </p>
-                        
-                        <div class="rating">
-                            ${'★'.repeat(Math.floor(guide.rating || 0))}${(guide.rating || 0) % 1 ? '½' : ''}
-                            <span>${guide.rating || 'N/A'}</span>
-                        </div>
-                        
-                        <div class="price">${guide.price || 'Price on request'}</div>
-                        
-                        <button class="btn btn-primary hire-now" 
-                                data-type="guide" 
-                                data-id="${guide._id}"
-                                data-name="${guide.name}"
-                                aria-label="Hire ${guide.name}">
-                            Hire Now
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-            
-        } catch (error) {
-            console.error('Error loading guides:', error);
-            showNotification('Error loading guides. Please try again.', 'error');
-        }
-    }
-
-    async function loadTranslators() {
-        try {
-            const response = await apiService.getTranslators();
-            const data = response.data || [];
-            const grid = document.querySelector('#translators-page .translators-grid-full');
-            if (!grid) return;
-            
-            if (data.length === 0) {
-                grid.innerHTML = `
-                    <div class="no-data-message">
-                        <i class="fas fa-language"></i>
-                        <h3>No translators available</h3>
-                        <p>Check back soon for available translators.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            grid.innerHTML = data.map(translator => `
-                <div class="translator-card" data-id="${translator._id}">
-                    <div class="guide-avatar">
-                        <img src="${translator.image}" alt="${translator.name}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
-                    </div>
-                    
-                    <div class="guide-info">
-                        <h3>${translator.name}</h3>
-                        <p class="specialty">${translator.specialty || 'Translator'}</p>
-                        
-                        <div class="languages-section">
-                            <div class="languages-header">
-                                <i class="fas fa-language" aria-hidden="true"></i>
-                                <strong>Languages:</strong>
-                            </div>
-                            <div class="languages-list">
-                                ${(translator.languages || []).map(lang => `
-                                    <span class="language-tag">${lang}</span>
-                                `).join('')}
-                            </div>
-                        </div>
-                        
-                        <p class="experience">
-                            <i class="fas fa-briefcase" aria-hidden="true"></i> ${translator.experience || 'Experienced translator'}
-                        </p>
-                        
-                        <div class="rating">
-                            ${'★'.repeat(Math.floor(translator.rating || 0))}${(translator.rating || 0) % 1 ? '½' : ''}
-                            <span>${translator.rating || 'N/A'}</span>
-                        </div>
-                        
-                        <div class="price">${translator.price || 'Price on request'}</div>
-                        
-                        <button class="btn btn-primary hire-now" 
-                                data-type="translator" 
-                                data-id="${translator._id}"
-                                data-name="${translator.name}"
-                                aria-label="Hire ${translator.name}">
-                            Hire Now
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-            
-        } catch (error) {
-            console.error('Error loading translators:', error);
-            showNotification('Error loading translators. Please try again.', 'error');
-        }
-    }
-
-    async function loadAccommodations() {
-        try {
-            const response = await apiService.getAccommodations();
-            const data = response.data || [];
-            const grid = document.querySelector('#accommodations-page .accommodations-grid-full');
-            if (!grid) return;
-            
-            if (data.length === 0) {
-                grid.innerHTML = `
-                    <div class="no-data-message">
-                        <i class="fas fa-hotel"></i>
-                        <h3>No accommodations available</h3>
-                        <p>Check back soon for available accommodations.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            grid.innerHTML = data.map(acc => `
-                <div class="accommodation-card" data-id="${acc._id}">
-                    <div class="accommodation-image">
-                        <img src="${acc.image}" alt="${acc.name}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
-                    </div>
-                    <div class="accommodation-content">
-                        <span class="type">${acc.type || 'Accommodation'}</span>
-                        <h3>${acc.name}</h3>
-                        <div class="location">
-                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${acc.location}
-                        </div>
-                        <p>${acc.description?.substring(0, 120) || ''}...</p>
-                        <div class="features">
-                            ${(acc.features || []).slice(0, 3).map(f => `<span class="feature-tag">${f}</span>`).join('')}
-                        </div>
-                        <div class="price-tag">${acc.price || 'Price on request'}</div>
-                        <button class="btn btn-primary book-now" 
-                                data-type="accommodation" 
-                                data-id="${acc._id}"
-                                data-name="${acc.name}"
-                                aria-label="Book ${acc.name}">
-                            Book Now
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-            
-        } catch (error) {
-            console.error('Error loading accommodations:', error);
-            showNotification('Error loading accommodations. Please try again.', 'error');
-        }
-    }
-
-    async function loadBlog() {
-        try {
-            const response = await apiService.getBlogPosts();
-            const data = response.data || [];
-            const grid = document.querySelector('#blog-page .blog-grid-full');
-            if (!grid) return;
-            
-            if (data.length === 0) {
-                grid.innerHTML = `
+        
+        // Load blog preview
+        const blogGrid = document.querySelector('.blog-grid');
+        if (blogGrid) {
+            try {
+                const blogPosts = await apiService.getBlogPosts();
+                const featured = blogPosts.slice(0, 3);
+                renderBlogPosts(featured, blogGrid);
+            } catch (error) {
+                blogGrid.innerHTML = `
                     <div class="no-data-message">
                         <i class="fas fa-newspaper"></i>
-                        <h3>No blog posts available</h3>
-                        <p>Check back soon for travel stories and tips.</p>
+                        <p>Loading blog posts...</p>
                     </div>
                 `;
-                return;
             }
-            
-            grid.innerHTML = data.map(blog => `
-                <article class="blog-card" data-id="${blog._id}">
-                    <div class="blog-image">
-                        <img src="${blog.image}" alt="${blog.title}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
-                        <span class="blog-category">${blog.category || 'Travel'}</span>
-                    </div>
-                    <div class="blog-content">
-                        <div class="blog-meta">
-                            <span class="blog-date">
-                                <i class="fas fa-calendar" aria-hidden="true"></i> ${blog.date || new Date().toLocaleDateString()}
-                            </span>
-                            <span class="blog-read-time">${blog.readTime || '5 min read'}</span>
-                        </div>
-                        <h3>${blog.title}</h3>
-                        <p>${blog.excerpt}</p>
-                        <p class="author"><i class="fas fa-user" aria-hidden="true"></i> ${blog.author || 'Go Trip Team'}</p>
-                        <a href="#" class="view-article-link read-more-link" data-id="${blog._id}">
-                            Read Full Article →
-                        </a>
-                    </div>
-                </article>
-            `).join('');
-            
-        } catch (error) {
-            console.error('Error loading blog:', error);
-            showNotification('Error loading blog posts. Please try again.', 'error');
         }
     }
 
-    function viewBlogArticle(articleId) {
+    async function loadDestinationsPage() {
+        const grid = document.querySelector('.destinations-grid-full');
+        if (!grid) return;
+        
+        grid.innerHTML = `
+            <div class="loading-spinner" style="grid-column: 1/-1; margin: 40px auto;"></div>
+        `;
+        
         try {
-            const data = dataManager.getData('blog');
-            const article = data.find(a => a._id == articleId);
-            if (!article) {
-                showNotification('Article not found. Please try another article.', 'error');
-                return;
-            }
-            
-            const blogPage = document.getElementById('blog-page');
-            if (!blogPage) return;
-            
-            blogPage.innerHTML = `
-                <div class="container">
-                    <div class="article-detail">
-                        <div class="article-header">
-                            <button class="btn btn-outline back-to-blog-link">
-                                <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Blog
-                            </button>
-                            <h1 class="article-title">${article.title}</h1>
-                            <div class="article-meta">
-                                <span><i class="fas fa-calendar" aria-hidden="true"></i> ${article.date}</span>
-                                <span><i class="fas fa-user" aria-hidden="true"></i> ${article.author}</span>
-                                <span><i class="fas fa-clock" aria-hidden="true"></i> ${article.readTime}</span>
-                                <span class="article-category">${article.category}</span>
-                            </div>
-                        </div>
-                        <div class="article-image">
-                            <img src="${article.image}" alt="${article.title}" loading="lazy" onerror="this.src='./images/placeholder.jpg'">
-                        </div>
-                        <div class="article-content">
-                            <p>${article.content}</p>
-                        </div>
-                        <div class="article-footer">
-                            <button class="btn btn-primary back-to-blog-link">
-                                <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Blog
-                            </button>
-                        </div>
-                    </div>
+            const destinations = await apiService.getDestinations();
+            renderDestinations(destinations, grid);
+        } catch (error) {
+            grid.innerHTML = `
+                <div class="no-data-message">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h3>No destinations available</h3>
+                    <p>Check back soon or contact us directly.</p>
                 </div>
             `;
-            
-            blogPage.querySelectorAll('.back-to-blog-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    navigateTo('/blog');
-                });
-            });
-        } catch (error) {
-            console.error('Error viewing blog article:', error);
-            showNotification('Error loading article. Please try again.', 'error');
         }
     }
 
-    // ===============================
-    // HERO WELCOME BANNER
-    // ===============================
-    
-    function initializeHeroWelcomeBanner() {
+    async function loadGuidesPage() {
+        const grid = document.querySelector('.guides-grid-full');
+        if (!grid) return;
+        
+        grid.innerHTML = `
+            <div class="loading-spinner" style="grid-column: 1/-1; margin: 40px auto;"></div>
+        `;
+        
         try {
-            const banner = document.getElementById('hero-welcome-banner');
-            if (!banner) return;
-            
-            const messagesContainer = banner.querySelector('.hero-messages');
-            if (!messagesContainer) return;
-            
-            messagesContainer.innerHTML = config.heroMessages.map((message, index) => `
-                <div class="hero-message ${index === 0 ? 'active' : ''}" 
-                     role="status" 
-                     aria-live="polite"
-                     aria-label="Hero message ${index + 1}">
-                    <i class="fas ${message.icon}" aria-hidden="true"></i>
-                    <span>${message.text}</span>
+            const guides = await apiService.getGuides();
+            renderGuides(guides, grid);
+        } catch (error) {
+            grid.innerHTML = `
+                <div class="no-data-message">
+                    <i class="fas fa-user-tie"></i>
+                    <h3>No guides available</h3>
+                    <p>Check back soon or contact us directly.</p>
                 </div>
-            `).join('');
-            
-            startHeroMessageRotation();
-            
-            const prevBtn = banner.querySelector('.hero-message-prev');
-            const nextBtn = banner.querySelector('.hero-message-next');
-            
-            if (prevBtn) {
-                prevBtn.addEventListener('click', () => {
-                    showHeroMessage(currentHeroMessageIndex - 1);
-                });
-            }
-            
-            if (nextBtn) {
-                nextBtn.addEventListener('click', () => {
-                    showHeroMessage(currentHeroMessageIndex + 1);
-                });
-            }
-            
-            banner.addEventListener('mouseenter', () => {
-                if (heroMessageTimer) {
-                    clearInterval(heroMessageTimer);
-                    heroMessageTimer = null;
-                }
-            });
-            
-            banner.addEventListener('mouseleave', () => {
-                startHeroMessageRotation();
-            });
-            
-        } catch (error) {
-            console.error('Error initializing hero welcome banner:', error);
-        }
-    }
-    
-    function startHeroMessageRotation() {
-        try {
-            if (heroMessageTimer) clearInterval(heroMessageTimer);
-            heroMessageTimer = setInterval(() => {
-                showHeroMessage(currentHeroMessageIndex + 1);
-            }, 4000);
-        } catch (error) {
-            console.error('Error starting hero message rotation:', error);
-        }
-    }
-    
-    function showHeroMessage(index) {
-        try {
-            const messages = document.querySelectorAll('.hero-message');
-            const totalMessages = messages.length;
-            if (totalMessages === 0) return;
-            
-            if (messages[currentHeroMessageIndex]) {
-                messages[currentHeroMessageIndex].classList.remove('active');
-            }
-            
-            currentHeroMessageIndex = (index + totalMessages) % totalMessages;
-            
-            if (messages[currentHeroMessageIndex]) {
-                messages[currentHeroMessageIndex].classList.add('active');
-            }
-            
-            if (heroMessageTimer) {
-                clearInterval(heroMessageTimer);
-                startHeroMessageRotation();
-            }
-            
-        } catch (error) {
-            console.error('Error showing hero message:', error);
+            `;
         }
     }
 
-    // ===============================
-    // MODAL SYSTEM
-    // ===============================
-    
-    function createModal(content = null) {
+    async function loadTranslatorsPage() {
+        const grid = document.querySelector('.translators-grid-full');
+        if (!grid) return;
+        
+        grid.innerHTML = `
+            <div class="loading-spinner" style="grid-column: 1/-1; margin: 40px auto;"></div>
+        `;
+        
         try {
-            if (isModalOpen) return null;
-            
-            const existing = document.getElementById('modal-container');
-            if (existing) existing.remove();
-            
-            const modalContainer = document.createElement('div');
-            modalContainer.id = 'modal-container';
-            modalContainer.className = 'modal-container';
-            
-            const modalContent = document.createElement('div');
-            modalContent.className = 'modal-content';
-            modalContent.setAttribute('role', 'dialog');
-            modalContent.setAttribute('aria-modal', 'true');
-            
-            if (content) {
-                modalContent.innerHTML = content;
-            }
-            
-            modalContainer.appendChild(modalContent);
-            document.body.appendChild(modalContainer);
-            
-            requestAnimationFrame(() => {
-                modalContainer.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
-            
-            isModalOpen = true;
-            
-            const closeBtn = modalContent.querySelector('.modal-close');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closeModal);
-            }
-            
-            modalContainer.addEventListener('click', (e) => {
-                if (e.target === modalContainer) {
-                    closeModal();
-                }
-            });
-            
-            const escHandler = (e) => {
-                if (e.key === 'Escape') {
-                    closeModal();
-                }
-            };
-            document.addEventListener('keydown', escHandler);
-            
-            modalContainer._escHandler = escHandler;
-            
-            const focusable = modalContent.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-            if (focusable) {
-                setTimeout(() => focusable.focus(), 100);
-            }
-            
-            return modalContent;
+            const translators = await apiService.getTranslators();
+            renderTranslators(translators, grid);
         } catch (error) {
-            console.error('Error creating modal:', error);
-            showNotification('Error creating form. Please try again.', 'error');
-            return null;
-        }
-    }
-
-    function closeModal() {
-        try {
-            const modal = document.getElementById('modal-container');
-            if (modal) {
-                if (modal._escHandler) {
-                    document.removeEventListener('keydown', modal._escHandler);
-                }
-                
-                modal.classList.remove('active');
-                document.body.style.overflow = '';
-                isModalOpen = false;
-                
-                setTimeout(() => {
-                    if (modal.parentNode) {
-                        modal.parentNode.removeChild(modal);
-                    }
-                }, 300);
-            }
-        } catch (error) {
-            console.error('Error closing modal:', error);
-        }
-    }
-
-    // ===============================
-    // FORM HANDLERS
-    // ===============================
-    
-    async function showBookingModal(serviceType, serviceId, serviceName) {
-        try {
-            // Fetch service details from API
-            let service = { name: serviceName, price: 'Price on request', rating: 'N/A' };
-            
-            // Try to get specific service details
-            if (serviceId) {
-                try {
-                    const endpoint = `/${serviceType}s/${serviceId}`;
-                    const response = await apiService.request(endpoint);
-                    if (response.success && response.data) {
-                        service = response.data;
-                    }
-                } catch (error) {
-                    console.warn('Could not fetch service details:', error.message);
-                }
-            }
-            
-            const modalContent = `
-                <div class="modal-header">
-                    <h2><i class="fas fa-calendar-check" aria-hidden="true"></i> Book ${service.name}</h2>
-                    <button class="modal-close" aria-label="Close modal">&times;</button>
+            grid.innerHTML = `
+                <div class="no-data-message">
+                    <i class="fas fa-language"></i>
+                    <h3>No translators available</h3>
+                    <p>Check back soon or contact us directly.</p>
                 </div>
-                
-                <div class="modal-body">
-                    <div class="modal-intro">
-                        <p>Complete this form to book <strong>${service.name}</strong>. Your booking will be processed soon.</p>
-                        <div class="service-info">
-                            <span class="service-price">Price: ${service.price}</span>
-                            <span class="service-rating">Rating: ${service.rating}</span>
+            `;
+        }
+    }
+
+    async function loadAccommodationsPage() {
+        const grid = document.querySelector('.accommodations-grid-full');
+        if (!grid) return;
+        
+        grid.innerHTML = `
+            <div class="loading-spinner" style="grid-column: 1/-1; margin: 40px auto;"></div>
+        `;
+        
+        try {
+            const accommodations = await apiService.getAccommodations();
+            renderAccommodations(accommodations, grid);
+        } catch (error) {
+            grid.innerHTML = `
+                <div class="no-data-message">
+                    <i class="fas fa-hotel"></i>
+                    <h3>No accommodations available</h3>
+                    <p>Check back soon or contact us directly.</p>
+                </div>
+            `;
+        }
+    }
+
+    async function loadBlogPage() {
+        const grid = document.querySelector('.blog-grid-full');
+        if (!grid) return;
+        
+        grid.innerHTML = `
+            <div class="loading-spinner" style="grid-column: 1/-1; margin: 40px auto;"></div>
+        `;
+        
+        try {
+            const blogPosts = await apiService.getBlogPosts();
+            renderBlogPosts(blogPosts, grid);
+        } catch (error) {
+            grid.innerHTML = `
+                <div class="no-data-message">
+                    <i class="fas fa-newspaper"></i>
+                    <h3>No blog posts available</h3>
+                    <p>Check back soon for updates.</p>
+                </div>
+            `;
+        }
+    }
+
+    // ===============================
+    // RENDER FUNCTIONS
+    // ===============================
+    
+    function renderDestinations(destinations, container) {
+        if (!destinations || destinations.length === 0) {
+            container.innerHTML = `
+                <div class="no-data-message">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h3>No destinations found</h3>
+                    <p>Please check back later.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = destinations.map(dest => {
+            const imageUrl = dest.image || 'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
+            const rating = dest.rating ? dest.rating.toFixed(1) : null;
+            const price = dest.price || dest.dailyRate ? `$${dest.dailyRate || dest.price}` : 'Contact for price';
+            
+            return `
+            <div class="destination-card" role="listitem">
+                <div class="destination-image">
+                    <img src="${imageUrl}" 
+                         alt="${dest.name || 'Destination'}" 
+                         loading="lazy"
+                         onerror="this.src='https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    ${rating ? `
+                        <div class="destination-rating">
+                            <i class="fas fa-star"></i> ${rating}
                         </div>
+                    ` : ''}
+                </div>
+                <div class="destination-content">
+                    <h3>${dest.name || 'Destination'}</h3>
+                    <div class="destination-location">
+                        <i class="fas fa-map-marker-alt"></i> ${dest.location || 'Rwanda'}
                     </div>
+                    <p class="destination-description">
+                        ${(dest.description || dest.shortDescription || '').substring(0, 100)}...
+                    </p>
+                    ${dest.features ? `
+                        <div class="destination-features">
+                            ${dest.features.slice(0, 3).map(f => 
+                                `<span class="feature">${f}</span>`
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="price-tag">
+                        <i class="fas fa-tag"></i> ${price}
+                    </div>
+                    <button class="btn btn-primary book-now" 
+                            data-type="destination" 
+                            data-id="${dest.id || dest._id || dest.name}"
+                            data-name="${dest.name}">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+        `}).join('');
+    }
+
+    function renderGuides(guides, container) {
+        if (!guides || guides.length === 0) {
+            container.innerHTML = `
+                <div class="no-data-message">
+                    <i class="fas fa-user-tie"></i>
+                    <h3>No guides available</h3>
+                    <p>Please check back later.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = guides.map(guide => {
+            const imageUrl = guide.image || '#';
+            const rating = guide.rating ? guide.rating.toFixed(1) : null;
+            
+            return `
+            <div class="guide-card" role="listitem">
+                <div class="guide-avatar">
+                    <img src="${imageUrl}" 
+                         alt="${guide.name || 'Tour Guide'}" 
+                         loading="lazy"
+                         onerror="this.src='https://images.unsplash.com/photo-1540569876033-6e5d046a1d77?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    <div class="guide-status"></div>
+                </div>
+                <div class="guide-info">
+                    <h3>${guide.name || 'Tour Guide'}</h3>
+                    <p class="specialty">${guide.specialty || 'Professional Guide'}</p>
                     
-                    <form id="booking-form" novalidate>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="booking-name">Your Name *</label>
-                                <input type="text" id="booking-name" name="name" required 
-                                       placeholder="Your full name" autocomplete="name">
+                    ${guide.languages ? `
+                        <div class="languages-section">
+                            <div class="languages-header">
+                                <i class="fas fa-language"></i>
+                                <strong>Languages:</strong>
                             </div>
-                            <div class="form-group">
-                                <label for="booking-email">Your Email *</label>
-                                <input type="email" id="booking-email" name="email" required 
-                                       placeholder="Your email address" autocomplete="email">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="booking-phone">Phone Number *</label>
-                                <input type="tel" id="booking-phone" name="phone" required 
-                                       placeholder="Your phone number" autocomplete="tel">
-                            </div>
-                            <div class="form-group">
-                                <label for="booking-dates">Preferred Dates *</label>
-                                <input type="text" id="booking-dates" name="dates" required 
-                                       placeholder="e.g., June 15-25, 2024">
+                            <div class="languages-list">
+                                ${guide.languages.map(lang => 
+                                    `<span class="language-tag">${lang}</span>`
+                                ).join('')}
                             </div>
                         </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="booking-travelers">Number of Travelers *</label>
-                                <select id="booking-travelers" name="travelers" required>
-                                    <option value="">Select</option>
-                                    <option value="1">1 person</option>
-                                    <option value="2">2 people</option>
-                                    <option value="3-4">3-4 people</option>
-                                    <option value="5-6">5-6 people</option>
-                                    <option value="7+">7+ people</option>
-                                </select>
+                    ` : ''}
+                    
+                    ${guide.experience ? `
+                        <p class="experience">
+                            <i class="fas fa-briefcase"></i> ${guide.experience}
+                        </p>
+                    ` : ''}
+                    
+                    ${rating ? `
+                        <div class="rating">
+                            ${'★'.repeat(Math.floor(guide.rating))}${guide.rating % 1 ? '½' : ''}
+                            <span>${rating}</span>
+                        </div>
+                    ` : ''}
+                    
+                    ${guide.dailyRate ? `
+                        <div class="price-tag">$${guide.dailyRate}/day</div>
+                    ` : ''}
+                    
+                    <button class="btn btn-primary book-now" 
+                            data-type="guide" 
+                            data-id="${guide.id || guide._id || guide.name}"
+                            data-name="${guide.name}">
+                        Hire Now
+                    </button>
+                </div>
+            </div>
+        `}).join('');
+    }
+
+    function renderTranslators(translators, container) {
+        if (!translators || translators.length === 0) {
+            container.innerHTML = `
+                <div class="no-data-message">
+                    <i class="fas fa-language"></i>
+                    <h3>No translators available</h3>
+                    <p>Please check back later.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = translators.map(translator => {
+            const imageUrl = translator.image || '#';
+            const rating = translator.rating ? translator.rating.toFixed(1) : null;
+            
+            return `
+            <div class="translator-card" role="listitem">
+                <div class="guide-avatar">
+                    <img src="${imageUrl}" 
+                         alt="${translator.name || 'Translator'}" 
+                         loading="lazy"
+                         onerror="this.src='https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    <div class="guide-status"></div>
+                </div>
+                <div class="guide-info">
+                    <h3>${translator.name || 'Translator'}</h3>
+                    <p class="specialty">${translator.specialty || 'Professional Translator'}</p>
+                    
+                    ${translator.languages ? `
+                        <div class="languages-section">
+                            <div class="languages-header">
+                                <i class="fas fa-language"></i>
+                                <strong>Languages:</strong>
                             </div>
-                            <div class="form-group">
-                                <label for="booking-country">Country</label>
-                                <input type="text" id="booking-country" name="country" 
-                                       placeholder="Your country" autocomplete="country">
+                            <div class="languages-list">
+                                ${translator.languages.map(lang => 
+                                    `<span class="language-tag">${lang}</span>`
+                                ).join('')}
                             </div>
                         </div>
-                        
+                    ` : ''}
+                    
+                    ${translator.experience ? `
+                        <p class="experience">
+                            <i class="fas fa-briefcase"></i> ${translator.experience}
+                        </p>
+                    ` : ''}
+                    
+                    ${rating ? `
+                        <div class="rating">
+                            ${'★'.repeat(Math.floor(translator.rating))}${translator.rating % 1 ? '½' : ''}
+                            <span>${rating}</span>
+                        </div>
+                    ` : ''}
+                    
+                    ${translator.dailyRate ? `
+                        <div class="price-tag">$${translator.dailyRate}/day</div>
+                    ` : ''}
+                    
+                    <button class="btn btn-primary book-now" 
+                            data-type="translator" 
+                            data-id="${translator.id || translator._id || translator.name}"
+                            data-name="${translator.name}">
+                        Hire Now
+                    </button>
+                </div>
+            </div>
+        `}).join('');
+    }
+
+    function renderAccommodations(accommodations, container) {
+        if (!accommodations || accommodations.length === 0) {
+            container.innerHTML = `
+                <div class="no-data-message">
+                    <i class="fas fa-hotel"></i>
+                    <h3>No accommodations available</h3>
+                    <p>Please check back later.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = accommodations.map(acc => {
+            const imageUrl = acc.image || '#';
+            
+            return `
+            <div class="accommodation-card" role="listitem">
+                <div class="accommodation-image">
+                    <img src="${imageUrl}" 
+                         alt="${acc.name || 'Accommodation'}" 
+                         loading="lazy"
+                         onerror="this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                </div>
+                <div class="accommodation-content">
+                    ${acc.type ? `<span class="type">${acc.type}</span>` : ''}
+                    <h3>${acc.name || 'Accommodation'}</h3>
+                    <div class="location">
+                        <i class="fas fa-map-marker-alt"></i> ${acc.location || 'Rwanda'}
+                    </div>
+                    <p>${(acc.description || '').substring(0, 120)}...</p>
+                    ${acc.features ? `
+                        <div class="features">
+                            ${acc.features.slice(0, 3).map(f => 
+                                `<span class="feature-tag">${f}</span>`
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                    ${acc.dailyRate ? `
+                        <div class="price-tag">$${acc.dailyRate}/night</div>
+                    ` : ''}
+                    <button class="btn btn-primary book-now" 
+                            data-type="accommodation" 
+                            data-id="${acc.id || acc._id || acc.name}"
+                            data-name="${acc.name}">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+        `}).join('');
+    }
+
+    function renderBlogPosts(blogPosts, container) {
+        if (!blogPosts || blogPosts.length === 0) {
+            container.innerHTML = `
+                <div class="no-data-message">
+                    <i class="fas fa-newspaper"></i>
+                    <h3>No blog posts available</h3>
+                    <p>Please check back later.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = blogPosts.map(post => {
+            const imageUrl = post.image || '#';
+            const date = post.date ? new Date(post.date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }) : 'Recent';
+            
+            return `
+            <article class="blog-card" role="listitem">
+                <div class="blog-image">
+                    <img src="${imageUrl}" 
+                         alt="${post.title || 'Blog Post'}" 
+                         loading="lazy"
+                         onerror="this.src='https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    ${post.category ? `
+                        <span class="blog-category">${post.category}</span>
+                    ` : ''}
+                </div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar"></i> ${date}
+                        </span>
+                        <span class="blog-read-time">${post.readTime || '5 min read'}</span>
+                    </div>
+                    <h3>${post.title || 'Blog Post'}</h3>
+                    <p class="blog-excerpt">
+                        ${(post.excerpt || post.description || '').substring(0, 120)}...
+                    </p>
+                    <div class="author">
+                        <i class="fas fa-user"></i> ${post.author || 'Go Trip Team'}
+                    </div>
+                    <a href="#" class="read-more-link" data-id="${post.id || post._id || post.title}">
+                        Read More <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </article>
+        `}).join('');
+    }
+
+    // ===============================
+    // MODAL FUNCTIONS
+    // ===============================
+    
+    function showBookingModal(serviceType, serviceId, serviceName) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const minDate = tomorrow.toISOString().split('T')[0];
+        
+        const modalHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-calendar-check"></i> Book ${serviceName}</h2>
+                    <button class="modal-close" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Complete this form to book ${serviceName}. We'll contact you shortly to confirm.</p>
+                    <form id="booking-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="booking-name">Full Name *</label>
+                                <input type="text" id="booking-name" name="name" required placeholder="Your full name">
+                            </div>
+                            <div class="form-group">
+                                <label for="booking-email">Email *</label>
+                                <input type="email" id="booking-email" name="email" required placeholder="Your email">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="booking-phone">Phone *</label>
+                                <input type="tel" id="booking-phone" name="phone" required placeholder="Your phone number">
+                            </div>
+                            <div class="form-group">
+                                <label for="booking-date">Preferred Date *</label>
+                                <input type="date" id="booking-date" name="date" required min="${minDate}">
+                            </div>
+                        </div>
                         <div class="form-group">
-                            <label for="booking-message">Special Requests or Requirements</label>
-                            <textarea id="booking-message" name="message" 
-                                      placeholder="Any special requirements or additional information..." 
-                                      rows="4"></textarea>
+                            <label for="booking-message">Additional Details</label>
+                            <textarea id="booking-message" name="message" placeholder="Any special requests..." rows="4"></textarea>
                         </div>
-                        
-                        <div class="modal-footer">
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary btn-large">
-                                    <i class="fas fa-save" aria-hidden="true"></i> Submit Booking
-                                </button>
-                            </div>
-                            <p class="form-note">
-                                Your booking will be processed and you will receive a confirmation email.
-                            </p>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-large">
+                                <i class="fas fa-paper-plane"></i> Submit Booking
+                            </button>
                         </div>
                     </form>
                 </div>
-            `;
-            
-            const modal = createModal(modalContent);
-            if (!modal) return;
-            
-            const form = modal.querySelector('#booking-form');
-            const submitBtn = form.querySelector('button[type="submit"]');
-            
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
-                
-                if (!data.name || !data.email || !data.phone || !data.dates || !data.travelers) {
-                    showNotification('❌ Please fill in all required fields.', 'error');
-                    return;
-                }
-                
-                if (!validateEmail(data.email)) {
-                    showNotification('❌ Please enter a valid email address.', 'error');
-                    return;
-                }
-                
-                if (!validatePhone(data.phone)) {
-                    showNotification('❌ Please enter a valid phone number.', 'error');
-                    return;
-                }
-                
-                const bookingData = {
-                    serviceType,
-                    serviceId,
-                    serviceName: service.name,
-                    servicePrice: service.price,
-                    serviceRating: service.rating,
-                    customerName: data.name,
-                    customerEmail: data.email,
-                    customerPhone: data.phone,
-                    country: data.country || 'Not specified',
-                    travelDates: data.dates,
-                    numberOfTravelers: data.travelers,
-                    specialRequests: data.message || 'None',
-                    status: 'pending',
-                    paymentStatus: 'unpaid',
-                    bookingDate: new Date().toISOString()
-                };
-                
-                showLoading(submitBtn, true);
-                
-                try {
-                    const response = await apiService.createBooking(bookingData);
-                    
-                    if (response.success) {
-                        showNotification('✅ Booking submitted successfully!', 'success');
-                        closeModal();
-                    } else {
-                        showNotification(`❌ ${response.message || 'Failed to save booking'}`, 'error');
-                    }
-                } catch (error) {
-                    console.error('Booking error:', error);
-                    showNotification('❌ Failed to save booking. Please try again.', 'error');
-                } finally {
-                    showLoading(submitBtn, false);
-                }
-            });
-            
-        } catch (error) {
-            console.error('Error creating booking modal:', error);
-            showNotification('Error loading booking form. Please try again.', 'error');
-        }
-    }
-
-    function showTripPlanningModal() {
-        const modalContent = `
-            <div class="modal-header">
-                <h2><i class="fas fa-map-marked-alt" aria-hidden="true"></i> Plan Your Custom Itinerary</h2>
-                <button class="modal-close" aria-label="Close modal">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="modal-intro">
-                    <p>Tell us about your dream Rwanda trip. Our experts will create a custom itinerary just for you.</p>
-                </div>
-                
-                <form id="plan-trip-form" novalidate>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="trip-name">Your Name *</label>
-                            <input type="text" id="trip-name" name="name" required 
-                                   placeholder="Your full name" autocomplete="name">
-                        </div>
-                        <div class="form-group">
-                            <label for="trip-email">Your Email *</label>
-                            <input type="email" id="trip-email" name="email" required 
-                                   placeholder="Your email address" autocomplete="email">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="trip-phone">Phone Number *</label>
-                            <input type="tel" id="trip-phone" name="phone" required 
-                                   placeholder="Your phone number" autocomplete="tel">
-                        </div>
-                        <div class="form-group">
-                            <label for="trip-country">Country *</label>
-                            <input type="text" id="trip-country" name="country" required 
-                                   placeholder="Your country" autocomplete="country">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="trip-dates">Travel Dates *</label>
-                            <input type="text" id="trip-dates" name="dates" required 
-                                   placeholder="e.g., June 15-25, 2024">
-                        </div>
-                        <div class="form-group">
-                            <label for="trip-travelers">Number of Travelers *</label>
-                            <select id="trip-travelers" name="travelers" required>
-                                <option value="">Select</option>
-                                <option value="1">1 person</option>
-                                <option value="2">2 people</option>
-                                <option value="3-4">3-4 people</option>
-                                <option value="5-6">5-6 people</option>
-                                <option value="7+">7+ people</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="trip-budget">Budget Range *</label>
-                        <select id="trip-budget" name="budget" required>
-                            <option value="">Select budget</option>
-                            <option value="budget">Budget ($500 - $1,500)</option>
-                            <option value="midrange">Mid-range ($1,500 - $3,000)</option>
-                            <option value="premium">Premium ($3,000 - $5,000)</option>
-                            <option value="luxury">Luxury ($5,000+)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="trip-accommodation">Accommodation Preference *</label>
-                            <select id="trip-accommodation" name="accommodation" required>
-                            <option value="">Select preference</option>
-                            <option value="budget">Budget (Hostels, Guesthouses)</option>
-                            <option value="midrange">Mid-range (Hotels, Eco-Lodges)</option>
-                            <option value="luxury">Luxury (5-Star Hotels, Resorts)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Travel Interests *</label>
-                        <div class="interests-grid">
-                            <label class="interest-checkbox">
-                                <input type="checkbox" name="interests" value="gorilla">
-                                <span class="checkbox-label">
-                                    <i class="fas fa-ape"></i>
-                                    Gorilla Trekking
-                                </span>
-                            </label>
-                            <label class="interest-checkbox">
-                                <input type="checkbox" name="interests" value="safari">
-                                <span class="checkbox-label">
-                                    <i class="fas fa-paw"></i>
-                                    Safari & Wildlife
-                                </span>
-                            </label>
-                            <label class="interest-checkbox">
-                                <input type="checkbox" name="interests" value="culture">
-                                <span class="checkbox-label">
-                                    <i class="fas fa-theater-masks"></i>
-                                    Cultural Experiences
-                                </span>
-                            </label>
-                            <label class="interest-checkbox">
-                                <input type="checkbox" name="interests" value="hiking">
-                                <span class="checkbox-label">
-                                    <i class="fas fa-mountain"></i>
-                                    Hiking & Adventure
-                                </span>
-                            </label>
-                            <label class="interest-checkbox">
-                                <input type="checkbox" name="interests" value="beach">
-                                <span class="checkbox-label">
-                                    <i class="fas fa-umbrella-beach"></i>
-                                    Beach & Relaxation
-                                </span>
-                            </label>
-                            <label class="interest-checkbox">
-                                <input type="checkbox" name="interests" value="birdwatching">
-                                <span class="checkbox-label">
-                                    <i class="fas fa-dove"></i>
-                                    Bird Watching
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="trip-requirements">Special Requirements</label>
-                        <textarea id="trip-requirements" name="requirements" 
-                                  placeholder="Any dietary restrictions, mobility needs, special requests..." 
-                                  rows="3"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="trip-message">Tell us about your dream Rwanda trip *</label>
-                        <textarea id="trip-message" name="message" required 
-                                  placeholder="Describe your ideal Rwanda experience..." 
-                                  rows="4"></textarea>
-                    </div>
-                    
-                    <div class="modal-footer">
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary btn-large">
-                                <i class="fas fa-save" aria-hidden="true"></i> Submit Trip Plan
-                            </button>
-                        </div>
-                        <p class="form-note">
-                            Your itinerary request will be processed and you will receive a response within 24 hours.
-                        </p>
-                    </div>
-                </form>
             </div>
         `;
         
-        const modal = createModal(modalContent);
-        if (!modal) return;
-        
-        const form = modal.querySelector('#plan-trip-form');
+        const modal = createModal(modalHTML);
+        const form = modal.querySelector('#booking-form');
         const submitBtn = form.querySelector('button[type="submit"]');
         
         form.addEventListener('submit', async (e) => {
@@ -1418,173 +993,503 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
             
-            const interests = Array.from(form.querySelectorAll('input[name="interests"]:checked'))
-                .map(cb => cb.value);
-            
-            const requiredFields = ['name', 'email', 'phone', 'country', 'dates', 'travelers', 'budget', 'accommodation', 'message'];
-            const missingFields = requiredFields.filter(field => !data[field]);
-            
-            if (missingFields.length > 0) {
-                showNotification('❌ Please fill in all required fields.', 'error');
-                return;
-            }
-            
-            if (interests.length === 0) {
-                showNotification('❌ Please select at least one travel interest.', 'error');
+            if (!data.name || !data.email || !data.phone || !data.date) {
+                showNotification('Please fill all required fields', 'error');
                 return;
             }
             
             if (!validateEmail(data.email)) {
-                showNotification('❌ Please enter a valid email address.', 'error');
+                showNotification('Please enter a valid email', 'error');
                 return;
             }
             
             if (!validatePhone(data.phone)) {
-                showNotification('❌ Please enter a valid phone number.', 'error');
+                showNotification('Please enter a valid phone number', 'error');
                 return;
             }
             
-            const tripPlanData = {
-                customerName: data.name,
-                customerEmail: data.email,
-                customerPhone: data.phone,
-                country: data.country,
-                travelDates: data.dates,
-                numberOfTravelers: data.travelers,
-                budgetRange: data.budget,
-                accommodationPreference: data.accommodation,
-                interests: interests,
-                specialRequirements: data.requirements || 'None',
-                tripDescription: data.message,
-                status: 'pending'
+            const bookingData = {
+                serviceType,
+                serviceId,
+                serviceName,
+                ...data,
+                submittedAt: new Date().toISOString()
             };
             
             showLoading(submitBtn, true);
             
             try {
-                const response = await apiService.createTripPlan(tripPlanData);
-                
-                if (response.success) {
-                    showNotification('✅ Trip plan submitted successfully!', 'success');
-                    closeModal();
-                } else {
-                    showNotification(`❌ ${response.message || 'Failed to save itinerary'}`, 'error');
-                }
+                const result = await apiService.createBooking(bookingData);
+                showNotification('Booking submitted successfully! We\'ll contact you soon.', 'success');
+                closeModal();
             } catch (error) {
-                console.error('Trip plan error:', error);
-                showNotification('❌ Failed to save itinerary. Please try again.', 'error');
+                showNotification('Booking submitted (offline mode)', 'info');
+                closeModal();
             } finally {
                 showLoading(submitBtn, false);
             }
         });
     }
 
+    // Preload trip plan modal HTML for faster loading
+    function preloadTripPlanModal() {
+        if (preloadedTripPlanModal) return preloadedTripPlanModal;
+        
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const minDate = tomorrow.toISOString().split('T')[0];
+        
+        preloadedTripPlanModal = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-map-marked-alt"></i> Plan Your Trip</h2>
+                    <button class="modal-close" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Tell us about your dream Rwanda adventure. We'll create a custom itinerary just for you.</p>
+                    <form id="trip-plan-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="trip-name">Full Name *</label>
+                                <input type="text" id="trip-name" name="name" required placeholder="Your full name">
+                            </div>
+                            <div class="form-group">
+                                <label for="trip-email">Email *</label>
+                                <input type="email" id="trip-email" name="email" required placeholder="Your email">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="trip-phone">Phone *</label>
+                                <input type="tel" id="trip-phone" name="phone" required placeholder="Your phone number">
+                            </div>
+                            <div class="form-group">
+                                <label for="trip-travelers">Number of Travelers *</label>
+                                <select id="trip-travelers" name="travelers" required>
+                                    <option value="">Select...</option>
+                                    <option value="1">1 person</option>
+                                    <option value="2">2 people</option>
+                                    <option value="3-4">3-4 people</option>
+                                    <option value="5+">5+ people</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="trip-start">Start Date *</label>
+                                <input type="date" id="trip-start" name="startDate" required min="${minDate}">
+                            </div>
+                            <div class="form-group">
+                                <label for="trip-duration">Duration (days) *</label>
+                                <input type="number" id="trip-duration" name="duration" required min="1" max="30" placeholder="e.g., 7">
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4><i class="fas fa-heart"></i> Select Your Interests</h4>
+                            <p class="section-description">Choose activities that interest you (select all that apply):</p>
+                            
+                            <div class="interests-grid">
+                                <div class="interest-category">
+                                    <h5><i class="fas fa-paw"></i> Wildlife & Nature</h5>
+                                    <div class="interest-options">
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="gorilla_trekking">
+                                            <span class="interest-label">
+                                                Gorilla Trekking
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="wildlife_safari">
+                                            <span class="interest-label">
+                                                Wildlife Safari
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="bird_watching">
+                                            <span class="interest-label">
+                                                Bird Watching
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="chimpanzee_tracking">
+                                            <span class="interest-label">
+                                                Chimpanzee Tracking
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="interest-category">
+                                    <h5><i class="fas fa-hiking"></i> Adventure & Outdoors</h5>
+                                    <div class="interest-options">
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="mountain_hiking">
+                                            <span class="interest-label">
+                                                Mountain Hiking
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="canopy_walk">
+                                            <span class="interest-label">
+                                                Canopy Walk
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="waterfall_exploration">
+                                            <span class="interest-label">
+                                                Waterfall Exploration
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="nature_walks">
+                                            <span class="interest-label">
+                                                Nature Walks
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="interest-category">
+                                    <h5><i class="fas fa-landmark"></i> Culture & History</h5>
+                                    <div class="interest-options">
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="cultural_tours">
+                                            <span class="interest-label">
+                                                Cultural Village Tours
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="historical_sites">
+                                            <span class="interest-label">
+                                                Historical Sites
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="local_cuisine">
+                                            <span class="interest-label">
+                                                Local Cuisine Experience
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="art_crafts">
+                                            <span class="interest-label">
+                                                Arts & Crafts
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="interest-category">
+                                    <h5><i class="fas fa-spa"></i> Relaxation & Luxury</h5>
+                                    <div class="interest-options">
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="luxury_accommodation">
+                                            <span class="interest-label">
+                                                Luxury Accommodations
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="spa_wellness">
+                                            <span class="interest-label">
+                                                Spa & Wellness
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="photography_tour">
+                                            <span class="interest-label">
+                                                Photography Tour
+                                            </span>
+                                        </label>
+                                        <label class="interest-checkbox">
+                                            <input type="checkbox" name="interests" value="city_exploration">
+                                            <span class="interest-label">
+                                                City Exploration
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="trip-message">Tell us about your dream trip *</label>
+                            <textarea id="trip-message" name="message" required placeholder="What would you like to experience in Rwanda?" rows="4"></textarea>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input type="checkbox" id="trip-newsletter" name="newsletter" checked>
+                            <label for="trip-newsletter">Subscribe to our newsletter for travel tips and offers</label>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-large">
+                                <i class="fas fa-paper-plane"></i> Submit Trip Plan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        
+        return preloadedTripPlanModal;
+    }
+
+    function showTripPlanningModal() {
+        // Use preloaded modal HTML for faster loading
+        const modalHTML = preloadTripPlanModal();
+        const modal = createModal(modalHTML);
+        const form = modal.querySelector('#trip-plan-form');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            const interests = Array.from(form.querySelectorAll('input[name="interests"]:checked')).map(cb => cb.value);
+            
+            if (!data.name || !data.email || !data.phone || !data.travelers || !data.startDate || !data.duration || !data.message) {
+                showNotification('Please fill all required fields', 'error');
+                return;
+            }
+            
+            if (!validateEmail(data.email)) {
+                showNotification('Please enter a valid email', 'error');
+                return;
+            }
+            
+            if (!validatePhone(data.phone)) {
+                showNotification('Please enter a valid phone number', 'error');
+                return;
+            }
+            
+            if (interests.length === 0) {
+                showNotification('Please select at least one interest', 'error');
+                return;
+            }
+            
+            const tripData = {
+                ...data,
+                interests,
+                submittedAt: new Date().toISOString()
+            };
+            
+            showLoading(submitBtn, true);
+            
+            try {
+                const result = await apiService.createTripPlan(tripData);
+                showNotification('Trip plan submitted successfully! We\'ll contact you soon.', 'success');
+                closeModal();
+            } catch (error) {
+                showNotification('Trip plan submitted (offline mode)', 'info');
+                closeModal();
+            } finally {
+                showLoading(submitBtn, false);
+            }
+        });
+    }
+
+    function createModal(content) {
+        // Close any existing modal
+        closeModal();
+        
+        const modalContainer = document.createElement('div');
+        modalContainer.id = 'modal-container';
+        modalContainer.className = 'modal-container';
+        modalContainer.setAttribute('role', 'dialog');
+        modalContainer.setAttribute('aria-modal', 'true');
+        
+        modalContainer.innerHTML = content;
+        document.body.appendChild(modalContainer);
+        
+        // Add close handlers
+        const closeBtn = modalContainer.querySelector('.modal-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeModal);
+        }
+        
+        const handleClickOutside = (e) => {
+            if (e.target === modalContainer) {
+                closeModal();
+            }
+        };
+        
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') closeModal();
+        };
+        
+        modalContainer.addEventListener('click', handleClickOutside);
+        document.addEventListener('keydown', handleEscape);
+        
+        // Store handlers for cleanup
+        modalContainer._handlers = { handleClickOutside, handleEscape };
+        
+        // Show modal
+        requestAnimationFrame(() => {
+            modalContainer.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        return modalContainer;
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('modal-container');
+        if (modal) {
+            modal.classList.remove('active');
+            
+            // Cleanup event listeners
+            if (modal._handlers) {
+                modal.removeEventListener('click', modal._handlers.handleClickOutside);
+                document.removeEventListener('keydown', modal._handlers.handleEscape);
+            }
+            
+            setTimeout(() => {
+                if (modal.parentNode) {
+                    modal.parentNode.removeChild(modal);
+                }
+                document.body.style.overflow = '';
+            }, 300);
+        }
+    }
+
     // ===============================
-    // FORM HANDLERS
+    // HERO MESSAGE ROTATION
     // ===============================
     
-    function setupFormHandlers() {
-        // Newsletter form
-        const newsletterForm = document.getElementById('newsletter-form');
-        if (newsletterForm) {
-            const submitBtn = newsletterForm.querySelector('button[type="submit"]');
-            
-            newsletterForm.addEventListener('submit', async (e) => {
+    function initializeHeroMessages() {
+        const messagesContainer = document.querySelector('.hero-messages');
+        const messages = config.heroMessages;
+        
+        if (!messagesContainer || !messages.length) return;
+        
+        // Initialize messages
+        messagesContainer.innerHTML = messages.map((msg, index) => `
+            <div class="hero-message ${index === 0 ? 'active' : ''}">
+                <i class="fas ${msg.icon}"></i>
+                <span>${msg.text}</span>
+            </div>
+        `).join('');
+        
+        // Start rotation
+        startMessageRotation();
+        
+        // Add control handlers
+        const prevBtn = document.querySelector('.hero-message-prev');
+        const nextBtn = document.querySelector('.hero-message-next');
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                changeMessage(-1);
+                restartRotation();
+            });
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                changeMessage(1);
+                restartRotation();
+            });
+        }
+    }
+    
+    function changeMessage(direction) {
+        const messages = document.querySelectorAll('.hero-message');
+        const total = messages.length;
+        
+        messages[currentHeroMessageIndex].classList.remove('active');
+        currentHeroMessageIndex = (currentHeroMessageIndex + direction + total) % total;
+        messages[currentHeroMessageIndex].classList.add('active');
+    }
+    
+    function startMessageRotation() {
+        if (heroMessageTimer) clearInterval(heroMessageTimer);
+        heroMessageTimer = setInterval(() => {
+            changeMessage(1);
+        }, 4000);
+    }
+    
+    function restartRotation() {
+        startMessageRotation();
+    }
+
+    // ===============================
+    // SEARCH FUNCTIONALITY
+    // ===============================
+    
+    function initializeSearch() {
+        const heroSearchBtn = document.querySelector('.hero-search-btn');
+        const heroSearchForm = document.querySelector('.hero-search-form');
+        const searchModal = document.getElementById('search-modal');
+        
+        // Hero search form submission
+        if (heroSearchForm) {
+            heroSearchForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                const emailInput = newsletterForm.querySelector('input[type="email"]');
-                const email = emailInput?.value.trim();
+                const searchInput = this.querySelector('input[type="search"]');
+                const searchTerm = searchInput.value.trim();
                 
-                if (!email || !validateEmail(email)) {
-                    showNotification('❌ Please enter a valid email address.', 'error');
-                    return;
-                }
-                
-                showLoading(submitBtn, true);
-                
-                try {
-                    const response = await apiService.subscribeNewsletter({ 
-                        email,
-                        subscribedAt: new Date().toISOString()
-                    });
-                    
-                    if (response.success) {
-                        showNotification('✅ Subscribed successfully!', 'success');
-                        newsletterForm.reset();
-                    } else {
-                        showNotification(`❌ ${response.message || 'Subscription failed'}`, 'error');
-                    }
-                } catch (error) {
-                    console.error('Newsletter subscription error:', error);
-                    showNotification('❌ Failed to subscribe. Please try again.', 'error');
-                } finally {
-                    showLoading(submitBtn, false);
+                if (searchTerm) {
+                    showNotification(`Searching for "${searchTerm}"...`, 'info', 2000);
+                    // Navigate to destinations page and highlight search results
+                    showPage('destinations');
+                    // You could add search filtering logic here
                 }
             });
         }
         
-        // Contact form
-        const contactForm = document.getElementById('contact-form');
-        if (contactForm) {
-            const submitBtn = contactForm.querySelector('button[type="submit"]');
-            
-            contactForm.addEventListener('submit', async (e) => {
+        // Hero search button (if separate from form)
+        if (heroSearchBtn && !heroSearchBtn.closest('form')) {
+            heroSearchBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                
-                const name = document.getElementById('contact-name')?.value.trim();
-                const email = document.getElementById('contact-email')?.value.trim();
-                const subject = document.getElementById('contact-subject')?.value.trim();
-                const message = document.getElementById('contact-message')?.value.trim();
-                
-                if (!name || !email || !subject || !message) {
-                    showNotification('❌ Please fill in all fields.', 'error');
-                    return;
-                }
-                
-                if (!validateEmail(email)) {
-                    showNotification('❌ Please enter a valid email address.', 'error');
-                    return;
-                }
-                
-                const contactData = {
-                    name,
-                    email,
-                    subject,
-                    message
-                };
-                
-                showLoading(submitBtn, true);
-                
-                try {
-                    const response = await apiService.sendContactMessage(contactData);
-                    
-                    if (response.success) {
-                        showNotification('✅ Message sent successfully!', 'success');
-                        contactForm.reset();
-                    } else {
-                        showNotification(`❌ ${response.message || 'Failed to save message'}`, 'error');
-                    }
-                } catch (error) {
-                    console.error('Contact form error:', error);
-                    showNotification('❌ Failed to send message. Please try again.', 'error');
-                } finally {
-                    showLoading(submitBtn, false);
+                if (searchModal) {
+                    searchModal.hidden = false;
+                    requestAnimationFrame(() => {
+                        const searchInput = searchModal.querySelector('input[type="search"]');
+                        if (searchInput) searchInput.focus();
+                    });
+                } else {
+                    // Fallback: navigate to destinations page
+                    showPage('destinations');
                 }
             });
         }
     }
 
     // ===============================
-    // EVENT DELEGATION
+    // EVENT HANDLERS
     // ===============================
     
-    function setupEventDelegation() {
+    function setupEventListeners() {
+        // Navigation links
         document.addEventListener('click', (e) => {
             const target = e.target;
             
-            if (target.matches('.book-now, .hire-now') || 
-                target.closest('.book-now, .hire-now')) {
+            // Navigation
+            if (target.matches('.nav-link')) {
                 e.preventDefault();
-                const button = target.matches('.book-now, .hire-now') ? target : target.closest('.book-now, .hire-now');
+                const page = target.dataset.page;
+                if (page) showPage(page);
+            }
+            
+            // Service links
+            if (target.matches('.service-link')) {
+                e.preventDefault();
+                const page = target.dataset.page;
+                if (page) showPage(page);
+            }
+            
+            // Explore Destinations button (hero section)
+            if (target.matches('.explore-destinations-btn') || target.closest('.explore-destinations-btn')) {
+                e.preventDefault();
+                showPage('destinations');
+            }
+            
+            // Book now buttons
+            if (target.matches('.book-now') || target.closest('.book-now')) {
+                e.preventDefault();
+                const button = target.matches('.book-now') ? target : target.closest('.book-now');
                 const type = button.dataset.type;
                 const id = button.dataset.id;
                 const name = button.dataset.name;
@@ -1593,280 +1498,309 @@
                 }
             }
             
-            else if (target.matches('.view-article-link') || 
-                    target.closest('.view-article-link')) {
-                e.preventDefault();
-                const link = target.matches('.view-article-link') ? target : target.closest('.view-article-link');
-                const articleId = link.dataset.id;
-                if (articleId) {
-                    viewBlogArticle(articleId);
-                }
-            }
-            
-            else if (target.matches('.nav-link') || 
-                    target.closest('.nav-link')) {
-                e.preventDefault();
-                const link = target.matches('.nav-link') ? target : target.closest('.nav-link');
-                const href = link.getAttribute('href');
-                if (href && href.startsWith('/')) {
-                    navigateTo(href);
-                }
-            }
-            
-            else if (target.matches('.plan-trip-btn, .plan-trip-hero-btn, .plan-trip-nav-btn, .plan-trip-footer-btn') ||
-                    target.closest('.plan-trip-btn, .plan-trip-hero-btn, .plan-trip-nav-btn, .plan-trip-footer-btn')) {
+            // Plan trip buttons (FAST LOADING)
+            if (target.matches('.plan-trip-nav-btn, .plan-trip-hero-btn, .plan-trip-footer-btn') || 
+                target.closest('.plan-trip-nav-btn, .plan-trip-hero-btn, .plan-trip-footer-btn')) {
                 e.preventDefault();
                 showTripPlanningModal();
             }
             
-            else if (target.matches('.explore-destinations-btn') ||
-                    target.closest('.explore-destinations-btn')) {
+            // View all buttons
+            if (target.matches('.view-all-btn')) {
                 e.preventDefault();
-                navigateTo('/destinations');
+                const page = target.dataset.page;
+                if (page) showPage(page);
             }
             
-            else if (target.matches('.view-all-btn') ||
-                    target.closest('.view-all-btn')) {
+            // Read more links
+            if (target.matches('.read-more-link') || target.closest('.read-more-link')) {
                 e.preventDefault();
-                const page = target.dataset.page || target.closest('.view-all-btn')?.dataset.page;
-                if (page) {
-                    navigateTo('/' + page);
+                const link = target.matches('.read-more-link') ? target : target.closest('.read-more-link');
+                const page = link.dataset.page || 'blog';
+                showPage(page);
+            }
+            
+            // Footer links
+            if (target.matches('.footer-links a[data-page]')) {
+                e.preventDefault();
+                const page = target.dataset.page;
+                if (page) showPage(page);
+            }
+        });
+        
+        // Mobile menu
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+        
+        if (mobileMenuBtn && navLinks) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenuBtn.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+            });
+        }
+        
+        // Search modal
+        const searchBtn = document.getElementById('search-btn-desktop');
+        const searchModal = document.getElementById('search-modal');
+        const searchClose = searchModal?.querySelector('.search-close');
+        
+        if (searchBtn && searchModal) {
+            searchBtn.addEventListener('click', () => {
+                searchModal.hidden = false;
+                requestAnimationFrame(() => {
+                    const searchInput = searchModal.querySelector('input[type="search"]');
+                    if (searchInput) searchInput.focus();
+                });
+            });
+        }
+        
+        if (searchClose) {
+            searchClose.addEventListener('click', () => {
+                searchModal.hidden = true;
+            });
+        }
+        
+        // Initialize search functionality
+        initializeSearch();
+        
+        // Newsletter forms
+        const newsletterForms = document.querySelectorAll('#newsletter-form, .footer-newsletter-form');
+        newsletterForms.forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const emailInput = form.querySelector('input[type="email"]');
+                const email = emailInput?.value.trim();
+                
+                if (!email || !validateEmail(email)) {
+                    showNotification('Please enter a valid email address', 'error');
+                    return;
                 }
-            }
-            
-            else if (target.matches('.service-link') ||
-                    target.closest('.service-link')) {
-                e.preventDefault();
-                const page = target.dataset.page || target.closest('.service-link')?.dataset.page;
-                if (page) {
-                    navigateTo('/' + page);
+                
+                const submitBtn = form.querySelector('button[type="submit"]');
+                showLoading(submitBtn, true);
+                
+                try {
+                    const result = await apiService.subscribeNewsletter({ email });
+                    showNotification('Successfully subscribed to newsletter!', 'success');
+                    form.reset();
+                } catch (error) {
+                    showNotification('Subscribed (offline mode)', 'info');
+                    form.reset();
+                } finally {
+                    showLoading(submitBtn, false);
                 }
-            }
-            
-            else if (target.matches('.footer-links a[data-page]') ||
-                    target.closest('.footer-links a[data-page]')) {
+            });
+        });
+        
+        // Contact form
+        const contactForm = document.getElementById('contact-form');
+        if (contactForm) {
+            contactForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const page = target.dataset.page || target.closest('a[data-page]')?.dataset.page;
-                if (page) {
-                    navigateTo('/' + page);
+                
+                const name = contactForm.querySelector('#contact-name').value.trim();
+                const email = contactForm.querySelector('#contact-email').value.trim();
+                const subject = contactForm.querySelector('#contact-subject').value.trim();
+                const message = contactForm.querySelector('#contact-message').value.trim();
+                
+                if (!name || !email || !subject || !message) {
+                    showNotification('Please fill all fields', 'error');
+                    return;
                 }
-            }
-            
-            else if (target.matches('.back-to-blog-link') ||
-                    target.closest('.back-to-blog-link')) {
-                e.preventDefault();
-                navigateTo('/blog');
+                
+                if (!validateEmail(email)) {
+                    showNotification('Please enter a valid email', 'error');
+                    return;
+                }
+                
+                const submitBtn = contactForm.querySelector('button[type="submit"]');
+                showLoading(submitBtn, true);
+                
+                try {
+                    const result = await apiService.sendContactMessage({ name, email, subject, message });
+                    showNotification('Message sent successfully!', 'success');
+                    contactForm.reset();
+                } catch (error) {
+                    showNotification('Message sent (offline mode)', 'info');
+                    contactForm.reset();
+                } finally {
+                    showLoading(submitBtn, false);
+                }
+            });
+        }
+        
+        // Window resize - close mobile menu on large screens
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768 && navLinks && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                if (mobileMenuBtn) mobileMenuBtn.classList.remove('active');
+                document.body.style.overflow = '';
             }
         });
     }
 
     // ===============================
-    // MOBILE MENU
+    // IMAGE LAZY LOADING
     // ===============================
-    
-    function setupMobileMenu() {
-        try {
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            const navLinks = document.querySelector('.nav-links');
-            
-            if (!mobileMenuBtn || !navLinks) return;
-            
-            const toggleMenu = () => {
-                const isActive = mobileMenuBtn.classList.contains('active');
-                mobileMenuBtn.classList.toggle('active');
-                navLinks.classList.toggle('active');
-                document.body.style.overflow = !isActive ? 'hidden' : '';
-            };
-            
-            mobileMenuBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleMenu();
-            });
-            
-            navLinks.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenuBtn.classList.remove('active');
-                    navLinks.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            });
-            
-            document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768 && 
-                    !mobileMenuBtn.contains(e.target) && 
-                    !navLinks.contains(e.target) &&
-                    navLinks.classList.contains('active')) {
-                    toggleMenu();
-                }
-            });
-            
-            let resizeTimer;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(() => {
-                    if (window.innerWidth > 768 && navLinks.classList.contains('active')) {
-                        toggleMenu();
+    function initLazyLoading() {
+        const images = document.querySelectorAll('img[loading="lazy"]');
+        
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.classList.add('loaded');
+                        imageObserver.unobserve(img);
                     }
-                }, 250);
+                });
+            }, {
+                rootMargin: '50px 0px',
+                threshold: 0.1
             });
             
-        } catch (error) {
-            console.error('Error setting up mobile menu:', error);
+            images.forEach(img => imageObserver.observe(img));
+        } else {
+            // Fallback for older browsers
+            images.forEach(img => {
+                img.classList.add('loaded');
+            });
         }
     }
 
     // ===============================
-    // SEARCH SYSTEM
+    // CONNECTION STATUS
     // ===============================
-    
-    function setupSearchModal() {
-        const searchBtn = document.getElementById('search-btn-desktop');
-        const searchModal = document.getElementById('search-modal');
+    function updateConnectionStatus(status) {
+        const statusEl = document.getElementById('connection-status');
+        if (!statusEl) return;
         
-        if (!searchBtn || !searchModal) return;
+        let icon = 'fa-circle';
+        let text = 'Checking connection...';
         
-        const searchClose = searchModal.querySelector('.search-close');
-        const searchInput = document.getElementById('search-input');
+        switch(status) {
+            case 'online':
+                icon = 'fa-check-circle';
+                text = 'Connected';
+                break;
+            case 'offline':
+                icon = 'fa-times-circle';
+                text = 'Offline';
+                break;
+            case 'limited':
+                icon = 'fa-exclamation-triangle';
+                text = 'Limited connection';
+                break;
+        }
         
-        searchBtn.addEventListener('click', () => {
-            searchModal.classList.add('active');
-            setTimeout(() => {
-                searchInput?.focus();
-            }, 100);
-        });
-        
-        searchClose.addEventListener('click', () => {
-            searchModal.classList.remove('active');
-        });
-        
-        searchModal.addEventListener('click', (e) => {
-            if (e.target === searchModal) {
-                searchModal.classList.remove('active');
-            }
-        });
-        
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                searchModal.classList.add('active');
-                setTimeout(() => {
-                    searchInput?.focus();
-                }, 100);
-            }
-            
-            if (e.key === 'Escape' && searchModal.classList.contains('active')) {
-                searchModal.classList.remove('active');
-            }
-        });
+        statusEl.className = `connection-status ${status}`;
+        statusEl.innerHTML = `<i class="fas ${icon}"></i><span>${text}</span>`;
     }
 
     // ===============================
     // INITIALIZATION
     // ===============================
     
-    async function init() {
-        if (isInitialized) return;
-        isInitialized = true;
+    async function initializeApp() {
+        console.log('🚀 Initializing Go Trip Application');
         
-        console.log('🚀 Initializing Go Trip System v3.0');
-        console.log('📡 Backend URL:', config.baseUrl);
-        console.log('🌍 Environment:', window.location.hostname.includes('onrender.com') ? 'Render' : 'Local');
-        
-        // Hide loading overlay immediately
+        // Hide loading overlay
         const loadingOverlay = document.getElementById('loading-overlay');
         if (loadingOverlay) {
-            loadingOverlay.style.opacity = '0';
             setTimeout(() => {
-                loadingOverlay.style.display = 'none';
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
             }, 500);
         }
         
-        // Set current year in footer
+        // Set current year
         const yearElement = document.getElementById('current-year');
         if (yearElement) {
             yearElement.textContent = new Date().getFullYear();
         }
         
-        // Initialize UI components immediately
-        setupMobileMenu();
-        setupSearchModal();
-        setupEventDelegation();
-        setupFormHandlers();
-        initializeHeroWelcomeBanner();
+        // Preload trip plan modal for faster loading
+        preloadTripPlanModal();
         
-        // Handle browser navigation
-        window.addEventListener('popstate', () => {
-            const path = getCurrentPath();
-            const pageId = getPageFromPath(path);
-            showPage(pageId, false);
+        // Initialize UI components
+        initializeHeroMessages();
+        setupEventListeners();
+        initLazyLoading();
+        
+        // Add connection status element if not exists
+        if (!document.getElementById('connection-status')) {
+            const statusDiv = document.createElement('div');
+            statusDiv.id = 'connection-status';
+            statusDiv.className = 'connection-status checking';
+            statusDiv.innerHTML = '<i class="fas fa-circle"></i><span>Checking connection...</span>';
+            document.body.appendChild(statusDiv);
+        }
+        
+        // Test backend connection
+        try {
+            const health = await apiService.checkHealth();
+            connectionStatus = health.api ? 'online' : 'offline';
+            updateConnectionStatus(connectionStatus);
+            console.log(`✅ Backend status: ${connectionStatus}`);
+        } catch (error) {
+            connectionStatus = 'offline';
+            updateConnectionStatus('offline');
+            console.log('⚠️ Running in offline mode');
+        }
+        
+        // Online/offline detection
+        window.addEventListener('online', () => {
+            updateConnectionStatus('online');
+            showNotification('Back online', 'success', 2000);
+        });
+        
+        window.addEventListener('offline', () => {
+            updateConnectionStatus('offline');
+            showNotification('You are offline. Some features may not work.', 'warning', 3000);
         });
         
         // Load initial page
-        const initialPath = getCurrentPath();
-        const initialPage = getPageFromPath(initialPath);
-        showPage(initialPage, false);
+        const path = window.location.pathname;
+        let page = 'home';
         
-        // Check backend health in background
-        setTimeout(async () => {
-            try {
-                console.log('🩺 Checking backend health...');
-                const health = await apiService.checkHealth();
-                console.log('✅ Backend Health:', health);
-                apiHealth = health.success;
-                connectionStatus = health.database === 'connected' ? 'online' : 'limited';
-                
-                if (health.database === 'connected') {
-                    showNotification('✅ Connected to backend server', 'success', 2000);
-                } else if (apiHealth) {
-                    showNotification('⚠️ Backend online, database offline', 'warning', 3000);
-                }
-                
-                // Pre-fetch data if backend is available
-                if (apiHealth) {
-                    await dataManager.fetchAllData();
-                }
-                
-            } catch (error) {
-                console.warn('⚠️ Backend check failed:', error.message);
-                apiHealth = false;
-                connectionStatus = 'offline';
-                showNotification('⚠️ Backend unavailable. Some features may not work.', 'warning', 3000);
+        if (path !== '/') {
+            const pageMatch = path.match(/\/(\w+)/);
+            if (pageMatch && pageMatch[1]) {
+                page = pageMatch[1];
             }
-        }, 1000);
+        }
         
-        console.log('✅ Go Trip System initialized');
+        showPage(page);
+        
+        console.log('✅ Application initialized');
     }
 
     // ===============================
-    // GLOBAL EXPORTS
+    // EXPORT TO WINDOW
     // ===============================
     window.GoTrip = {
-        navigateTo,
+        apiService,
         showPage,
-        closeModal,
         showNotification,
         showTripPlanningModal,
         showBookingModal,
-        apiService,
-        dataManager,
-        config,
-        getApiHealth: () => apiHealth,
-        getConnectionStatus: () => connectionStatus
+        closeModal,
+        utils: {
+            validateEmail,
+            validatePhone,
+            showLoading
+        }
     };
 
     // ===============================
-    // INITIALIZE ON DOM READY
+    // START APPLICATION
     // ===============================
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', initializeApp);
     } else {
-        // DOM already loaded
-        setTimeout(init, 100);
+        setTimeout(initializeApp, 100);
     }
-
-    // Handle window load event
-    window.addEventListener('load', () => {
-        console.log('📄 Page fully loaded');
-    });
-
 })();

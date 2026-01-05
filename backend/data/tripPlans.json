@@ -1,0 +1,13 @@
+[
+  {
+    "title": "Rwanda Adventure",
+    "userIndex": 1,
+    "destinationIndexes": [0],
+    "guideIndexes": [0],
+    "translatorIndexes": [0],
+    "startDate": "2026-06-10T00:00:00Z",
+    "endDate": "2026-06-12T00:00:00Z",
+    "totalCost": 1200,
+    "status": "planned"
+  }
+]

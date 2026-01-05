@@ -1,232 +1,186 @@
-import mongoose from 'mongoose';
-import {
-    User,
-    Guide,
-    Translator,
-    Destination,
-    Accommodation,
-    Blog,
-    Booking,
-    TripPlan
-} from './models/index.js';
+// backend/seedData.js
+import dotenv from "dotenv";
+import path from "path";
+import mongoose from "mongoose";
+import crypto from "crypto";
+import slugify from "slugify";
 
-const seedData = async () => {
-    try {
-        // Clear existing data
-        await User.deleteMany({});
-        await Guide.deleteMany({});
-        await Translator.deleteMany({});
-        await Destination.deleteMany({});
-        await Accommodation.deleteMany({});
-        await Blog.deleteMany({});
-        await Booking.deleteMany({});
-        await TripPlan.deleteMany({});
+import User from "./models/User.js";
+import Guide from "./models/Guide.js";
+import Translator from "./models/Translator.js";
+import Destination from "./models/Destination.js";
+import Accommodation from "./models/Accommodation.js";
+import Blog from "./models/Blog.js";
+import Booking from "./models/Booking.js";
+import TripPlan from "./models/TripPlan.js";
+import Contact from "./models/Contact.js";
+import Newsletter from "./models/Newsletter.js";
 
-        console.log('Cleared existing data');
+// Load environment variables
+dotenv.config({ path: path.resolve("./backend/.env") });
 
-        // Create admin user
-        const adminUser = await User.create({
-            name: 'Admin User',
-            email: 'admin@gotrip.africa',
-            password: 'admin123',
-            phone: '+250 787 407 051',
-            country: 'Rwanda',
-            role: 'admin',
-            status: 'active'
-        });
-
-        // Create regular user
-        const regularUser = await User.create({
-            name: 'Test Customer',
-            email: 'customer@example.com',
-            password: 'customer123',
-            phone: '+250 788 123 456',
-            country: 'USA',
-            role: 'user',
-            status: 'active'
-        });
-
-        console.log('Created users');
-
-        // Seed guides data
-        const guides = [
-            {
-                name: "Jean Claude N.",
-                specialty: "Gorilla Trekking Expert",
-                languages: ["English", "French", "Swahili"],
-                experience: "8 years experience",
-                rating: 4.9,
-                price: "$150/day",
-                dailyRate: 180,
-                image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-                certifications: ["Wildlife First Aid", "CPR Certified"],
-                experienceYears: 8,
-                available: true,
-                description: "Expert guide specializing in gorilla trekking with extensive knowledge of Volcanoes National Park."
-            },
-            // Add more guides from your mock data...
-        ];
-
-        await Guide.insertMany(guides);
-        console.log('Seeded guides');
-
-        // Seed translators data
-        const translators = [
-            {
-                name: "Patience Rutayisire",
-                languages: ["English", "German", "Spanish", "French", "Swahili", "Chinese", "Kinyarwanda"],
-                specialty: "Tourism & Business Translation",
-                rating: 4.9,
-                price: "$140/day",
-                dailyRate: 140,
-                image: "./images/Patie.png",
-                experience: "5 years experience",
-                certifications: ["Certified Translator", "Tourism Diploma", "Business Communication"],
-                experienceYears: 5,
-                available: true,
-                description: "Professional translator specializing in tourism and business communications."
-            },
-            // Add more translators...
-        ];
-
-        await Translator.insertMany(translators);
-        console.log('Seeded translators');
-
-        // Seed destinations data
-        const destinations = [
-            {
-                name: "Volcanoes National Park",
-                location: "Northern Province, Rwanda",
-                description: "Home to the endangered mountain gorillas, this UNESCO World Heritage site offers unforgettable gorilla trekking experiences in the Virunga Mountains.",
-                image: "./images/mount-bisoke-rwanda.jpg",
-                features: ["Gorilla Trekking", "Mountain Hiking", "Bird Watching", "Cultural Villages"],
-                rating: 4.9,
-                price: "From $1,500",
-                basePrice: 1500,
-                duration: "3-5 days",
-                bestSeason: ["June", "July", "August", "September"]
-            },
-            // Add more destinations...
-        ];
-
-        await Destination.insertMany(destinations);
-        console.log('Seeded destinations');
-
-        // Seed accommodations data
-        const accommodations = [
-            {
-                name: "Bisate Lodge",
-                location: "Volcanoes National Park",
-                type: "Luxury Eco-Lodge",
-                description: "Award-winning eco-lodge with stunning views of the volcanoes, offering luxury accommodation and direct gorilla trekking access.",
-                image: "./images/Bisate-Lodge-Rwanda-Exterior.jpg",
-                features: ["Private Villas", "Gorilla Views", "Spa", "Fine Dining"],
-                price: "$2,500/night",
-                dailyRate: 2500,
-                rating: 4.9,
-                category: "luxury",
-                capacity: 2,
-                available: true
-            },
-            // Add more accommodations...
-        ];
-
-        await Accommodation.insertMany(accommodations);
-        console.log('Seeded accommodations');
-
-        // Seed blog data
-        const blogs = [
-            {
-                title: "Complete Guide to Gorilla Trekking in Rwanda",
-                excerpt: "Everything you need to know about mountain gorilla trekking in Volcanoes National Park, including permits, preparation, and what to expect.",
-                content: "Full article content here...",
-                date: "May 15, 2024",
-                category: "Adventure",
-                image: "./images/gorilla-trekk-rwanda.jpg",
-                readTime: "8 min read",
-                author: "Jean Claude",
-                tags: ["Gorilla Trekking", "Wildlife", "Adventure", "Rwanda"],
-                views: 1250
-            },
-            // Add more blogs...
-        ];
-
-        await Blog.insertMany(blogs);
-        console.log('Seeded blog posts');
-
-        // Create sample bookings
-        const bookings = [
-            {
-                user: regularUser._id,
-                userName: regularUser.name,
-                userEmail: regularUser.email,
-                serviceType: 'destination',
-                serviceName: 'Volcanoes National Park',
-                bookingReference: 'BOOK-001',
-                date: new Date(Date.now() + 86400000 * 7),
-                duration: 3,
-                travelers: 2,
-                totalAmount: 1500,
-                status: 'confirmed',
-                paymentStatus: 'paid',
-                notes: 'Looking forward to gorilla trekking'
-            },
-            {
-                user: regularUser._id,
-                userName: regularUser.name,
-                userEmail: regularUser.email,
-                serviceType: 'guide',
-                serviceName: 'Jean Claude N.',
-                bookingReference: 'BOOK-002',
-                date: new Date(Date.now() + 86400000 * 5),
-                duration: 2,
-                travelers: 4,
-                totalAmount: 360,
-                status: 'pending',
-                paymentStatus: 'pending',
-                notes: 'Need a gorilla trekking expert'
-            }
-        ];
-
-        await Booking.insertMany(bookings);
-        console.log('Seeded bookings');
-
-        // Create sample trip plans
-        const tripPlans = [
-            {
-                user: regularUser._id,
-                userName: regularUser.name,
-                userEmail: regularUser.email,
-                tripReference: 'TRIP-001',
-                startDate: new Date(Date.now() + 86400000 * 14),
-                duration: '6-8 days',
-                travelers: 3,
-                budget: 'midrange',
-                interests: ['gorilla', 'culture', 'hiking'],
-                message: 'Looking for a family adventure with gorilla trekking and cultural experiences',
-                status: 'review'
-            }
-        ];
-
-        await TripPlan.insertMany(tripPlans);
-        console.log('Seeded trip plans');
-
-        console.log('Database seeding completed successfully!');
-        process.exit(0);
-    } catch (error) {
-        console.error('Seeding error:', error);
-        process.exit(1);
-    }
+// MongoDB connection
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("🔗 MongoDB connected");
+  } catch (error) {
+    console.error("❌ MongoDB connection error:", error);
+    process.exit(1);
+  }
 };
 
-// Run seeding if called directly
-if (process.argv[2] === '--seed') {
-    mongoose.connect(process.env.MONGO_URI)
-        .then(() => seedData())
-        .catch(error => {
-            console.error('Database connection error:', error);
-            process.exit(1);
-        });
-}
+// Helper functions
+const generateBookingReference = () => "BK-" + crypto.randomBytes(5).toString("hex").toUpperCase();
 
-export default seedData;
+// Mock data
+const mockData = {
+  destinations: [
+    { name: "Volcanoes National Park", country: "Rwanda", description: "Gorilla trekking in the Virunga Mountains." },
+    { name: "Lake Kivu", country: "Rwanda", description: "Beautiful lake with beaches and water sports." },
+    { name: "Nyungwe Forest National Park", country: "Rwanda", description: "Rainforest with chimpanzees and canopy walk." },
+    { name: "Kigali City", country: "Rwanda", description: "Capital city with museums, markets, and culture." },
+  ],
+  accommodations: [
+    { name: "Volcano Lodge", destinationName: "Volcanoes National Park", address: "Main Road", type: "Luxury Eco-Lodge", dailyRate: 250, features: ["WiFi","Breakfast"], image: "./images/volcano-lodge.jpg" },
+    { name: "Lake Kivu Resort", destinationName: "Lake Kivu", address: "Lakeshore Drive", type: "Luxury Resort", dailyRate: 200, features: ["Pool","Spa","Breakfast"], image: "./images/lake-kivu-resort.jpg" },
+    { name: "Nyungwe Forest Lodge", destinationName: "Nyungwe Forest National Park", address: "Forest Trail", type: "Luxury Eco-Lodge", dailyRate: 220, features: ["WiFi","Hiking","Breakfast"], image: "./images/nyungwe-lodge.jpg" },
+    { name: "Kigali Business Hotel", destinationName: "Kigali City", address: "Downtown Street", type: "Business Hotel", dailyRate: 180, features: ["WiFi","Conference Room"], image: "./images/kigali-hotel.jpg" },
+  ],
+  guides: [
+    { firstName: "Jean Claude", lastName: "N.", phone:"123456789", languages:["English","French"], specialty:"Gorilla Trekking", experienceYears:8, dailyRate:150, rating:4.9, available:true, image:"./images/jean-claude.jpg" },
+    { firstName: "Marie Aimee", lastName:"K.", phone:"987654321", languages:["English","Kinyarwanda"], specialty:"Cultural Tours", experienceYears:6, dailyRate:160, rating:4.8, available:true, image:"./images/marie-aimee.jpg" },
+    { firstName: "Eric", lastName:"B.", phone:"555555555", languages:["English","German"], specialty:"Bird Watching", experienceYears:5, dailyRate:140, rating:4.7, available:true, image:"./images/eric-b.jpg" },
+    { firstName: "Alice", lastName:"M.", phone:"111222333", languages:["English","French"], specialty:"Photography Tours", experienceYears:7, dailyRate:155, rating:4.8, available:true, image:"./images/alice-m.jpg" },
+  ],
+  translators: [
+    { firstName:"Patience", lastName:"Rutayisire", phone:"123456789", languages:["English","German"], specialty:"Tourism", experienceYears:5, dailyRate:140, rating:4.9, available:true, image:"./images/patie.png" },
+    { firstName:"Eric", lastName:"M.", phone:"987654321", languages:["English","Chinese"], specialty:"Medical", experienceYears:8, dailyRate:150, rating:4.8, available:true, image:"./images/eric-m.jpg" },
+    { firstName:"Celine", lastName:"K.", phone:"555444333", languages:["English","French"], specialty:"Business", experienceYears:6, dailyRate:145, rating:4.7, available:true, image:"./images/celine-k.jpg" },
+    { firstName:"David", lastName:"T.", phone:"222333444", languages:["English","Spanish"], specialty:"Technical", experienceYears:7, dailyRate:150, rating:4.8, available:true, image:"./images/david-t.jpg" },
+  ],
+  users: [
+    { name: "Alice M.", firstName:"Alice", lastName:"M.", email:"alice@example.com", password:"password123" },
+    { name: "Bob K.", firstName:"Bob", lastName:"K.", email:"bob@example.com", password:"password123" },
+    { name: "Charlie L.", firstName:"Charlie", lastName:"L.", email:"charlie@example.com", password:"password123" },
+    { name: "Diana S.", firstName:"Diana", lastName:"S.", email:"diana@example.com", password:"password123" },
+  ],
+  blogs: [
+    { title:"Top 5 Gorilla Trekking Tips", content:"Lorem ipsum...", author:"Admin" },
+    { title:"Lake Kivu Attractions", content:"Lorem ipsum...", author:"Admin" },
+    { title:"Nyungwe Forest Guide", content:"Lorem ipsum...", author:"Admin" },
+    { title:"Kigali City Travel Guide", content:"Lorem ipsum...", author:"Admin" },
+  ],
+  contacts: [
+    { name:"Visitor 1", email:"visitor1@example.com", message:"I want more info." },
+    { name:"Visitor 2", email:"visitor2@example.com", message:"Booking question." },
+    { name:"Visitor 3", email:"visitor3@example.com", message:"How to book?" },
+    { name:"Visitor 4", email:"visitor4@example.com", message:"Pricing inquiry." },
+  ],
+  newsletters: [
+    { email:"subscriber1@example.com" },
+    { email:"subscriber2@example.com" },
+    { email:"subscriber3@example.com" },
+    { email:"subscriber4@example.com" },
+  ],
+};
+
+// Seed function
+const seedData = async () => {
+  try {
+    // Clear all collections
+    await User.deleteMany({});
+    await Guide.deleteMany({});
+    await Translator.deleteMany({});
+    await Destination.deleteMany({});
+    await Accommodation.deleteMany({});
+    await Blog.deleteMany({});
+    await Booking.deleteMany({});
+    await TripPlan.deleteMany({});
+    await Contact.deleteMany({});
+    await Newsletter.deleteMany({});
+    console.log("🧹 Database cleared");
+
+    // Insert destinations
+    const insertedDestinations = await Destination.insertMany(mockData.destinations);
+    const getDestinationId = (name) => insertedDestinations.find(d => d.name === name)?._id;
+
+    // Insert accommodations (with unique slugs)
+    for (const acc of mockData.accommodations) {
+      const destId = getDestinationId(acc.destinationName);
+      if (!destId) continue;
+      const newAcc = new Accommodation({ ...acc, destination: destId });
+      await newAcc.save();
+      console.log(`Inserted Accommodation: ${newAcc.name} -> ${newAcc.slug}`);
+    }
+
+    // Insert guides and translators
+    await Guide.insertMany(mockData.guides);
+    await Translator.insertMany(mockData.translators);
+
+    // Insert users
+    const insertedUsers = await User.insertMany(mockData.users);
+
+    // Insert blogs with unique slugs
+    for (const blog of mockData.blogs) {
+      let baseSlug = slugify(blog.title, { lower: true, strict: true });
+      let slug = baseSlug;
+      let count = 1;
+      while (await mongoose.models.Blog.exists({ slug })) {
+        slug = `${baseSlug}-${count}`;
+        count++;
+      }
+      blog.slug = slug;
+    }
+    await Blog.insertMany(mockData.blogs);
+
+    // Insert bookings
+    const accommodations = await Accommodation.find({});
+    const bookingsData = insertedUsers.flatMap(user =>
+      accommodations.map(acc => ({
+        user: user._id,
+        accommodation: acc._id,
+        bookingReference: generateBookingReference(),
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        totalPrice: acc.dailyRate * 3,
+      }))
+    );
+    await Booking.insertMany(bookingsData);
+
+    // Insert trip plans with titles
+    const tripPlansData = insertedUsers.map((user, index) => ({
+      user: user._id,
+      title: `Trip Plan ${index + 1}`, // ✅ required field
+      destinations: insertedDestinations.map(d => d._id),
+      guides: [],
+      translators: [],
+      startDate: new Date(),
+      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      totalCost: 0,
+      notes: "Sample trip plan",
+      status: "planned",
+    }));
+    await TripPlan.insertMany(tripPlansData);
+
+    // Insert contacts
+    await Contact.insertMany(mockData.contacts);
+
+    // Insert newsletters
+    await Newsletter.insertMany(mockData.newsletters);
+
+    console.log("🌱 All 10 models seeded successfully with 4+ entries each!");
+    process.exit();
+  } catch (err) {
+    console.error("❌ Seeding error:", err);
+    process.exit(1);
+  }
+};
+
+// Run seed
+const runSeed = async () => {
+  await connectDB();
+  await seedData();
+};
+
+runSeed();

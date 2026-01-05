@@ -1,0 +1,11 @@
+[
+  {
+    "name": "Alice Mukasa",
+    "email": "alice@gotrip.africa",
+    "phone": "+250788222222",
+    "subject": "Inquiry about gorilla trekking",
+    "message": "I want to book a trip for June.",
+    "status": "new",
+    "createdAt": "2026-01-04T00:00:00Z"
+  }
+]
