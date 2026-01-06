@@ -3376,3 +3376,168 @@ img[loading="lazy"].loaded {
         animation: none !important;
     }
 }
+/* ===== MOBILE FIXES ===== */
+
+/* Fix for Trip Plan Modal checkboxes on mobile */
+@media (max-width: 768px) {
+    .interests-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .interest-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .interest-checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        flex-shrink: 0;
+    }
+    
+    .interest-checkbox .checkbox-label {
+        font-size: 14px;
+        line-height: 1.4;
+        color: #333;
+    }
+    
+    /* Hero Welcome Banner mobile fix */
+    .hero-welcome-banner {
+        position: fixed !important;
+        top: 80px !important;
+        left: 10px !important;
+        right: 10px !important;
+        z-index: 1000 !important;
+        margin: 0 !important;
+        padding: 12px 15px !important;
+        background: linear-gradient(135deg, #2E7D32, #1B5E20, #4CAF50) !important;
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    .hero-welcome-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .hero-messages {
+        height: auto;
+        min-height: 40px;
+        text-align: center;
+    }
+    
+    .hero-message {
+        font-size: 14px;
+        line-height: 1.3;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .hero-message i {
+        font-size: 16px;
+        color: #FFD700;
+    }
+    
+    .hero-message-controls {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    /* Hero content adjustment for banner */
+    .hero {
+        padding-top: 150px !important;
+    }
+    
+    .hero-content {
+        margin-top: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-welcome-banner {
+        top: 70px !important;
+        padding: 10px !important;
+    }
+    
+    .hero-message {
+        font-size: 12px;
+    }
+    
+    .hero-message i {
+        font-size: 14px;
+    }
+}
+
+/* Hide search button entirely */
+.search-btn {
+    display: none !important;
+}
+
+/* Adjust navigation for removed search button */
+.nav-buttons {
+    gap: 10px;
+}
+
+/* Ensure all images load properly */
+img[loading="lazy"] {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+img[loading="lazy"]:not(.loaded) {
+    opacity: 0;
+}
+
+/* Form improvements */
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.form-check input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+.form-check label {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Modal improvements for mobile */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-height: 85vh;
+        margin: 10px;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
+/* Remove any leftover search modal styles */
+.search-modal {
+    display: none !important;
+}

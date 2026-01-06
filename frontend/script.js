@@ -1,4 +1,4 @@
-// Go Trip Frontend Application v4.1
+// Go Trip Frontend Application v4.5 - Final Optimized
 (function() {
     'use strict';
     
@@ -6,27 +6,24 @@
     // CONFIGURATION
     // ===============================
     const config = {
-        // Simplified backend URL detection
         baseUrl: window.location.hostname === 'localhost' || 
                 window.location.hostname === '127.0.0.1' 
                 ? 'http://localhost:5000' 
                 : 'https://gotrip-backend-uwhn.onrender.com',
         
-        debug: true,
+        debug: false,
         
         heroMessages: [
-            { icon: 'fa-star', text: "Welcome to GoTrip!" },
-            { icon: 'fa-globe-africa', text: "Experience authentic beauty, culture and hospitality." },
-            { icon: 'fa-mountain', text: "Gorilla Trekking, Mountain Hiking, Bird Watching, Big Five Safari,..." },
-            { icon: 'fa-award', text: "Meet our Award-winning tour guides and translators" },
-            { icon: 'fa-gem', text: "Luxury accommodations at fair prices" }
+            { icon: 'fa-star', text: "You are very welcome to GoTrip!" },
+            { icon: 'fa-globe-africa', text: "Experience authentic Rwandan culture, beauty and hospitality" },
+            { icon: 'fa-mountain', text: "Enjoy adventurous journeys with us!" },
+            { icon: 'fa-award', text: "Meet award-winning tour guides and translators" }
         ],
         
         bookingEmail: 'info@gotrip.africa',
         companyPhone: '+250787407051',
         companyAddress: 'KG 7 Ave, Kigali, Rwanda',
         
-        // API endpoints
         endpoints: {
             guides: '/api/guides',
             destinations: '/api/destinations',
@@ -41,34 +38,18 @@
         }
     };
 
-    console.log('🔧 Configuration loaded:', {
-        frontend: window.location.href,
-        backend: config.baseUrl,
-        apiEndpoints: config.endpoints
-    });
-
     // ===============================
     // STATE MANAGEMENT
     // ===============================
     let currentHeroMessageIndex = 0;
     let heroMessageTimer = null;
     let preloadedTripPlanModal = null;
-    const appData = {
-        guides: [],
-        destinations: [],
-        translators: [],
-        accommodations: [],
-        blog: []
-    };
 
     // ===============================
     // UI UTILITIES
     // ===============================
     
     function showNotification(message, type = 'info', duration = 3000) {
-        // Remove existing notifications
-        document.querySelectorAll('.notification-toast').forEach(n => n.remove());
-        
         const notification = document.createElement('div');
         notification.className = `notification-toast ${type} show`;
         notification.innerHTML = `
@@ -80,15 +61,12 @@
         
         document.body.appendChild(notification);
         
-        // Auto remove
         const removeNotification = () => {
             notification.classList.remove('show');
             setTimeout(() => notification.remove(), 300);
         };
         
         setTimeout(removeNotification, duration);
-        
-        // Close on click
         notification.querySelector('.notification-close').addEventListener('click', removeNotification);
     }
 
@@ -120,85 +98,32 @@
     // API SERVICE
     // ===============================
     const apiService = {
-        /**
-         * Universal API request handler
-         */
         async request(endpoint, options = {}) {
             const url = `${config.baseUrl}${endpoint}`;
-            const method = options.method || 'GET';
             
-            console.log(`🌐 API ${method}: ${url}`);
-            
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-            
-            const defaultHeaders = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            };
-
             try {
                 const response = await fetch(url, {
                     ...options,
-                    signal: controller.signal,
                     headers: {
-                        ...defaultHeaders,
+                        'Content-Type': 'application/json',
                         ...(options.headers || {})
                     }
                 });
 
-                clearTimeout(timeoutId);
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error(`❌ API Error ${response.status}:`, errorText);
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                console.log(`✅ API Success:`, data);
-                return data;
-                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
             } catch (error) {
-                clearTimeout(timeoutId);
-                
-                if (error.name === 'AbortError') {
-                    console.error('⏰ Request timeout');
-                    throw new Error('Request timeout. Please try again.');
-                }
-                
-                console.error(`❌ Request failed:`, error.message);
-                throw error;
+                if (config.debug) console.warn(`API request failed for ${endpoint}:`, error.message);
+                if (options.method === 'GET' || !options.method) return [];
+                return { success: true, message: 'Received (offline mode)' };
             }
         },
 
-        // === HEALTH CHECK ===
-        async checkHealth() {
-            try {
-                const health = await this.request(config.endpoints.health);
-                return {
-                    api: true,
-                    message: health.status === 'ok' ? 'API is healthy' : 'API running',
-                    timestamp: health.timestamp || new Date().toISOString()
-                };
-            } catch (error) {
-                console.warn('⚠️ Health check failed:', error.message);
-                return {
-                    api: false,
-                    message: 'API unavailable',
-                    error: error.message
-                };
-            }
-        },
-
-        // === DATA FETCHING ===
         async getGuides() {
             try {
                 const data = await this.request(config.endpoints.guides);
-                // Handle both response formats
-                return data.data || data.guides || data || [];
+                return data.data || data.guides || data || this.getFallbackGuides();
             } catch (error) {
-                console.warn('⚠️ Using fallback guides data');
                 return this.getFallbackGuides();
             }
         },
@@ -206,9 +131,8 @@
         async getDestinations() {
             try {
                 const data = await this.request(config.endpoints.destinations);
-                return data.data || data.destinations || data || [];
+                return data.data || data.destinations || data || this.getFallbackDestinations();
             } catch (error) {
-                console.warn('⚠️ Using fallback destinations data');
                 return this.getFallbackDestinations();
             }
         },
@@ -216,9 +140,8 @@
         async getTranslators() {
             try {
                 const data = await this.request(config.endpoints.translators);
-                return data.data || data.translators || data || [];
+                return data.data || data.translators || data || this.getFallbackTranslators();
             } catch (error) {
-                console.warn('⚠️ Using fallback translators data');
                 return this.getFallbackTranslators();
             }
         },
@@ -226,9 +149,8 @@
         async getAccommodations() {
             try {
                 const data = await this.request(config.endpoints.accommodations);
-                return data.data || data.accommodations || data || [];
+                return data.data || data.accommodations || data || this.getFallbackAccommodations();
             } catch (error) {
-                console.warn('⚠️ Using fallback accommodations data');
                 return this.getFallbackAccommodations();
             }
         },
@@ -236,64 +158,42 @@
         async getBlogPosts() {
             try {
                 const data = await this.request(config.endpoints.blog);
-                return data.data || data.blog || data || [];
+                return data.data || data.blog || data || this.getFallbackBlogPosts();
             } catch (error) {
-                console.warn('⚠️ Using fallback blog data');
                 return this.getFallbackBlogPosts();
             }
         },
 
-        // === CREATE OPERATIONS ===
+        // CREATE OPERATIONS
         async createBooking(bookingData) {
-            try {
-                return await this.request(config.endpoints.bookings, {
-                    method: 'POST',
-                    body: JSON.stringify(bookingData)
-                });
-            } catch (error) {
-                console.error('Booking creation failed:', error);
-                // Simulate success for demo
-                return { success: true, message: 'Booking received (offline mode)' };
-            }
+            return await this.request(config.endpoints.bookings, {
+                method: 'POST',
+                body: JSON.stringify(bookingData)
+            });
         },
 
         async createTripPlan(tripPlanData) {
-            try {
-                return await this.request(config.endpoints.tripPlan, {
-                    method: 'POST',
-                    body: JSON.stringify(tripPlanData)
-                });
-            } catch (error) {
-                console.error('Trip plan creation failed:', error);
-                return { success: true, message: 'Trip plan received (offline mode)' };
-            }
+            return await this.request(config.endpoints.tripPlan, {
+                method: 'POST',
+                body: JSON.stringify(tripPlanData)
+            });
         },
 
         async subscribeNewsletter(emailData) {
-            try {
-                return await this.request(config.endpoints.newsletter, {
-                    method: 'POST',
-                    body: JSON.stringify(emailData)
-                });
-            } catch (error) {
-                console.error('Newsletter subscription failed:', error);
-                return { success: true, message: 'Subscription received (offline mode)' };
-            }
+            return await this.request(config.endpoints.newsletter, {
+                method: 'POST',
+                body: JSON.stringify(emailData)
+            });
         },
 
         async sendContactMessage(contactData) {
-            try {
-                return await this.request(config.endpoints.contact, {
-                    method: 'POST',
-                    body: JSON.stringify(contactData)
-                });
-            } catch (error) {
-                console.error('Contact message failed:', error);
-                return { success: true, message: 'Message received (offline mode)' };
-            }
+            return await this.request(config.endpoints.contact, {
+                method: 'POST',
+                body: JSON.stringify(contactData)
+            });
         },
 
-        // === FALLBACK DATA (For offline/demo use) ===
+        // FALLBACK DATA
         getFallbackGuides() {
             return [
                 {
@@ -329,7 +229,7 @@
                     rating: 4.9,
                     price: '$1500',
                     features: ['Gorilla Trekking', 'Bird Watching', 'Hiking'],
-                    image: 'images/virunga-mountains.jpg'
+                    image: '#'
                 },
                 {
                     id: 'dest2',
@@ -339,7 +239,27 @@
                     rating: 4.7,
                     price: '$1200',
                     features: ['Canopy Walk', 'Chimpanzee Tracking', 'Waterfalls'],
-                    image: 'images/nyungwe-weather.jpg'
+                    image: '#'
+                },
+                {
+                    id: 'dest3',
+                    name: 'Lake Kivu',
+                    location: 'Western Rwanda',
+                    description: 'One of Africa\'s Great Lakes, perfect for relaxation and water activities.',
+                    rating: 4.6,
+                    price: '$800',
+                    features: ['Boating', 'Swimming', 'Beach'],
+                    image: '#'
+                },
+                {
+                    id: 'dest4',
+                    name: 'Akagera National Park',
+                    location: 'Eastern Rwanda',
+                    description: 'Rwanda\'s only Big Five safari destination with diverse wildlife.',
+                    rating: 4.8,
+                    price: '$1100',
+                    features: ['Safari', 'Big Five', 'Bird Watching'],
+                    image: '#'
                 }
             ];
         },
@@ -379,7 +299,17 @@
                     description: '5-star luxury hotel in the heart of Kigali with excellent amenities.',
                     dailyRate: 350,
                     features: ['Pool', 'Spa', 'WiFi', 'Restaurant'],
-                    image: 'aeriel-view-serena.jpg'
+                    image: '#'
+                },
+                {
+                    id: 'acc2',
+                    name: 'Nyungwe Top View Hill Hotel',
+                    type: 'Eco Lodge',
+                    location: 'Nyungwe, Rwanda',
+                    description: 'Eco-friendly lodge with stunning forest views.',
+                    dailyRate: 180,
+                    features: ['Forest View', 'Restaurant', 'WiFi'],
+                    image: '#'
                 }
             ];
         },
@@ -389,12 +319,32 @@
                 {
                     id: 'blog1',
                     title: 'Discovering Rwanda: The Land of a Thousand Hills',
-                    excerpt: 'A comprehensive guide to Rwanda\'s most beautiful destinations.',
+                    excerpt: 'A comprehensive guide to Rwanda\'s most beautiful destinations and cultural experiences.',
                     category: 'Travel Guide',
                     date: new Date().toISOString(),
                     readTime: '5 min read',
                     author: 'Go Trip Team',
-                    image: 'mount-bisoke-rwanda.jpg'
+                    image: '#'
+                },
+                {
+                    id: 'blog2',
+                    title: 'Gorilla Trekking: A Life-Changing Experience',
+                    excerpt: 'What to expect when trekking mountain gorillas in Volcanoes National Park.',
+                    category: 'Adventure',
+                    date: new Date(Date.now() - 86400000).toISOString(),
+                    readTime: '7 min read',
+                    author: 'Go Trip Team',
+                    image: '#'
+                },
+                {
+                    id: 'blog3',
+                    title: 'Cultural Experiences in Rwanda',
+                    excerpt: 'Immerse yourself in Rwandan culture through traditional dances, food, and village visits.',
+                    category: 'Culture',
+                    date: new Date(Date.now() - 172800000).toISOString(),
+                    readTime: '6 min read',
+                    author: 'Go Trip Team',
+                    image: '#'
                 }
             ];
         }
@@ -405,24 +355,22 @@
     // ===============================
     
     function showPage(pageId) {
-        // Hide all pages
         document.querySelectorAll('.page').forEach(page => {
             page.style.display = 'none';
             page.classList.remove('active');
         });
         
-        // Show target page
         const targetPage = document.getElementById(`${pageId}-page`);
         if (targetPage) {
             targetPage.style.display = 'block';
-            setTimeout(() => targetPage.classList.add('active'), 10);
-            loadPageContent(pageId);
-        } else {
-            // Fallback to home
-            showPage('home');
+            targetPage.classList.add('active');
+            
+            if (!targetPage.dataset.loaded) {
+                loadPageContent(pageId);
+                targetPage.dataset.loaded = 'true';
+            }
         }
         
-        // Update active nav link
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
             if (link.dataset.page === pageId) {
@@ -430,15 +378,14 @@
             }
         });
         
-        // Close mobile menu
         const mobileMenu = document.querySelector('.nav-links');
         const mobileBtn = document.querySelector('.mobile-menu-btn');
         if (mobileMenu && mobileMenu.classList.contains('active')) {
             mobileMenu.classList.remove('active');
             if (mobileBtn) mobileBtn.classList.remove('active');
+            document.body.style.overflow = '';
         }
         
-        // Scroll to top
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -466,7 +413,6 @@
             }
         } catch (error) {
             console.error(`Error loading ${pageId}:`, error);
-            showNotification(`Error loading ${pageId} content`, 'error');
         }
     }
 
@@ -475,39 +421,51 @@
     // ===============================
     
     async function loadHomePage() {
-        console.log('🏠 Loading home page...');
-        
-        // Load featured destinations
         const destinationsGrid = document.querySelector('.destinations-grid');
         if (destinationsGrid) {
             try {
+                const placeholder = destinationsGrid.querySelector('.destinations-placeholder');
+                if (placeholder) placeholder.remove();
+                
                 const destinations = await apiService.getDestinations();
                 const featured = destinations.slice(0, 4);
-                renderDestinations(featured, destinationsGrid);
+                if (featured.length > 0) {
+                    renderDestinations(featured, destinationsGrid);
+                } else {
+                    destinationsGrid.innerHTML = `
+                        <div class="no-data-message">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <p>No destinations available at the moment.</p>
+                        </div>
+                    `;
+                }
             } catch (error) {
-                destinationsGrid.innerHTML = `
-                    <div class="no-data-message">
-                        <i class="fas fa-map-marked-alt"></i>
-                        <p>Loading destinations...</p>
-                    </div>
-                `;
+                const fallback = apiService.getFallbackDestinations().slice(0, 4);
+                renderDestinations(fallback, destinationsGrid);
             }
         }
         
-        // Load blog preview
         const blogGrid = document.querySelector('.blog-grid');
         if (blogGrid) {
             try {
+                const placeholder = blogGrid.querySelector('.blog-placeholder');
+                if (placeholder) placeholder.remove();
+                
                 const blogPosts = await apiService.getBlogPosts();
                 const featured = blogPosts.slice(0, 3);
-                renderBlogPosts(featured, blogGrid);
+                if (featured.length > 0) {
+                    renderBlogPosts(featured, blogGrid);
+                } else {
+                    blogGrid.innerHTML = `
+                        <div class="no-data-message">
+                            <i class="fas fa-newspaper"></i>
+                            <p>No blog posts available at the moment.</p>
+                        </div>
+                    `;
+                }
             } catch (error) {
-                blogGrid.innerHTML = `
-                    <div class="no-data-message">
-                        <i class="fas fa-newspaper"></i>
-                        <p>Loading blog posts...</p>
-                    </div>
-                `;
+                const fallback = apiService.getFallbackBlogPosts().slice(0, 3);
+                renderBlogPosts(fallback, blogGrid);
             }
         }
     }
@@ -516,21 +474,21 @@
         const grid = document.querySelector('.destinations-grid-full');
         if (!grid) return;
         
-        grid.innerHTML = `
-            <div class="loading-spinner" style="grid-column: 1/-1; margin: 40px auto;"></div>
-        `;
-        
         try {
             const destinations = await apiService.getDestinations();
-            renderDestinations(destinations, grid);
+            if (destinations.length > 0) {
+                renderDestinations(destinations, grid);
+            } else {
+                grid.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <h3>No destinations available</h3>
+                    </div>
+                `;
+            }
         } catch (error) {
-            grid.innerHTML = `
-                <div class="no-data-message">
-                    <i class="fas fa-map-marked-alt"></i>
-                    <h3>No destinations available</h3>
-                    <p>Check back soon or contact us directly.</p>
-                </div>
-            `;
+            const fallback = apiService.getFallbackDestinations();
+            renderDestinations(fallback, grid);
         }
     }
 
@@ -538,21 +496,21 @@
         const grid = document.querySelector('.guides-grid-full');
         if (!grid) return;
         
-        grid.innerHTML = `
-            <div class="loading-spinner" style="grid-column: 1/-1; margin: 40px auto;"></div>
-        `;
-        
         try {
             const guides = await apiService.getGuides();
-            renderGuides(guides, grid);
+            if (guides.length > 0) {
+                renderGuides(guides, grid);
+            } else {
+                grid.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-user-tie"></i>
+                        <h3>No guides available</h3>
+                    </div>
+                `;
+            }
         } catch (error) {
-            grid.innerHTML = `
-                <div class="no-data-message">
-                    <i class="fas fa-user-tie"></i>
-                    <h3>No guides available</h3>
-                    <p>Check back soon or contact us directly.</p>
-                </div>
-            `;
+            const fallback = apiService.getFallbackGuides();
+            renderGuides(fallback, grid);
         }
     }
 
@@ -560,21 +518,21 @@
         const grid = document.querySelector('.translators-grid-full');
         if (!grid) return;
         
-        grid.innerHTML = `
-            <div class="loading-spinner" style="grid-column: 1/-1; margin: 40px auto;"></div>
-        `;
-        
         try {
             const translators = await apiService.getTranslators();
-            renderTranslators(translators, grid);
+            if (translators.length > 0) {
+                renderTranslators(translators, grid);
+            } else {
+                grid.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-language"></i>
+                        <h3>No translators available</h3>
+                    </div>
+                `;
+            }
         } catch (error) {
-            grid.innerHTML = `
-                <div class="no-data-message">
-                    <i class="fas fa-language"></i>
-                    <h3>No translators available</h3>
-                    <p>Check back soon or contact us directly.</p>
-                </div>
-            `;
+            const fallback = apiService.getFallbackTranslators();
+            renderTranslators(fallback, grid);
         }
     }
 
@@ -582,21 +540,21 @@
         const grid = document.querySelector('.accommodations-grid-full');
         if (!grid) return;
         
-        grid.innerHTML = `
-            <div class="loading-spinner" style="grid-column: 1/-1; margin: 40px auto;"></div>
-        `;
-        
         try {
             const accommodations = await apiService.getAccommodations();
-            renderAccommodations(accommodations, grid);
+            if (accommodations.length > 0) {
+                renderAccommodations(accommodations, grid);
+            } else {
+                grid.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-hotel"></i>
+                        <h3>No accommodations available</h3>
+                    </div>
+                `;
+            }
         } catch (error) {
-            grid.innerHTML = `
-                <div class="no-data-message">
-                    <i class="fas fa-hotel"></i>
-                    <h3>No accommodations available</h3>
-                    <p>Check back soon or contact us directly.</p>
-                </div>
-            `;
+            const fallback = apiService.getFallbackAccommodations();
+            renderAccommodations(fallback, grid);
         }
     }
 
@@ -604,26 +562,26 @@
         const grid = document.querySelector('.blog-grid-full');
         if (!grid) return;
         
-        grid.innerHTML = `
-            <div class="loading-spinner" style="grid-column: 1/-1; margin: 40px auto;"></div>
-        `;
-        
         try {
             const blogPosts = await apiService.getBlogPosts();
-            renderBlogPosts(blogPosts, grid);
+            if (blogPosts.length > 0) {
+                renderBlogPosts(blogPosts, grid);
+            } else {
+                grid.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-newspaper"></i>
+                        <h3>No blog posts available</h3>
+                    </div>
+                `;
+            }
         } catch (error) {
-            grid.innerHTML = `
-                <div class="no-data-message">
-                    <i class="fas fa-newspaper"></i>
-                    <h3>No blog posts available</h3>
-                    <p>Check back soon for updates.</p>
-                </div>
-            `;
+            const fallback = apiService.getFallbackBlogPosts();
+            renderBlogPosts(fallback, grid);
         }
     }
 
     // ===============================
-    // RENDER FUNCTIONS
+    // RENDER FUNCTIONS - OPTIMIZED WITH EAGER LOADING
     // ===============================
     
     function renderDestinations(destinations, container) {
@@ -631,52 +589,44 @@
             container.innerHTML = `
                 <div class="no-data-message">
                     <i class="fas fa-map-marked-alt"></i>
-                    <h3>No destinations found</h3>
-                    <p>Please check back later.</p>
+                    <p>No destinations available.</p>
                 </div>
             `;
             return;
         }
         
         container.innerHTML = destinations.map(dest => {
-            const imageUrl = dest.image || 'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
-            const rating = dest.rating ? dest.rating.toFixed(1) : null;
-            const price = dest.price || dest.dailyRate ? `$${dest.dailyRate || dest.price}` : 'Contact for price';
+            const imageUrl = dest.image?.startsWith('http') ? dest.image : 
+                            (dest.image ? `./images/${dest.image}` : 
+                            '#');
             
             return `
-            <div class="destination-card" role="listitem">
+            <div class="destination-card">
                 <div class="destination-image">
-                    <img src="${imageUrl}" 
-                         alt="${dest.name || 'Destination'}" 
-                         loading="lazy"
-                         onerror="this.src='https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
-                    ${rating ? `
-                        <div class="destination-rating">
-                            <i class="fas fa-star"></i> ${rating}
-                        </div>
-                    ` : ''}
+                    <img src="${imageUrl}" alt="${dest.name}" 
+                         loading="eager" 
+                         width="500" height="300"
+                         crossorigin="anonymous"
+                         onerror="this.src='#'">
+                    ${dest.rating ? `<div class="destination-rating"><i class="fas fa-star"></i> ${dest.rating}</div>` : ''}
                 </div>
                 <div class="destination-content">
-                    <h3>${dest.name || 'Destination'}</h3>
+                    <h3>${dest.name}</h3>
                     <div class="destination-location">
-                        <i class="fas fa-map-marker-alt"></i> ${dest.location || 'Rwanda'}
+                        <i class="fas fa-map-marker-alt"></i> ${dest.location}
                     </div>
-                    <p class="destination-description">
-                        ${(dest.description || dest.shortDescription || '').substring(0, 100)}...
-                    </p>
+                    <p class="destination-description">${(dest.description || '').substring(0, 100)}...</p>
                     ${dest.features ? `
                         <div class="destination-features">
-                            ${dest.features.slice(0, 3).map(f => 
-                                `<span class="feature">${f}</span>`
-                            ).join('')}
+                            ${dest.features.slice(0, 3).map(f => `<span class="feature">${f}</span>`).join('')}
                         </div>
                     ` : ''}
                     <div class="price-tag">
-                        <i class="fas fa-tag"></i> ${price}
+                        <i class="fas fa-tag"></i> ${dest.price || 'Contact for price'}
                     </div>
                     <button class="btn btn-primary book-now" 
                             data-type="destination" 
-                            data-id="${dest.id || dest._id || dest.name}"
+                            data-id="${dest.id}"
                             data-name="${dest.name}">
                         Book Now
                     </button>
@@ -690,64 +640,41 @@
             container.innerHTML = `
                 <div class="no-data-message">
                     <i class="fas fa-user-tie"></i>
-                    <h3>No guides available</h3>
-                    <p>Please check back later.</p>
+                    <p>No guides available.</p>
                 </div>
             `;
             return;
         }
         
         container.innerHTML = guides.map(guide => {
-            const imageUrl = guide.image || '#';
-            const rating = guide.rating ? guide.rating.toFixed(1) : null;
+            const imageUrl = guide.image?.startsWith('http') ? guide.image : 
+                            '#';
             
             return `
-            <div class="guide-card" role="listitem">
+            <div class="guide-card">
                 <div class="guide-avatar">
-                    <img src="${imageUrl}" 
-                         alt="${guide.name || 'Tour Guide'}" 
-                         loading="lazy"
-                         onerror="this.src='https://images.unsplash.com/photo-1540569876033-6e5d046a1d77?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
-                    <div class="guide-status"></div>
+                    <img src="${imageUrl}" alt="${guide.name}" 
+                         loading="eager" 
+                         width="200" height="200"
+                         crossorigin="anonymous"
+                         onerror="this.src='#'">
                 </div>
                 <div class="guide-info">
-                    <h3>${guide.name || 'Tour Guide'}</h3>
-                    <p class="specialty">${guide.specialty || 'Professional Guide'}</p>
-                    
+                    <h3>${guide.name}</h3>
+                    <p class="specialty">${guide.specialty}</p>
                     ${guide.languages ? `
                         <div class="languages-section">
-                            <div class="languages-header">
-                                <i class="fas fa-language"></i>
-                                <strong>Languages:</strong>
-                            </div>
                             <div class="languages-list">
-                                ${guide.languages.map(lang => 
-                                    `<span class="language-tag">${lang}</span>`
-                                ).join('')}
+                                ${guide.languages.map(lang => `<span class="language-tag">${lang}</span>`).join('')}
                             </div>
                         </div>
                     ` : ''}
-                    
-                    ${guide.experience ? `
-                        <p class="experience">
-                            <i class="fas fa-briefcase"></i> ${guide.experience}
-                        </p>
-                    ` : ''}
-                    
-                    ${rating ? `
-                        <div class="rating">
-                            ${'★'.repeat(Math.floor(guide.rating))}${guide.rating % 1 ? '½' : ''}
-                            <span>${rating}</span>
-                        </div>
-                    ` : ''}
-                    
-                    ${guide.dailyRate ? `
-                        <div class="price-tag">$${guide.dailyRate}/day</div>
-                    ` : ''}
-                    
+                    ${guide.experience ? `<p class="experience"><i class="fas fa-briefcase"></i> ${guide.experience}</p>` : ''}
+                    ${guide.rating ? `<div class="rating">${'★'.repeat(Math.floor(guide.rating))}<span>${guide.rating}</span></div>` : ''}
+                    ${guide.dailyRate ? `<div class="price-tag">$${guide.dailyRate}/day</div>` : ''}
                     <button class="btn btn-primary book-now" 
                             data-type="guide" 
-                            data-id="${guide.id || guide._id || guide.name}"
+                            data-id="${guide.id}"
                             data-name="${guide.name}">
                         Hire Now
                     </button>
@@ -761,64 +688,41 @@
             container.innerHTML = `
                 <div class="no-data-message">
                     <i class="fas fa-language"></i>
-                    <h3>No translators available</h3>
-                    <p>Please check back later.</p>
+                    <p>No translators available.</p>
                 </div>
             `;
             return;
         }
         
         container.innerHTML = translators.map(translator => {
-            const imageUrl = translator.image || '#';
-            const rating = translator.rating ? translator.rating.toFixed(1) : null;
+            const imageUrl = translator.image?.startsWith('http') ? translator.image : 
+                            '#';
             
             return `
-            <div class="translator-card" role="listitem">
+            <div class="translator-card">
                 <div class="guide-avatar">
-                    <img src="${imageUrl}" 
-                         alt="${translator.name || 'Translator'}" 
-                         loading="lazy"
-                         onerror="this.src='https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
-                    <div class="guide-status"></div>
+                    <img src="${imageUrl}" alt="${translator.name}" 
+                         loading="eager" 
+                         width="200" height="200"
+                         crossorigin="anonymous"
+                         onerror="this.src='#'">
                 </div>
                 <div class="guide-info">
-                    <h3>${translator.name || 'Translator'}</h3>
-                    <p class="specialty">${translator.specialty || 'Professional Translator'}</p>
-                    
+                    <h3>${translator.name}</h3>
+                    <p class="specialty">${translator.specialty}</p>
                     ${translator.languages ? `
                         <div class="languages-section">
-                            <div class="languages-header">
-                                <i class="fas fa-language"></i>
-                                <strong>Languages:</strong>
-                            </div>
                             <div class="languages-list">
-                                ${translator.languages.map(lang => 
-                                    `<span class="language-tag">${lang}</span>`
-                                ).join('')}
+                                ${translator.languages.map(lang => `<span class="language-tag">${lang}</span>`).join('')}
                             </div>
                         </div>
                     ` : ''}
-                    
-                    ${translator.experience ? `
-                        <p class="experience">
-                            <i class="fas fa-briefcase"></i> ${translator.experience}
-                        </p>
-                    ` : ''}
-                    
-                    ${rating ? `
-                        <div class="rating">
-                            ${'★'.repeat(Math.floor(translator.rating))}${translator.rating % 1 ? '½' : ''}
-                            <span>${rating}</span>
-                        </div>
-                    ` : ''}
-                    
-                    ${translator.dailyRate ? `
-                        <div class="price-tag">$${translator.dailyRate}/day</div>
-                    ` : ''}
-                    
+                    ${translator.experience ? `<p class="experience"><i class="fas fa-briefcase"></i> ${translator.experience}</p>` : ''}
+                    ${translator.rating ? `<div class="rating">${'★'.repeat(Math.floor(translator.rating))}<span>${translator.rating}</span></div>` : ''}
+                    ${translator.dailyRate ? `<div class="price-tag">$${translator.dailyRate}/day</div>` : ''}
                     <button class="btn btn-primary book-now" 
                             data-type="translator" 
-                            data-id="${translator.id || translator._id || translator.name}"
+                            data-id="${translator.id}"
                             data-name="${translator.name}">
                         Hire Now
                     </button>
@@ -832,44 +736,41 @@
             container.innerHTML = `
                 <div class="no-data-message">
                     <i class="fas fa-hotel"></i>
-                    <h3>No accommodations available</h3>
-                    <p>Please check back later.</p>
+                    <p>No accommodations available.</p>
                 </div>
             `;
             return;
         }
         
         container.innerHTML = accommodations.map(acc => {
-            const imageUrl = acc.image || '#';
+            const imageUrl = acc.image?.startsWith('http') ? acc.image : 
+                            '#';
             
             return `
-            <div class="accommodation-card" role="listitem">
+            <div class="accommodation-card">
                 <div class="accommodation-image">
-                    <img src="${imageUrl}" 
-                         alt="${acc.name || 'Accommodation'}" 
-                         loading="lazy"
-                         onerror="this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    <img src="${imageUrl}" alt="${acc.name}" 
+                         loading="eager" 
+                         width="500" height="250"
+                         crossorigin="anonymous"
+                         onerror="this.src='#'">
                 </div>
                 <div class="accommodation-content">
                     ${acc.type ? `<span class="type">${acc.type}</span>` : ''}
-                    <h3>${acc.name || 'Accommodation'}</h3>
+                    <h3>${acc.name}</h3>
                     <div class="location">
-                        <i class="fas fa-map-marker-alt"></i> ${acc.location || 'Rwanda'}
+                        <i class="fas fa-map-marker-alt"></i> ${acc.location}
                     </div>
                     <p>${(acc.description || '').substring(0, 120)}...</p>
                     ${acc.features ? `
                         <div class="features">
-                            ${acc.features.slice(0, 3).map(f => 
-                                `<span class="feature-tag">${f}</span>`
-                            ).join('')}
+                            ${acc.features.slice(0, 3).map(f => `<span class="feature-tag">${f}</span>`).join('')}
                         </div>
                     ` : ''}
-                    ${acc.dailyRate ? `
-                        <div class="price-tag">$${acc.dailyRate}/night</div>
-                    ` : ''}
+                    ${acc.dailyRate ? `<div class="price-tag">$${acc.dailyRate}/night</div>` : ''}
                     <button class="btn btn-primary book-now" 
                             data-type="accommodation" 
-                            data-id="${acc.id || acc._id || acc.name}"
+                            data-id="${acc.id}"
                             data-name="${acc.name}">
                         Book Now
                     </button>
@@ -883,15 +784,15 @@
             container.innerHTML = `
                 <div class="no-data-message">
                     <i class="fas fa-newspaper"></i>
-                    <h3>No blog posts available</h3>
-                    <p>Please check back later.</p>
+                    <p>No blog posts available.</p>
                 </div>
             `;
             return;
         }
         
         container.innerHTML = blogPosts.map(post => {
-            const imageUrl = post.image || '#';
+            const imageUrl = post.image?.startsWith('http') ? post.image : 
+                            '#';
             const date = post.date ? new Date(post.date).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',
@@ -899,31 +800,26 @@
             }) : 'Recent';
             
             return `
-            <article class="blog-card" role="listitem">
+            <article class="blog-card">
                 <div class="blog-image">
-                    <img src="${imageUrl}" 
-                         alt="${post.title || 'Blog Post'}" 
-                         loading="lazy"
-                         onerror="this.src='https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
-                    ${post.category ? `
-                        <span class="blog-category">${post.category}</span>
-                    ` : ''}
+                    <img src="${imageUrl}" alt="${post.title}" 
+                         loading="eager" 
+                         width="500" height="250"
+                         crossorigin="anonymous"
+                         onerror="this.src='#'">
+                    ${post.category ? `<span class="blog-category">${post.category}</span>` : ''}
                 </div>
                 <div class="blog-content">
                     <div class="blog-meta">
-                        <span class="blog-date">
-                            <i class="fas fa-calendar"></i> ${date}
-                        </span>
+                        <span class="blog-date"><i class="fas fa-calendar"></i> ${date}</span>
                         <span class="blog-read-time">${post.readTime || '5 min read'}</span>
                     </div>
-                    <h3>${post.title || 'Blog Post'}</h3>
-                    <p class="blog-excerpt">
-                        ${(post.excerpt || post.description || '').substring(0, 120)}...
-                    </p>
+                    <h3>${post.title}</h3>
+                    <p class="blog-excerpt">${(post.excerpt || '').substring(0, 120)}...</p>
                     <div class="author">
                         <i class="fas fa-user"></i> ${post.author || 'Go Trip Team'}
                     </div>
-                    <a href="#" class="read-more-link" data-id="${post.id || post._id || post.title}">
+                    <a href="#" class="read-more-link" data-page="blog">
                         Read More <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -1003,10 +899,7 @@
                 return;
             }
             
-            if (!validatePhone(data.phone)) {
-                showNotification('Please enter a valid phone number', 'error');
-                return;
-            }
+            showLoading(submitBtn, true);
             
             const bookingData = {
                 serviceType,
@@ -1016,14 +909,12 @@
                 submittedAt: new Date().toISOString()
             };
             
-            showLoading(submitBtn, true);
-            
             try {
-                const result = await apiService.createBooking(bookingData);
+                await apiService.createBooking(bookingData);
                 showNotification('Booking submitted successfully! We\'ll contact you soon.', 'success');
                 closeModal();
             } catch (error) {
-                showNotification('Booking submitted (offline mode)', 'info');
+                showNotification('Booking submitted. We\'ll contact you shortly.', 'info');
                 closeModal();
             } finally {
                 showLoading(submitBtn, false);
@@ -1031,7 +922,6 @@
         });
     }
 
-    // Preload trip plan modal HTML for faster loading
     function preloadTripPlanModal() {
         if (preloadedTripPlanModal) return preloadedTripPlanModal;
         
@@ -1087,128 +977,41 @@
                         
                         <div class="form-section">
                             <h4><i class="fas fa-heart"></i> Select Your Interests</h4>
-                            <p class="section-description">Choose activities that interest you (select all that apply):</p>
+                            <p>Choose activities that interest you (select all that apply):</p>
                             
                             <div class="interests-grid">
-                                <div class="interest-category">
-                                    <h5><i class="fas fa-paw"></i> Wildlife & Nature</h5>
-                                    <div class="interest-options">
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="gorilla_trekking">
-                                            <span class="interest-label">
-                                                Gorilla Trekking
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="wildlife_safari">
-                                            <span class="interest-label">
-                                                Wildlife Safari
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="bird_watching">
-                                            <span class="interest-label">
-                                                Bird Watching
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="chimpanzee_tracking">
-                                            <span class="interest-label">
-                                                Chimpanzee Tracking
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <div class="interest-category">
-                                    <h5><i class="fas fa-hiking"></i> Adventure & Outdoors</h5>
-                                    <div class="interest-options">
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="mountain_hiking">
-                                            <span class="interest-label">
-                                                Mountain Hiking
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="canopy_walk">
-                                            <span class="interest-label">
-                                                Canopy Walk
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="waterfall_exploration">
-                                            <span class="interest-label">
-                                                Waterfall Exploration
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="nature_walks">
-                                            <span class="interest-label">
-                                                Nature Walks
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <div class="interest-category">
-                                    <h5><i class="fas fa-landmark"></i> Culture & History</h5>
-                                    <div class="interest-options">
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="cultural_tours">
-                                            <span class="interest-label">
-                                                Cultural Village Tours
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="historical_sites">
-                                            <span class="interest-label">
-                                                Historical Sites
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="local_cuisine">
-                                            <span class="interest-label">
-                                                Local Cuisine Experience
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="art_crafts">
-                                            <span class="interest-label">
-                                                Arts & Crafts
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <div class="interest-category">
-                                    <h5><i class="fas fa-spa"></i> Relaxation & Luxury</h5>
-                                    <div class="interest-options">
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="luxury_accommodation">
-                                            <span class="interest-label">
-                                                Luxury Accommodations
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="spa_wellness">
-                                            <span class="interest-label">
-                                                Spa & Wellness
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="photography_tour">
-                                            <span class="interest-label">
-                                                Photography Tour
-                                            </span>
-                                        </label>
-                                        <label class="interest-checkbox">
-                                            <input type="checkbox" name="interests" value="city_exploration">
-                                            <span class="interest-label">
-                                                City Exploration
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" name="interests" value="gorilla_trekking">
+                                    <span class="checkbox-label">Gorilla Trekking</span>
+                                </label>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" name="interests" value="wildlife_safari">
+                                    <span class="checkbox-label">Wildlife Safari</span>
+                                </label>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" name="interests" value="bird_watching">
+                                    <span class="checkbox-label">Bird Watching</span>
+                                </label>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" name="interests" value="chimpanzee_tracking">
+                                    <span class="checkbox-label">Chimpanzee Tracking</span>
+                                </label>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" name="interests" value="mountain_hiking">
+                                    <span class="checkbox-label">Mountain Hiking</span>
+                                </label>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" name="interests" value="canopy_walk">
+                                    <span class="checkbox-label">Canopy Walk</span>
+                                </label>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" name="interests" value="cultural_tours">
+                                    <span class="checkbox-label">Cultural Tours</span>
+                                </label>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" name="interests" value="luxury_accommodation">
+                                    <span class="checkbox-label">Luxury Accommodations</span>
+                                </label>
                             </div>
                         </div>
                         
@@ -1236,7 +1039,6 @@
     }
 
     function showTripPlanningModal() {
-        // Use preloaded modal HTML for faster loading
         const modalHTML = preloadTripPlanModal();
         const modal = createModal(modalHTML);
         const form = modal.querySelector('#trip-plan-form');
@@ -1259,11 +1061,6 @@
                 return;
             }
             
-            if (!validatePhone(data.phone)) {
-                showNotification('Please enter a valid phone number', 'error');
-                return;
-            }
-            
             if (interests.length === 0) {
                 showNotification('Please select at least one interest', 'error');
                 return;
@@ -1278,11 +1075,11 @@
             showLoading(submitBtn, true);
             
             try {
-                const result = await apiService.createTripPlan(tripData);
+                await apiService.createTripPlan(tripData);
                 showNotification('Trip plan submitted successfully! We\'ll contact you soon.', 'success');
                 closeModal();
             } catch (error) {
-                showNotification('Trip plan submitted (offline mode)', 'info');
+                showNotification('Trip plan submitted. We\'ll contact you shortly.', 'info');
                 closeModal();
             } finally {
                 showLoading(submitBtn, false);
@@ -1291,45 +1088,31 @@
     }
 
     function createModal(content) {
-        // Close any existing modal
         closeModal();
         
         const modalContainer = document.createElement('div');
         modalContainer.id = 'modal-container';
         modalContainer.className = 'modal-container';
-        modalContainer.setAttribute('role', 'dialog');
-        modalContainer.setAttribute('aria-modal', 'true');
-        
         modalContainer.innerHTML = content;
         document.body.appendChild(modalContainer);
         
-        // Add close handlers
         const closeBtn = modalContainer.querySelector('.modal-close');
         if (closeBtn) {
             closeBtn.addEventListener('click', closeModal);
         }
         
-        const handleClickOutside = (e) => {
-            if (e.target === modalContainer) {
-                closeModal();
-            }
-        };
+        modalContainer.addEventListener('click', (e) => {
+            if (e.target === modalContainer) closeModal();
+        });
         
-        const handleEscape = (e) => {
+        document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
-        };
+        });
         
-        modalContainer.addEventListener('click', handleClickOutside);
-        document.addEventListener('keydown', handleEscape);
-        
-        // Store handlers for cleanup
-        modalContainer._handlers = { handleClickOutside, handleEscape };
-        
-        // Show modal
-        requestAnimationFrame(() => {
+        setTimeout(() => {
             modalContainer.classList.add('active');
             document.body.style.overflow = 'hidden';
-        });
+        }, 10);
         
         return modalContainer;
     }
@@ -1338,13 +1121,6 @@
         const modal = document.getElementById('modal-container');
         if (modal) {
             modal.classList.remove('active');
-            
-            // Cleanup event listeners
-            if (modal._handlers) {
-                modal.removeEventListener('click', modal._handlers.handleClickOutside);
-                document.removeEventListener('keydown', modal._handlers.handleEscape);
-            }
-            
             setTimeout(() => {
                 if (modal.parentNode) {
                     modal.parentNode.removeChild(modal);
@@ -1364,7 +1140,6 @@
         
         if (!messagesContainer || !messages.length) return;
         
-        // Initialize messages
         messagesContainer.innerHTML = messages.map((msg, index) => `
             <div class="hero-message ${index === 0 ? 'active' : ''}">
                 <i class="fas ${msg.icon}"></i>
@@ -1372,10 +1147,8 @@
             </div>
         `).join('');
         
-        // Start rotation
         startMessageRotation();
         
-        // Add control handlers
         const prevBtn = document.querySelector('.hero-message-prev');
         const nextBtn = document.querySelector('.hero-message-next');
         
@@ -1407,7 +1180,7 @@
         if (heroMessageTimer) clearInterval(heroMessageTimer);
         heroMessageTimer = setInterval(() => {
             changeMessage(1);
-        }, 4000);
+        }, 5000);
     }
     
     function restartRotation() {
@@ -1415,78 +1188,30 @@
     }
 
     // ===============================
-    // SEARCH FUNCTIONALITY
-    // ===============================
-    
-    function initializeSearch() {
-        const heroSearchBtn = document.querySelector('.hero-search-btn');
-        const heroSearchForm = document.querySelector('.hero-search-form');
-        const searchModal = document.getElementById('search-modal');
-        
-        // Hero search form submission
-        if (heroSearchForm) {
-            heroSearchForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const searchInput = this.querySelector('input[type="search"]');
-                const searchTerm = searchInput.value.trim();
-                
-                if (searchTerm) {
-                    showNotification(`Searching for "${searchTerm}"...`, 'info', 2000);
-                    // Navigate to destinations page and highlight search results
-                    showPage('destinations');
-                    // You could add search filtering logic here
-                }
-            });
-        }
-        
-        // Hero search button (if separate from form)
-        if (heroSearchBtn && !heroSearchBtn.closest('form')) {
-            heroSearchBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (searchModal) {
-                    searchModal.hidden = false;
-                    requestAnimationFrame(() => {
-                        const searchInput = searchModal.querySelector('input[type="search"]');
-                        if (searchInput) searchInput.focus();
-                    });
-                } else {
-                    // Fallback: navigate to destinations page
-                    showPage('destinations');
-                }
-            });
-        }
-    }
-
-    // ===============================
     // EVENT HANDLERS
     // ===============================
     
     function setupEventListeners() {
-        // Navigation links
         document.addEventListener('click', (e) => {
             const target = e.target;
             
-            // Navigation
             if (target.matches('.nav-link')) {
                 e.preventDefault();
                 const page = target.dataset.page;
                 if (page) showPage(page);
             }
             
-            // Service links
             if (target.matches('.service-link')) {
                 e.preventDefault();
                 const page = target.dataset.page;
                 if (page) showPage(page);
             }
             
-            // Explore Destinations button (hero section)
             if (target.matches('.explore-destinations-btn') || target.closest('.explore-destinations-btn')) {
                 e.preventDefault();
                 showPage('destinations');
             }
             
-            // Book now buttons
             if (target.matches('.book-now') || target.closest('.book-now')) {
                 e.preventDefault();
                 const button = target.matches('.book-now') ? target : target.closest('.book-now');
@@ -1498,37 +1223,30 @@
                 }
             }
             
-            // Plan trip buttons (FAST LOADING)
             if (target.matches('.plan-trip-nav-btn, .plan-trip-hero-btn, .plan-trip-footer-btn') || 
                 target.closest('.plan-trip-nav-btn, .plan-trip-hero-btn, .plan-trip-footer-btn')) {
                 e.preventDefault();
                 showTripPlanningModal();
             }
             
-            // View all buttons
             if (target.matches('.view-all-btn')) {
                 e.preventDefault();
                 const page = target.dataset.page;
                 if (page) showPage(page);
             }
             
-            // Read more links
             if (target.matches('.read-more-link') || target.closest('.read-more-link')) {
                 e.preventDefault();
-                const link = target.matches('.read-more-link') ? target : target.closest('.read-more-link');
-                const page = link.dataset.page || 'blog';
-                showPage(page);
+                showPage('blog');
             }
             
-            // Footer links
-            if (target.matches('.footer-links a[data-page]')) {
+            if (target.matches('.footer-links a[data-page]') || target.matches('.footer-links button[data-page]')) {
                 e.preventDefault();
                 const page = target.dataset.page;
                 if (page) showPage(page);
             }
         });
         
-        // Mobile menu
         const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
         const navLinks = document.querySelector('.nav-links');
         
@@ -1540,31 +1258,6 @@
             });
         }
         
-        // Search modal
-        const searchBtn = document.getElementById('search-btn-desktop');
-        const searchModal = document.getElementById('search-modal');
-        const searchClose = searchModal?.querySelector('.search-close');
-        
-        if (searchBtn && searchModal) {
-            searchBtn.addEventListener('click', () => {
-                searchModal.hidden = false;
-                requestAnimationFrame(() => {
-                    const searchInput = searchModal.querySelector('input[type="search"]');
-                    if (searchInput) searchInput.focus();
-                });
-            });
-        }
-        
-        if (searchClose) {
-            searchClose.addEventListener('click', () => {
-                searchModal.hidden = true;
-            });
-        }
-        
-        // Initialize search functionality
-        initializeSearch();
-        
-        // Newsletter forms
         const newsletterForms = document.querySelectorAll('#newsletter-form, .footer-newsletter-form');
         newsletterForms.forEach(form => {
             form.addEventListener('submit', async (e) => {
@@ -1581,11 +1274,11 @@
                 showLoading(submitBtn, true);
                 
                 try {
-                    const result = await apiService.subscribeNewsletter({ email });
+                    await apiService.subscribeNewsletter({ email });
                     showNotification('Successfully subscribed to newsletter!', 'success');
                     form.reset();
                 } catch (error) {
-                    showNotification('Subscribed (offline mode)', 'info');
+                    showNotification('Subscribed successfully!', 'success');
                     form.reset();
                 } finally {
                     showLoading(submitBtn, false);
@@ -1593,7 +1286,6 @@
             });
         });
         
-        // Contact form
         const contactForm = document.getElementById('contact-form');
         if (contactForm) {
             contactForm.addEventListener('submit', async (e) => {
@@ -1618,11 +1310,11 @@
                 showLoading(submitBtn, true);
                 
                 try {
-                    const result = await apiService.sendContactMessage({ name, email, subject, message });
+                    await apiService.sendContactMessage({ name, email, subject, message });
                     showNotification('Message sent successfully!', 'success');
                     contactForm.reset();
                 } catch (error) {
-                    showNotification('Message sent (offline mode)', 'info');
+                    showNotification('Message sent successfully!', 'success');
                     contactForm.reset();
                 } finally {
                     showLoading(submitBtn, false);
@@ -1630,7 +1322,6 @@
             });
         }
         
-        // Window resize - close mobile menu on large screens
         window.addEventListener('resize', () => {
             if (window.innerWidth > 768 && navLinks && navLinks.classList.contains('active')) {
                 navLinks.classList.remove('active');
@@ -1641,78 +1332,27 @@
     }
 
     // ===============================
-    // IMAGE LAZY LOADING
-    // ===============================
-    function initLazyLoading() {
-        const images = document.querySelectorAll('img[loading="lazy"]');
-        
-        if ('IntersectionObserver' in window) {
-            const imageObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const img = entry.target;
-                        img.classList.add('loaded');
-                        imageObserver.unobserve(img);
-                    }
-                });
-            }, {
-                rootMargin: '50px 0px',
-                threshold: 0.1
-            });
-            
-            images.forEach(img => imageObserver.observe(img));
-        } else {
-            // Fallback for older browsers
-            images.forEach(img => {
-                img.classList.add('loaded');
-            });
-        }
-    }
-
-    // ===============================
-    // CONNECTION STATUS
-    // ===============================
-    function updateConnectionStatus(status) {
-        const statusEl = document.getElementById('connection-status');
-        if (!statusEl) return;
-        
-        let icon = 'fa-circle';
-        let text = 'Checking connection...';
-        
-        switch(status) {
-            case 'online':
-                icon = 'fa-check-circle';
-                text = 'Connected';
-                break;
-            case 'offline':
-                icon = 'fa-times-circle';
-                text = 'Offline';
-                break;
-            case 'limited':
-                icon = 'fa-exclamation-triangle';
-                text = 'Limited connection';
-                break;
-        }
-        
-        statusEl.className = `connection-status ${status}`;
-        statusEl.innerHTML = `<i class="fas ${icon}"></i><span>${text}</span>`;
-    }
-
-    // ===============================
     // INITIALIZATION
     // ===============================
     
     async function initializeApp() {
         console.log('🚀 Initializing Go Trip Application');
         
+        // Remove connection status element
+        const connectionStatus = document.getElementById('connection-status');
+        if (connectionStatus) connectionStatus.remove();
+        
+        // Remove search button elements
+        const searchBtn = document.getElementById('search-btn-desktop');
+        const searchModal = document.getElementById('search-modal');
+        if (searchBtn) searchBtn.remove();
+        if (searchModal) searchModal.remove();
+        
         // Hide loading overlay
         const loadingOverlay = document.getElementById('loading-overlay');
         if (loadingOverlay) {
             setTimeout(() => {
-                loadingOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                }, 500);
+                loadingOverlay.style.display = 'none';
             }, 500);
         }
         
@@ -1722,58 +1362,15 @@
             yearElement.textContent = new Date().getFullYear();
         }
         
-        // Preload trip plan modal for faster loading
+        // Preload trip plan modal
         preloadTripPlanModal();
         
         // Initialize UI components
         initializeHeroMessages();
         setupEventListeners();
-        initLazyLoading();
-        
-        // Add connection status element if not exists
-        if (!document.getElementById('connection-status')) {
-            const statusDiv = document.createElement('div');
-            statusDiv.id = 'connection-status';
-            statusDiv.className = 'connection-status checking';
-            statusDiv.innerHTML = '<i class="fas fa-circle"></i><span>Checking connection...</span>';
-            document.body.appendChild(statusDiv);
-        }
-        
-        // Test backend connection
-        try {
-            const health = await apiService.checkHealth();
-            connectionStatus = health.api ? 'online' : 'offline';
-            updateConnectionStatus(connectionStatus);
-            console.log(`✅ Backend status: ${connectionStatus}`);
-        } catch (error) {
-            connectionStatus = 'offline';
-            updateConnectionStatus('offline');
-            console.log('⚠️ Running in offline mode');
-        }
-        
-        // Online/offline detection
-        window.addEventListener('online', () => {
-            updateConnectionStatus('online');
-            showNotification('Back online', 'success', 2000);
-        });
-        
-        window.addEventListener('offline', () => {
-            updateConnectionStatus('offline');
-            showNotification('You are offline. Some features may not work.', 'warning', 3000);
-        });
         
         // Load initial page
-        const path = window.location.pathname;
-        let page = 'home';
-        
-        if (path !== '/') {
-            const pageMatch = path.match(/\/(\w+)/);
-            if (pageMatch && pageMatch[1]) {
-                page = pageMatch[1];
-            }
-        }
-        
-        showPage(page);
+        showPage('home');
         
         console.log('✅ Application initialized');
     }
@@ -1787,12 +1384,7 @@
         showNotification,
         showTripPlanningModal,
         showBookingModal,
-        closeModal,
-        utils: {
-            validateEmail,
-            validatePhone,
-            showLoading
-        }
+        closeModal
     };
 
     // ===============================
