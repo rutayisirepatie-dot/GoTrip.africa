@@ -15,16 +15,26 @@ const MONGO_URI = process.env.MONGO_URI;
 // ---------------- MIDDLEWARE ----------------
 app.use(express.json());
 
+// FIXED CORS CONFIGURATION - Allows both www and non-www versions
 app.use(
   cors({
     origin: [
       "http://localhost:5500",
       "http://127.0.0.1:5500",
       "https://gotrip.africa",
+      "https://www.gotrip.africa", // ADDED THIS
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      "https://gotrip-backend-uwhn.onrender.com" // Allow the backend itself
     ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept", "Origin"]
   })
 );
+
+// Handle preflight requests explicitly
+app.options("*", cors());
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -63,11 +73,35 @@ app.get("/", (req, res) => {
   res.send("🚀 GoTrip API is running");
 });
 
+// Health check endpoint
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     status: "ok",
     uptime: process.uptime(),
     timestamp: new Date(),
+    message: "GoTrip API is healthy",
+    cors: {
+      allowedOrigins: [
+        "https://gotrip.africa",
+        "https://www.gotrip.africa",
+        "http://localhost:5500"
+      ]
+    }
+  });
+});
+
+// CORS test endpoint
+app.get("/api/cors-test", (req, res) => {
+  res.json({
+    success: true,
+    message: "CORS is working correctly!",
+    allowedOrigin: req.headers.origin || "Not specified",
+    timestamp: new Date().toISOString(),
+    corsHeaders: {
+      "Access-Control-Allow-Origin": req.headers.origin || "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    }
   });
 });
 
@@ -124,10 +158,39 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: "Route not found" });
 });
 
+// ---------------- GLOBAL ERROR HANDLER ----------------
+app.use((err, req, res, next) => {
+  console.error("❌ Server error:", err.message);
+  
+  // Handle CORS errors
+  if (err.message.includes("CORS")) {
+    return res.status(403).json({ 
+      success: false, 
+      message: "CORS policy violation",
+      allowedOrigins: [
+        "https://gotrip.africa",
+        "https://www.gotrip.africa",
+        "http://localhost:5500"
+      ]
+    });
+  }
+  
+  res.status(500).json({ 
+    success: false, 
+    message: "Internal server error",
+    error: process.env.NODE_ENV === "development" ? err.message : undefined
+  });
+});
+
 // ---------------- START SERVER ----------------
 const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌐 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🌐 CORS Test: http://localhost:${PORT}/api/cors-test`);
+  console.log(`✅ CORS configured for:`);
+  console.log(`   - https://gotrip.africa`);
+  console.log(`   - https://www.gotrip.africa`);
+  console.log(`   - http://localhost:5500`);
 });
 
 // ---------------- GRACEFUL SHUTDOWN ----------------
