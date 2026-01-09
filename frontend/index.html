@@ -72,7 +72,7 @@
     <!-- Main stylesheet -->
     <link rel="stylesheet" href="style.css" media="all">
     
-    <!-- Font Awesome (FIXED - removed crossorigin for CDN) -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <!-- Favicon -->
@@ -97,120 +97,364 @@
         </style>
     </noscript>
     
-    <!-- Connection Status CSS -->
+    <!-- Enhanced Notification & Loading Styles -->
     <style>
-        .connection-status {
-            position: fixed;
-            top: 70px;
-            right: 20px;
-            z-index: 1000;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .connection-status.online {
-            background: #4caf50;
-            color: white;
-        }
-        
-        .connection-status.offline {
-            background: #f44336;
-            color: white;
-        }
-        
-        .connection-status.checking {
-            background: #ff9800;
-            color: white;
-        }
-        
-        .connection-status i {
-            font-size: 8px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
-        }
-        
+        /* Enhanced Notification System with Branding Colors */
         .notification-toast {
             position: fixed;
             top: 20px;
             right: 20px;
-            z-index: 2000;
-            background: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            border-left: 4px solid #4caf50;
-            max-width: 350px;
-            transform: translateX(120%);
-            transition: transform 0.3s ease;
+            width: 350px;
+            max-width: calc(100% - 40px);
+            background: #1a472a;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            overflow: hidden;
+            border-left: 4px solid #2e8b57;
         }
         
         .notification-toast.show {
+            opacity: 1;
             transform: translateX(0);
         }
         
+        .notification-toast.success {
+            background: #1a472a;
+            border-left-color: #2e8b57;
+        }
+        
         .notification-toast.error {
+            background: #3c1a1a;
             border-left-color: #f44336;
         }
         
         .notification-toast.warning {
-            border-left-color: #ff9800;
+            background: #b8860b;
+            border-left-color: #daa520;
+        }
+        
+        .notification-toast.info {
+            background: #1a472a;
+            border-left-color: #2e8b57;
+        }
+        
+        .notification-toast.loading {
+            background: #1a472a;
+            border-left-color: #2e8b57;
         }
         
         .notification-content {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
+            align-items: flex-start;
+            padding: 16px;
+            color: #ffffff;
+        }
+        
+        .notification-icon {
+            flex-shrink: 0;
+            margin-right: 12px;
+            font-size: 20px;
+        }
+        
+        .notification-toast.success .notification-icon {
+            color: #2e8b57;
+        }
+        
+        .notification-toast.error .notification-icon {
+            color: #f44336;
+        }
+        
+        .notification-toast.warning .notification-icon {
+            color: #daa520;
+        }
+        
+        .notification-toast.info .notification-icon {
+            color: #2e8b57;
+        }
+        
+        .notification-toast.loading .notification-icon {
+            color: #2e8b57;
+        }
+        
+        .notification-body {
+            flex-grow: 1;
+            min-width: 0;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 4px;
+            color: #ffffff;
+        }
+        
+        .notification-message {
+            font-size: 14px;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.95);
         }
         
         .notification-close {
-            background: none;
+            background: transparent;
             border: none;
-            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 20px;
             cursor: pointer;
-            color: #666;
+            padding: 0 0 0 8px;
+            line-height: 1;
+            transition: color 0.3s;
+        }
+        
+        .notification-close:hover {
+            color: #ffffff;
+        }
+        
+        /* Floating Messages - Enhanced with Branding Colors */
+        .floating-message {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 380px;
+            max-width: calc(100% - 40px);
+            background: linear-gradient(135deg, #1a472a 0%, #1a472acc 100%);
+            border-radius: 12px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+            z-index: 9998;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .floating-message.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .floating-message.welcome {
+            background: linear-gradient(135deg, #b8860b 0%, #b8860bcc 100%);
+            color: #ffffff;
+        }
+        
+        .floating-message.success {
+            background: linear-gradient(135deg, #1a472a 0%, #1a472acc 100%);
+            color: #ffffff;
+        }
+        
+        .floating-message.info {
+            background: linear-gradient(135deg, #1a472a 0%, #1a472acc 100%);
+            color: #ffffff;
+        }
+        
+        .floating-message-content {
+            padding: 20px;
+            color: inherit;
+        }
+        
+        .floating-message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: inherit;
+        }
+        
+        .floating-message-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            color: inherit;
+        }
+        
+        .floating-message.welcome .floating-message-icon {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .floating-message-icon i {
+            font-size: 20px;
+            color: inherit;
+        }
+        
+        .floating-message-title {
+            font-size: 17px;
+            font-weight: 600;
+            flex-grow: 1;
+            color: inherit;
+        }
+        
+        .floating-message-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: inherit;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s, transform 0.2s;
+            opacity: 0.8;
+        }
+        
+        .floating-message-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+            opacity: 1;
+        }
+        
+        .floating-message-body {
+            color: inherit;
+        }
+        
+        .floating-message-body p {
+            margin: 0 0 18px 0;
+            color: inherit;
+            line-height: 1.5;
+            font-size: 15px;
+            opacity: 0.95;
+        }
+        
+        .message-action-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: inherit;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .floating-message.welcome .message-action-btn {
+            background: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .message-action-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .floating-message.welcome .message-action-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .floating-message-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            width: 100%;
+            transform-origin: left;
+        }
+        
+        .floating-message.welcome .floating-message-progress {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        @keyframes progressShrink {
+            from { transform: scaleX(1); }
+            to { transform: scaleX(0); }
+        }
+        
+        /* Loading States */
+        .section-loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            margin: 20px 0;
+            min-height: 200px;
+        }
+        
+        .loader-spinner {
+            margin-bottom: 15px;
+            color: #1a472a;
+        }
+        
+        .loader-text {
+            color: var(--text-color);
+            font-size: 14px;
+            margin: 0;
         }
         
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            z-index: 9999;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.3s ease;
+            z-index: 9999;
+            color: #ffffff;
+            opacity: 1;
+            transition: opacity 0.5s ease;
         }
         
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #4caf50;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .loading-content {
+            text-align: center;
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .loading-text {
+            margin-top: 20px;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 500;
         }
         
+        .no-data-message {
+            text-align: center;
+            padding: 60px 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .no-data-message i {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        
+        .no-data-message h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .no-data-message p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        /* Modal Container */
         .modal-container {
             position: fixed;
             top: 0;
@@ -263,28 +507,111 @@
             color: #666;
         }
         
-        .no-data-message {
-            grid-column: 1 / -1;
+        .modal-loading {
             text-align: center;
-            padding: 40px;
-            background: #f9f9f9;
-            border-radius: 8px;
+            padding: 50px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            margin: 20px;
+            display: none;
         }
         
-        .no-data-message i {
-            font-size: 48px;
-            color: #ccc;
-            margin-bottom: 15px;
+        .modal-loading i {
+            font-size: 36px;
+            color: #1a472a;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .modal-loading p {
+            color: #666;
+            margin: 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        /* Hide hero messages - replaced by floating messages */
+        .hero-messages {
+            display: none !important;
+        }
+        
+        /* Image optimization */
+        img {
+            content-visibility: auto;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .notification-toast {
+                width: 300px;
+                top: 70px;
+                right: 10px;
+                max-width: calc(100% - 20px);
+            }
+            
+            .floating-message {
+                width: 320px;
+                top: 70px;
+                right: 10px;
+                max-width: calc(100% - 20px);
+            }
+            
+            .floating-message-content {
+                padding: 16px;
+            }
+            
+            .floating-message-icon {
+                width: 40px;
+                height: 40px;
+                margin-right: 12px;
+            }
+            
+            .floating-message-icon i {
+                font-size: 18px;
+            }
+            
+            .floating-message-title {
+                font-size: 16px;
+            }
+            
+            .floating-message-body p {
+                font-size: 14px;
+            }
+            
+            .message-action-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .floating-message {
+                width: 290px;
+                top: 60px;
+            }
+            
+            .floating-message-header {
+                flex-wrap: wrap;
+            }
+            
+            .floating-message-title {
+                font-size: 15px;
+                margin-top: 6px;
+            }
+            
+            .notification-toast {
+                width: 280px;
+            }
+            
+            .notification-content {
+                padding: 14px;
+            }
         }
     </style>
 </head>
 <body itemscope itemtype="https://schema.org/WebPage">
-    <!-- Connection Status Display -->
-    <div id="connection-status" class="connection-status checking">
-        <i class="fas fa-circle" aria-hidden="true"></i>
-        <span>Checking connection...</span>
-    </div>
-    
     <!-- No-JS Warning -->
     <noscript>
         <div class="no-js-warning" role="alert">
@@ -332,12 +659,6 @@
                         <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
                         <span class="nav-button-text">Plan Your Trip</span>
                     </button>
-                    
-                    <!-- Search Button -->
-                    <button class="btn btn-ghost search-btn" id="search-btn-desktop" aria-label="Open search">
-                        <i class="fas fa-search" aria-hidden="true"></i>
-                        <span class="nav-button-text">Search</span>
-                    </button>
                 </div>
             </div>
         </nav>
@@ -349,34 +670,6 @@
         <section id="home-page" class="page active" data-page="home">
             <!-- Hero Section -->
             <div class="hero" role="banner" aria-label="Welcome to Go Trip">
-                <!-- Welcome Banner -->
-                <div class="hero-welcome-banner" id="hero-welcome-banner" role="region" aria-label="Important messages">
-                    <div class="hero-welcome-content">
-                        <div class="hero-messages" role="list">
-                            <div class="hero-message active" role="listitem">
-                                <i class="fas fa-star" aria-hidden="true"></i>
-                                <span>You are very welcome to GoTrip!</span>
-                            </div>
-                            <div class="hero-message" role="listitem">
-                                <i class="fas fa-globe-africa" aria-hidden="true"></i>
-                                <span>Experience authentic Rwandan culture, beauty and hospitality</span>
-                            </div>
-                            <div class="hero-message" role="listitem">
-                                <i class="fas fa-mountain" aria-hidden="true"></i>
-                                <span>Enjoy adventurous journeys with us!</span>
-                            </div>
-                            <div class="hero-message" role="listitem">
-                                <i class="fas fa-award" aria-hidden="true"></i>
-                                <span>Meet award-winning tour guides and translators</span>
-                            </div>
-                        </div>
-                        <div class="hero-message-controls">
-                            <button class="hero-message-prev" aria-label="Previous message" title="Previous message">‹</button>
-                            <button class="hero-message-next" aria-label="Next message" title="Next message">›</button>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- Hero Content -->
                 <div class="hero-content">
                     <h1 class="hero-title">Discover Rwanda</h1>
@@ -444,10 +737,12 @@
                         <h2 id="destinations-heading">Featured Destinations</h2>
                         <p class="section-subtitle">Must-visit locations across Rwanda</p>
                     </header>
-                    <div class="destinations-grid" role="list" aria-label="List of featured destinations">
-                        <!-- Populated by JavaScript -->
-                        <div class="destinations-placeholder">
-                            <p>Loading destinations...</p>
+                    <div id="destinations-section" class="destinations-grid" role="list" aria-label="List of featured destinations">
+                        <div class="section-loader">
+                            <div class="loader-spinner">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                            </div>
+                            <p class="loader-text">Loading destinations...</p>
                         </div>
                     </div>
                     <div class="section-footer">
@@ -465,10 +760,12 @@
                         <h2 id="blog-heading">Latest Travel News</h2>
                         <p class="section-subtitle">Tips, stories, and insights to help you plan the perfect Rwanda adventure</p>
                     </header>
-                    <div class="blog-grid" role="list" aria-label="Latest blog posts">
-                        <!-- Populated by JavaScript -->
-                        <div class="blog-placeholder">
-                            <p>Loading blog posts...</p>
+                    <div id="blog-section" class="blog-grid" role="list" aria-label="Latest blog posts">
+                        <div class="section-loader">
+                            <div class="loader-spinner">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                            </div>
+                            <p class="loader-text">Loading blog posts...</p>
                         </div>
                     </div>
                     <div class="section-footer">
@@ -528,7 +825,7 @@
                 </div>
             </div>
             <div class="container">
-                <div class="guides-grid-full" role="list" aria-label="All tour guides">
+                <div id="guides-section" class="guides-grid-full" role="list" aria-label="All tour guides">
                     <!-- Populated by JavaScript -->
                 </div>
             </div>
@@ -543,7 +840,7 @@
                 </div>
             </div>
             <div class="container">
-                <div class="translators-grid-full" role="list" aria-label="All translators">
+                <div id="translators-section" class="translators-grid-full" role="list" aria-label="All translators">
                     <!-- Populated by JavaScript -->
                 </div>
             </div>
@@ -558,7 +855,7 @@
                 </div>
             </div>
             <div class="container">
-                <div class="accommodations-grid-full" role="list" aria-label="All accommodations">
+                <div id="accommodations-section" class="accommodations-grid-full" role="list" aria-label="All accommodations">
                     <!-- Populated by JavaScript -->
                 </div>
             </div>
@@ -573,7 +870,7 @@
                 </div>
             </div>
             <div class="container">
-                <div class="blog-grid-full" role="list" aria-label="All blog posts">
+                <div id="blog-section-full" class="blog-grid-full" role="list" aria-label="All blog posts">
                     <!-- Populated by JavaScript -->
                 </div>
             </div>
@@ -778,14 +1075,17 @@
     </footer>                    
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay" aria-hidden="true" aria-label="Loading content" hidden>
-        <div class="loading-spinner" aria-hidden="true"></div>
-        <p>Loading Go Trip...</p>
+        <div class="loading-content">
+            <i class="fas fa-spinner fa-spin fa-3x"></i>
+            <h2 style="color: white;">Welcome to GoTrip</h2>
+            <p class="loading-text">Loading your Rwanda adventure...</p>
+        </div>
     </div>
 
     <!-- Modal Container -->
     <div id="modal-container" class="modal-container"></div>
 
-    <!-- Scripts -->
+    <!-- Main JavaScript -->
     <script src="script.js" defer></script>
     
     <!-- Additional Structured Data -->
