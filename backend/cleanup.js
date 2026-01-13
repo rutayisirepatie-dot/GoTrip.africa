@@ -1,48 +1,69 @@
+// cleanup.js
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-// Use your MongoDB URI from .env
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/gotrip_db';
+// Load environment variables
+dotenv.config({ path: join(__dirname, '.env') });
 
-const cleanUpCollections = async () => {
+async function cleanup() {
   try {
-    await mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('✅ Connected to MongoDB');
-
-    const db = mongoose.connection.db;
-    const collections = await db.listCollections().toArray();
-
-    console.log('Found collections:');
-    collections.forEach(c => console.log('-', c.name));
-
-    // Filter collections with invalid names (spaces or starting/ending with dot)
-    const invalidCollections = collections.filter(c => /\s/.test(c.name) || /^\./.test(c.name) || /\.$/.test(c.name));
-
-    if (invalidCollections.length === 0) {
-      console.log('No invalid collections found ✅');
-    } else {
-      console.log('Invalid collections found:');
-      invalidCollections.forEach(c => console.log('-', c.name));
-
-      for (const coll of invalidCollections) {
-        console.log(`Dropping collection: ${coll.name}`);
-        await db.dropCollection(coll.name);
-      }
-      console.log('✅ Invalid collections removed');
+    console.log('🧹 Starting database cleanup...');
+    
+    // Get the MongoDB URI
+    const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+    
+    if (!mongoUri) {
+      console.error('❌ No MongoDB URI found in .env file');
+      console.log('💡 Make sure you have either MONGO_URI or MONGODB_URI in your .env file');
+      return;
     }
-
+    
+    console.log('📡 Connecting to MongoDB...');
+    await mongoose.connect(mongoUri);
+    console.log('✅ Connected to MongoDB\n');
+    
+    // Get all collections
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    
+    console.log('🗑️  Clearing collections:');
+    console.log('='.repeat(40));
+    
+    for (const collection of collections) {
+      try {
+        const result = await mongoose.connection.db.collection(collection.name).deleteMany({});
+        console.log(`✓ ${collection.name}: Deleted ${result.deletedCount} documents`);
+      } catch (error) {
+        console.log(`⚠️ ${collection.name}: ${error.message}`);
+      }
+    }
+    
+    // Also drop the database to ensure clean state
+    // await mongoose.connection.db.dropDatabase();
+    // console.log('\n✅ Database dropped completely');
+    
     await mongoose.disconnect();
-    console.log('Disconnected from MongoDB');
-    process.exit(0);
-  } catch (err) {
-    console.error('❌ Cleanup error:', err);
-    process.exit(1);
+    console.log('\n🎉 CLEANUP COMPLETE!');
+    console.log('='.repeat(40));
+    console.log('✅ All data has been deleted');
+    console.log('✅ Ready for fresh seeding');
+    console.log('\n👉 Now run: node seedData.js');
+    
+  } catch (error) {
+    console.error('❌ Cleanup failed:', error.message);
+    
+    if (error.message.includes('Authentication failed')) {
+      console.log('\n💡 Authentication issues:');
+      console.log('1. Check your MongoDB Atlas username/password');
+      console.log('2. Make sure your IP is whitelisted');
+      console.log('3. Verify the database name in your connection string');
+    }
   }
-};
+}
 
-cleanUpCollections();
+// Run the cleanup
+cleanup();

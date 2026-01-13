@@ -1,24 +1,43 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const contactSchema = new mongoose.Schema(
-  {
-    name: String,
-    email: String,
-    subject: String,
-    message: String,
-    status: {
-      type: String,
-      enum: ['new', 'read', 'replied', 'archived'],
-      default: 'new',
-    },
-    createdAt: { type: Date, default: Date.now },
+const contactSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, "Name is required"],
+    trim: true
   },
-  {
-    collection: 'contacts', // 🔑 EXPLICIT binding
+  email: {
+    type: String,
+    required: [true, "Email is required"],
+    lowercase: true,
+    trim: true
+  },
+  phone: {
+    type: String,
+    trim: true
+  },
+  subject: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  message: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  status: {
+    type: String,
+    enum: ["new", "read", "responded", "closed"],
+    default: "new"
+  },
+  response: {
+    message: String,
+    respondedBy: String,
+    respondedAt: Date
   }
-);
+}, {
+  timestamps: true
+});
 
-const Contact =
-  mongoose.models.Contact || mongoose.model('Contact', contactSchema);
-
-export default Contact;
+export default mongoose.model("Contact", contactSchema);

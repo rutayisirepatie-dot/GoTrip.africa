@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Trip - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a472a;
+            --secondary-color: #b8860b;
+            --sidebar-width: 250px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--primary-color);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo h2 {
+            font-size: 24px;
+        }
+        
+        .logo span:first-child {
+            color: white;
+        }
+        
+        .logo span:last-child {
+            color: var(--secondary-color);
+        }
+        
+        .nav-links {
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .booking-icon { background: #e3f2fd; color: #2196f3; }
+        .guide-icon { background: #f3e5f5; color: #9c27b0; }
+        .destination-icon { background: #e8f5e9; color: #4caf50; }
+        .user-icon { background: #fff3e0; color: #ff9800; }
+        
+        .stat-info h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        /* Content Sections */
+        .content-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section-header h2 {
+            color: var(--primary-color);
+            font-size: 22px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #153d23;
+            transform: translateY(-2px);
+        }
+        
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .action-btn {
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .edit-btn {
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+        
+        .delete-btn {
+            background: #fdeaea;
+            color: #f44336;
+        }
+        
+        /* Login Page */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2e8b57 100%);
+        }
+        
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-box h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen (Default) -->
+    <div id="login-screen" class="login-container">
+        <div class="login-box">
+            <h1>Go Trip Admin Login</h1>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="admin@gotrip.africa" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <div id="login-error" style="color: #f44336; margin-top: 10px; display: none;">
+                    Invalid credentials
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Admin Dashboard (Hidden by default) -->
+    <div id="dashboard" style="display: none;">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h2><span>Go</span> <span>Trip</span></h2>
+                <p>Admin Dashboard</p>
+            </div>
+            
+            <div class="nav-links">
+                <a href="#" class="nav-item active" data-section="dashboard-home">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-section="destinations">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>Destinations</span>
+                </a>
+                <a href="#" class="nav-item" data-section="guides">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Tour Guides</span>
+                </a>
+                <a href="#" class="nav-item" data-section="translators">
+                    <i class="fas fa-language"></i>
+                    <span>Translators</span>
+                </a>
+                <a href="#" class="nav-item" data-section="accommodations">
+                    <i class="fas fa-hotel"></i>
+                    <span>Accommodations</span>
+                </a>
+                <a href="#" class="nav-item" data-section="bookings">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Bookings</span>
+                </a>
+                <a href="#" class="nav-item" data-section="trip-plans">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>Trip Plans</span>
+                </a>
+                <a href="#" class="nav-item" data-section="blog">
+                    <i class="fas fa-newspaper"></i>
+                    <span>Blog Posts</span>
+                </a>
+                <a href="#" class="nav-item" data-section="subscribers">
+                    <i class="fas fa-users"></i>
+                    <span>Subscribers</span>
+                </a>
+                <a href="#" class="nav-item" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>Dashboard Overview</h1>
+                <div class="user-info">
+                    <span>Welcome, Admin</span>
+                    <i class="fas fa-user-circle" style="font-size: 24px;"></i>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon booking-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Bookings</h3>
+                        <div class="stat-number" id="total-bookings">0</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon guide-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Tour Guides</h3>
+                        <div class="stat-number" id="total-guides">0</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon destination-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Destinations</h3>
+                        <div class="stat-number" id="total-destinations">0</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon user-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Subscribers</h3>
+                        <div class="stat-number" id="total-subscribers">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content Sections (will be loaded dynamically) -->
+            <div id="content-sections">
+                <!-- Dashboard Home -->
+                <div id="dashboard-home" class="content-section">
+                    <div class="section-header">
+                        <h2>Recent Bookings</h2>
+                        <button class="btn" onclick="loadSection('bookings')">
+                            <i class="fas fa-eye"></i> View All
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="recent-bookings">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Service</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Other sections will be loaded dynamically -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Simple admin credentials (In production, use proper authentication)
+        const ADMIN_CREDENTIALS = {
+            email: 'admin@gotrip.africa',
+            password: 'admin123'
+        };
+        
+        // Check if already logged in
+        if (localStorage.getItem('adminLoggedIn') === 'true') {
+            showDashboard();
+        }
+        
+        // Login form handler
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+                localStorage.setItem('adminLoggedIn', 'true');
+                showDashboard();
+                loadDashboardData();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        });
+        
+        // Logout handler
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('adminLoggedIn');
+            location.reload();
+        });
+        
+        // Navigation handlers
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all items
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Load the section
+                const section = this.dataset.section;
+                loadSection(section);
+            });
+        });
+        
+        function showDashboard() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'flex';
+        }
+        
+        function loadDashboardData() {
+            // Load statistics
+            fetchStats();
+            // Load recent bookings
+            fetchRecentBookings();
+        }
+        
+        async function fetchStats() {
+            try {
+                // Fetch from your backend API
+                const responses = await Promise.allSettled([
+                    fetch('https://gotrip-backend-uwhn.onrender.com/api/bookings').then(r => r.json()),
+                    fetch('https://gotrip-backend-uwhn.onrender.com/api/guides').then(r => r.json()),
+                    fetch('https://gotrip-backend-uwhn.onrender.com/api/destinations').then(r => r.json()),
+                    fetch('https://gotrip-backend-uwhn.onrender.com/api/newsletters').then(r => r.json())
+                ]);
+                
+                // Update stats
+                document.getElementById('total-bookings').textContent = 
+                    responses[0].status === 'fulfilled' ? (responses[0].value.data?.length || 0) : 0;
+                
+                document.getElementById('total-guides').textContent = 
+                    responses[1].status === 'fulfilled' ? (responses[1].value.data?.length || 0) : 0;
+                
+                document.getElementById('total-destinations').textContent = 
+                    responses[2].status === 'fulfilled' ? (responses[2].value.data?.length || 0) : 0;
+                
+                document.getElementById('total-subscribers').textContent = 
+                    responses[3].status === 'fulfilled' ? (responses[3].value.data?.length || 0) : 0;
+                    
+            } catch (error) {
+                console.log('Error loading stats:', error);
+                // Use fallback data
+                document.getElementById('total-bookings').textContent = '12';
+                document.getElementById('total-guides').textContent = '8';
+                document.getElementById('total-destinations').textContent = '6';
+                document.getElementById('total-subscribers').textContent = '45';
+            }
+        }
+        
+        async function fetchRecentBookings() {
+            try {
+                const response = await fetch('https://gotrip-backend-uwhn.onrender.com/api/bookings');
+                const data = await response.json();
+                const bookings = data.data || data || [];
+                
+                const tbody = document.querySelector('#recent-bookings tbody');
+                tbody.innerHTML = '';
+                
+                bookings.slice(0, 5).forEach(booking => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${booking._id?.substring(0, 8) || 'N/A'}</td>
+                        <td>${booking.serviceName || 'N/A'}</td>
+                        <td>${booking.name || 'N/A'}</td>
+                        <td>${new Date(booking.date || booking.submittedAt).toLocaleDateString()}</td>
+                        <td><span class="status pending">Pending</span></td>
+                        <td>
+                            <button class="action-btn edit-btn">View</button>
+                            <button class="action-btn delete-btn">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+            } catch (error) {
+                console.log('Error loading bookings:', error);
+                // Show sample data
+                const tbody = document.querySelector('#recent-bookings tbody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td>BK001</td>
+                        <td>Volcanoes National Park</td>
+                        <td>John Doe</td>
+                        <td>2024-01-15</td>
+                        <td><span class="status pending">Pending</span></td>
+                        <td>
+                            <button class="action-btn edit-btn">View</button>
+                            <button class="action-btn delete-btn">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        function loadSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(sec => {
+                sec.style.display = 'none';
+            });
+            
+            // Show selected section
+            const sectionElement = document.getElementById(section);
+            if (sectionElement) {
+                sectionElement.style.display = 'block';
+                
+                // Update header
+                const headerTitle = document.querySelector('.header h1');
+                const sectionName = section.replace('-', ' ');
+                headerTitle.textContent = sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
+                
+                // Load section data
+                loadSectionData(section);
+            }
+        }
+        
+        async function loadSectionData(section) {
+            try {
+                const endpoints = {
+                    'destinations': '/api/destinations',
+                    'guides': '/api/guides',
+                    'translators': '/api/translators',
+                    'accommodations': '/api/accommodations',
+                    'bookings': '/api/bookings',
+                    'trip-plans': '/api/tripplans',
+                    'blog': '/api/blogs',
+                    'subscribers': '/api/newsletters'
+                };
+                
+                if (endpoints[section]) {
+                    const response = await fetch(`https://gotrip-backend-uwhn.onrender.com${endpoints[section]}`);
+                    const data = await response.json();
+                    console.log(`${section} data:`, data);
+                    
+                    // You can create dynamic tables for each section here
+                }
+            } catch (error) {
+                console.log(`Error loading ${section}:`, error);
+            }
+        }
+    </script>
+</body>
+</html>

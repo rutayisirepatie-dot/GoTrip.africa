@@ -1,36 +1,58 @@
 import mongoose from 'mongoose';
-import slugify from 'slugify';
 
-const blogSchema = new mongoose.Schema(
-  {
-    title: { type: String, required: true },
-    content: { type: String, required: true },
-    author: String,
-    createdAt: { type: Date, default: Date.now },
-    tags: [String],
-    slug: { type: String, unique: true }, // unique slug
-  },
-  {
-    collection: 'blogs', // 🔑 bind to the existing Atlas collection
-  }
-);
+const blogPostSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
+  title: { type: String, required: true },
+  author: { type: String, required: true },
+  content: { type: String, required: true },
+  excerpt: { type: String, required: true },
+  featuredImage: { type: String, required: true },
+  images: [{ type: String }],
+  tags: [{ type: String }],
+  category: { type: String, required: true },
+  featured: { type: Boolean, default: false },
+  readTime: { type: Number, min: 1 }, // in minutes
+  published: { type: Boolean, default: false },
+  publishedDate: { type: Date, default: Date.now },
+  views: { type: Number, default: 0 },
+  likes: { type: Number, default: 0 },
+  comments: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now }
+}, {
+  timestamps: true,
+  toJSON: { virtuals: true }
+});
 
-// Pre-save hook to generate unique slug
-blogSchema.pre('save', async function(next) {
-  if (this.isNew || this.isModified('title')) {
-    let baseSlug = slugify(this.title, { lower: true, strict: true });
-    let slug = baseSlug;
-    let count = 1;
+// Virtual for formatted published date
+blogPostSchema.virtual('formattedDate').get(function() {
+  return this.publishedDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+});
 
-    while (await mongoose.models.Blog.exists({ slug })) {
-      slug = `${baseSlug}-${count}`;
-      count++;
-    }
+// Virtual for reading time text
+blogPostSchema.virtual('readTimeText').get(function() {
+  return `${this.readTime} min read`;
+});
 
-    this.slug = slug;
+// Increment views middleware
+blogPostSchema.pre('save', function(next) {
+  if (this.isModified('views')) {
+    // Additional view logic if needed
   }
   next();
 });
 
-const Blog = mongoose.models.Blog || mongoose.model('Blog', blogSchema);
-export default Blog;
+// Indexes
+blogPostSchema.index({ title: 'text', content: 'text', excerpt: 'text' });
+blogPostSchema.index({ category: 1 });
+blogPostSchema.index({ tags: 1 });
+blogPostSchema.index({ featured: 1 });
+blogPostSchema.index({ published: 1 });
+blogPostSchema.index({ publishedDate: -1 });
+blogPostSchema.index({ views: -1 });
+
+const BlogPost = mongoose.model('BlogPost', blogPostSchema);
+export default BlogPost;

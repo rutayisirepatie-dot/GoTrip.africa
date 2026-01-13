@@ -1,12 +1,15 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const userSchema = new mongoose.Schema(
+const adminSchema = new mongoose.Schema(
   {
-    name: {
+    username: {
       type: String,
-      required: [true, "Name is required"],
-      trim: true
+      required: [true, "Username is required"],
+      unique: true,
+      trim: true,
+      minlength: [3, "Username must be at least 3 characters"],
+      maxlength: [30, "Username cannot exceed 30 characters"]
     },
     email: {
       type: String,
@@ -29,41 +32,20 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Phone number is required"]
     },
-    country: {
+    name: {
       type: String,
-      required: [true, "Country is required"]
-    },
-    city: {
-      type: String
+      required: [true, "Name is required"],
+      trim: true
     },
     role: {
       type: String,
-      enum: ["user", "premium", "admin"], // Fixed enum values
-      default: "user"
+      enum: ["superadmin", "admin", "moderator", "editor"],
+      default: "admin"
     },
-    preferences: {
-      language: {
-        type: String,
-        enum: ["en", "fr", "rw", "sw"], // Language codes instead of full names
-        default: "en"
-      },
-      notifications: {
-        type: Boolean,
-        default: true
-      },
-      currency: {
-        type: String,
-        enum: ["USD", "EUR", "GBP", "RWF"],
-        default: "USD"
-      }
-    },
-    profileImage: {
-      type: String,
-      default: ""
-    },
-    isVerified: {
-      type: Boolean,
-      default: false
+    permissions: {
+      type: [String], // Changed from embedded to array of strings
+      default: [],
+      enum: ["all", "users", "content", "bookings", "settings", "reports"]
     },
     isActive: {
       type: Boolean,
@@ -75,13 +57,13 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    collection: 'users',
+    collection: 'admins',
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
         delete ret._id;
         delete ret.__v;
-        delete ret.password;
+        delete ret.password; // Never send password in JSON
         ret.id = doc._id.toString();
         return ret;
       }
@@ -90,7 +72,7 @@ const userSchema = new mongoose.Schema(
 );
 
 // Hash password before saving
-userSchema.pre('save', async function (next) {
+adminSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   
   try {
@@ -103,21 +85,21 @@ userSchema.pre('save', async function (next) {
 });
 
 // Method to compare password
-userSchema.methods.comparePassword = async function (candidatePassword) {
+adminSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
 // Virtual for formatted name
-userSchema.virtual('displayName').get(function () {
-  return this.name;
+adminSchema.virtual('displayName').get(function () {
+  return this.name || this.username;
 });
 
 // Indexes
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ role: 1 });
-userSchema.index({ country: 1 });
-userSchema.index({ isActive: 1 });
+adminSchema.index({ username: 1 }, { unique: true });
+adminSchema.index({ email: 1 }, { unique: true });
+adminSchema.index({ role: 1 });
+adminSchema.index({ isActive: 1 });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+const Admin = mongoose.models.Admin || mongoose.model('Admin', adminSchema);
 
-export default User;
+export default Admin;

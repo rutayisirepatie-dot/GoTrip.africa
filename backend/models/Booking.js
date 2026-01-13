@@ -1,82 +1,109 @@
 import mongoose from 'mongoose';
-import crypto from 'crypto';
 
 const bookingSchema = new mongoose.Schema(
   {
-    user: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'User', 
-      required: [true, 'User is required'] 
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, "User is required"]
     },
-    accommodation: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'Accommodation', 
-      required: [true, 'Accommodation is required'] 
+    destination: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Destination',
+      required: [true, "Destination is required"]
     },
-    startDate: { 
-      type: Date, 
-      required: [true, 'Start date is required'] 
+    guide: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Guide',
+      required: [true, "Guide is required"]
     },
-    endDate: { 
-      type: Date, 
-      required: [true, 'End date is required'], 
-      validate: {
-        validator: function(v) {
-          return v > this.startDate;
-        },
-        message: 'End date must be after start date'
-      }
+    checkIn: {
+      type: Date,
+      required: [true, "Check-in date is required"]
     },
-    totalPrice: { 
-      type: Number, 
-      required: [true, 'Total price is required'], 
-      min: [0, 'Total price must be positive']
+    checkOut: {
+      type: Date,
+      required: [true, "Check-out date is required"]
     },
-    status: { 
-      type: String, 
-      enum: ['pending','confirmed','cancelled'], 
-      default: 'pending' 
+    numberOfPeople: {
+      type: Number,
+      required: [true, "Number of people is required"],
+      min: [1, "At least 1 person is required"],
+      max: [20, "Maximum 20 people allowed"]
     },
-    paymentStatus: { 
-      type: String, 
-      enum: ['unpaid','paid','refunded'], 
-      default: 'unpaid' 
+    totalAmount: {
+      type: Number,
+      required: [true, "Total amount is required"],
+      min: [0, "Amount cannot be negative"]
     },
-    bookingReference: {
+    status: {
       type: String,
-      unique: true,
-      required: true
+      enum: ["pending", "confirmed", "cancelled", "completed"],
+      default: "pending"
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed", "refunded"],
+      default: "pending"
+    },
+    specialRequests: {
+      type: String,
+      maxlength: [500, "Special requests cannot exceed 500 characters"]
+    },
+    bookingDate: {
+      type: Date,
+      default: Date.now
+    },
+    paymentMethod: {
+      type: String,
+      enum: ["credit_card", "paypal", "bank_transfer", "mobile_money"],
+      default: "credit_card"
+    },
+    transactionId: {
+      type: String
+    },
+    isActive: {
+      type: Boolean,
+      default: true
     }
   },
   {
     timestamps: true,
-    collection: 'bookings', // 🔑 bind to the exact Atlas collection
+    collection: 'bookings',
+    toJSON: {
+      virtuals: true,
+      transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.__v;
+        ret.id = doc._id.toString();
+        return ret;
+      }
+    }
   }
 );
 
-// Pre-validate hook
-bookingSchema.pre('validate', async function(next) {
-  try {
-    // Generate unique booking reference
-    if (!this.bookingReference) {
-      this.bookingReference = 'BK-' + crypto.randomBytes(5).toString('hex').toUpperCase();
-    }
-
-    // Calculate totalPrice if missing
-    if (!this.totalPrice) {
-      const Accommodation = mongoose.model('Accommodation');
-      const accommodation = await Accommodation.findById(this.accommodation);
-      if (!accommodation) throw new Error('Accommodation not found');
-
-      const nights = Math.ceil((this.endDate - this.startDate) / (1000 * 60 * 60 * 24));
-      this.totalPrice = accommodation.dailyRate * nights;
-    }
-
-    next();
-  } catch (err) {
-    next(err);
-  }
+// Virtual for duration in days
+bookingSchema.virtual('durationDays').get(function () {
+  if (!this.checkIn || !this.checkOut) return 0;
+  const diffTime = Math.abs(this.checkOut - this.checkIn);
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 });
 
+// Virtual for formatted amount
+bookingSchema.virtual('formattedAmount').get(function () {
+  return `$${this.totalAmount?.toFixed(2) || '0.00'}`;
+});
+
+// Indexes
+bookingSchema.index({ user: 1 });
+bookingSchema.index({ destination: 1 });
+bookingSchema.index({ guide: 1 });
+bookingSchema.index({ status: 1 });
+bookingSchema.index({ paymentStatus: 1 });
+bookingSchema.index({ bookingDate: -1 });
+bookingSchema.index({ checkIn: 1 });
+bookingSchema.index({ checkOut: 1 });
+
 const Booking = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
+
 export default Booking;
