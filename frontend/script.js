@@ -1,4 +1,4 @@
-// Go Trip Frontend Application v6.0 - Optimized for SEO and Mobile
+// Go Trip Frontend Application v6.0
 (function() {
     'use strict';
     
@@ -57,7 +57,7 @@
     };
 
     // ===============================
-    // ENHANCED SEED DATA
+    // ENHANCED SEED DATA - KEEPING ALL YOUR EXISTING DATA
     // ===============================
     const seedData = {
         destinations: [
@@ -521,6 +521,85 @@
     };
 
     // ===============================
+    // FORM SUBMISSION FUNCTION - NEW ADDITION
+    // ===============================
+    
+    async function submitFormToEmail(formData, formType = 'contact') {
+        try {
+            // Determine email subject based on form type
+            let emailSubject = 'GoTrip Form Submission';
+            
+            switch(formType) {
+                case 'booking':
+                    emailSubject = `Booking Request: ${formData.serviceName || 'Service'}`;
+                    break;
+                case 'trip-plan':
+                    emailSubject = 'Trip Planning Request';
+                    break;
+                case 'contact':
+                    emailSubject = formData.subject || 'Contact Form Submission';
+                    break;
+            }
+            
+            // Prepare data for Formspree
+            const submissionData = {
+                _subject: emailSubject,
+                _replyto: formData.email,
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone || '',
+                message: formData.message || '',
+                form_type: formType
+            };
+            
+            // Add additional fields based on form type
+            if (formType === 'booking') {
+                submissionData.service_type = formData.serviceType || '';
+                submissionData.service_name = formData.serviceName || '';
+                submissionData.preferred_date = formData.date || '';
+            } else if (formType === 'trip-plan') {
+                submissionData.start_date = formData.startDate || '';
+                submissionData.end_date = formData.endDate || '';
+                submissionData.travelers = formData.travelers || '';
+                submissionData.budget = formData.budget || '';
+                submissionData.nationality = formData.nationality || '';
+                submissionData.interests = formData.interests || '';
+            } else if (formType === 'contact') {
+                submissionData.subject = formData.subject || '';
+            }
+            
+            // Use Formspree endpoint - YOU NEED TO REPLACE THIS WITH YOUR OWN
+            const formspreeEndpoint = 'https://formspree.io/f/xlggdeal'; // REPLACE THIS
+            
+            // Send to Formspree
+            const response = await fetch(formspreeEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(submissionData)
+            });
+            
+            if (response.ok) {
+                return { 
+                    success: true, 
+                    message: 'Thank you! Your message has been sent successfully. We will respond within 24 hours.' 
+                };
+            } else {
+                throw new Error('Form submission failed');
+            }
+            
+        } catch (error) {
+            console.error('Form submission error:', error);
+            return { 
+                success: false, 
+                message: 'Sorry, there was an error sending your message. Please try again or contact us directly at info@gotrip.africa' 
+            };
+        }
+    }
+
+    // ===============================
     // STATE MANAGEMENT
     // ===============================
     let currentWelcomeIndex = 0;
@@ -693,7 +772,7 @@
         if (show) {
             const originalText = element.innerHTML;
             element.dataset.originalContent = originalText;
-            element.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            element.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             element.disabled = true;
         } else {
             if (element.dataset.originalContent) {
@@ -1260,15 +1339,23 @@
                 return;
             }
             
-            // Simulate API call
+            // Submit to email - NEW ADDITION
             const submitBtn = form.querySelector('button[type="submit"]');
             showLoading(submitBtn, true);
             
-            setTimeout(() => {
-                showNotification('Booking request submitted successfully! We\'ll contact you within 24 hours.', 'success');
+            try {
+                const result = await submitFormToEmail(data, 'booking');
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    closeModal();
+                } else {
+                    showNotification(result.message, 'error');
+                }
+            } catch (error) {
+                showNotification('Error submitting form. Please try again.', 'error');
+            } finally {
                 showLoading(submitBtn, false);
-                closeModal();
-            }, 1500);
+            }
         });
     }
 
@@ -1420,6 +1507,13 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
             
+            // Get selected interests
+            const interests = [];
+            form.querySelectorAll('input[name="interests"]:checked').forEach(checkbox => {
+                interests.push(checkbox.value);
+            });
+            data.interests = interests.join(', ');
+            
             if (!data.name || !data.email || !data.phone || !data.nationality || 
                 !data.startDate || !data.endDate || !data.travelers || !data.budget || !data.message) {
                 showNotification('Please fill all required fields', 'error');
@@ -1441,20 +1535,28 @@
                 return;
             }
             
-            // Simulate API call
+            // Submit to email - NEW ADDITION
             const submitBtn = form.querySelector('button[type="submit"]');
             showLoading(submitBtn, true);
             
-            setTimeout(() => {
-                showNotification('Trip plan submitted successfully! Our travel expert will contact you within 24 hours.', 'success');
+            try {
+                const result = await submitFormToEmail(data, 'trip-plan');
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    closeModal();
+                } else {
+                    showNotification(result.message, 'error');
+                }
+            } catch (error) {
+                showNotification('Error submitting form. Please try again.', 'error');
+            } finally {
                 showLoading(submitBtn, false);
-                closeModal();
-            }, 1500);
+            }
         });
     }
 
     // ===============================
-    // ENHANCED RENDER FUNCTIONS
+    // ENHANCED RENDER FUNCTIONS - ALL YOUR EXISTING FUNCTIONS
     // ===============================
     
     function renderDestinations(destinations, container, isHome = false) {
@@ -2014,7 +2116,7 @@
     // ===============================
     
     function setupEventListeners() {
-        // Contact form
+        // Contact form - UPDATED WITH EMAIL SUBMISSION
         const contactForm = document.getElementById('contact-form');
         if (contactForm) {
             contactForm.addEventListener('submit', async (e) => {
@@ -2038,11 +2140,20 @@
                 const submitBtn = contactForm.querySelector('button[type="submit"]');
                 showLoading(submitBtn, true);
                 
-                setTimeout(() => {
-                    showNotification('Message sent successfully! We\'ll respond within 24 hours.', 'success');
-                    contactForm.reset();
+                try {
+                    const formData = { name, email, subject, message };
+                    const result = await submitFormToEmail(formData, 'contact');
+                    if (result.success) {
+                        showNotification(result.message, 'success');
+                        contactForm.reset();
+                    } else {
+                        showNotification(result.message, 'error');
+                    }
+                } catch (error) {
+                    showNotification('Error submitting form. Please try again.', 'error');
+                } finally {
                     showLoading(submitBtn, false);
-                }, 1500);
+                }
             });
         }
     }
@@ -2248,6 +2359,15 @@
         }, 1000);
         
         console.log('✅ Application initialized successfully');
+        
+        // IMPORTANT: Instructions for setting up Formspree
+        console.log('📧 FORM SETUP INSTRUCTIONS:');
+        console.log('1. Go to https://formspree.io/ and sign up for a free account');
+        console.log('2. Create a new form endpoint');
+        console.log('3. Find this line in the code: const formspreeEndpoint = \'https://formspree.io/f/mjvnjkdz\';');
+        console.log('4. Replace \'mjvnjkdz\' with your Formspree form ID');
+        console.log('5. Set the email forwarding to: info@gotrip.africa');
+        console.log('6. Test the forms to ensure they work correctly');
     }
 
     // ===============================
@@ -2258,7 +2378,8 @@
         showNotification,
         showTripPlanningModal,
         showBookingModal,
-        closeModal
+        closeModal,
+        submitFormToEmail
     };
 
     // ===============================
