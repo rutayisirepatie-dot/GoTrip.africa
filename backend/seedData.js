@@ -8,7 +8,7 @@ export const seedData = {
   // =====================
   destinations: [
     {
-      _id: 'rw-volcanoes-park',
+      _id: '1', // Changed to avoid duplicates
       name: 'Volcanoes National Park',
       location: 'Musanze District, Northern Province',
       country: 'Rwanda',
@@ -75,10 +75,12 @@ export const seedData = {
         'Physical fitness required for trekking'
       ],
       coordinates: { lat: -1.4432, lng: 29.5374 },
-      tags: ['Wildlife', 'Adventure', 'Gorillas', 'Hiking', 'UNESCO']
+      tags: ['Wildlife', 'Adventure', 'Gorillas', 'Hiking', 'UNESCO'],
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'rw-nyungwe-forest',
+      _id: '2',
       name: 'Nyungwe National Park',
       location: 'Southwest Rwanda',
       country: 'Rwanda',
@@ -145,10 +147,12 @@ export const seedData = {
         'Camera with zoom lens recommended'
       ],
       coordinates: { lat: -2.4944, lng: 29.3021 },
-      tags: ['Rainforest', 'Chimpanzees', 'Birding', 'Hiking', 'Canopy']
+      tags: ['Rainforest', 'Chimpanzees', 'Birding', 'Hiking', 'Canopy'],
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'rw-akagera-park',
+      _id: '3',
       name: 'Akagera National Park',
       location: 'Eastern Rwanda',
       country: 'Rwanda',
@@ -215,10 +219,12 @@ export const seedData = {
         'Early morning game drives recommended'
       ],
       coordinates: { lat: -1.6684, lng: 30.7449 },
-      tags: ['Safari', 'Big5', 'Wildlife', 'Lake', 'Photography']
+      tags: ['Safari', 'Big5', 'Wildlife', 'Lake', 'Photography'],
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'rw-lake-kivu',
+      _id: '4',
       name: 'Lake Kivu',
       location: 'Western Rwanda',
       country: 'Rwanda',
@@ -285,10 +291,12 @@ export const seedData = {
         'Try local fish brochettes'
       ],
       coordinates: { lat: -2.0000, lng: 29.1667 },
-      tags: ['Lake', 'Beach', 'Relaxation', 'Islands', 'WaterSports']
+      tags: ['Lake', 'Beach', 'Relaxation', 'Islands', 'WaterSports'],
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'rw-kigali-city',
+      _id: '5',
       name: 'Kigali City',
       location: 'Kigali Province',
       country: 'Rwanda',
@@ -355,7 +363,9 @@ export const seedData = {
         'Evening security is excellent'
       ],
       coordinates: { lat: -1.9441, lng: 30.0619 },
-      tags: ['City', 'Culture', 'History', 'Shopping', 'Food']
+      tags: ['City', 'Culture', 'History', 'Shopping', 'Food'],
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   ],
 
@@ -364,7 +374,7 @@ export const seedData = {
   // =====================
   guides: [
     {
-      _id: 'guide-jean-de-dieu',
+      _id: '6',
       name: 'Jean de Dieu Nzabonimpa',
       email: 'jean@gotrip.com',
       phone: '+250788333333',
@@ -411,10 +421,12 @@ export const seedData = {
           comment: 'Jean made our gorilla trek unforgettable! His knowledge of gorilla behavior was incredible.',
           date: '2024-01-15'
         }
-      ]
+      ],
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'guide-marie-claire',
+      _id: '7',
       name: 'Marie Claire Uwimana',
       email: 'marie@gotrip.com',
       phone: '+250788444444',
@@ -461,10 +473,12 @@ export const seedData = {
           comment: 'Marie found 45 bird species in one morning! Her photography tips were invaluable.',
           date: '2024-02-10'
         }
-      ]
+      ],
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'guide-david-m',
+      _id: '8',
       name: 'David Mugisha',
       email: 'david@gotrip.com',
       phone: '+250788555555',
@@ -496,10 +510,12 @@ export const seedData = {
       availability: {
         monday: true, tuesday: true, wednesday: true, thursday: true,
         friday: true, saturday: true, sunday: true
-      }
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'guide-alice-u',
+      _id: '9',
       name: 'Alice Umutoni',
       email: 'alice@gotrip.com',
       phone: '+250788666666',
@@ -530,7 +546,9 @@ export const seedData = {
       availability: {
         monday: true, tuesday: true, wednesday: true, thursday: true,
         friday: true, saturday: true, sunday: false
-      }
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   ],
 
@@ -539,7 +557,7 @@ export const seedData = {
   // =====================
   translators: [
     {
-      _id: 'trans-david-m',
+      _id: '10',
       name: 'David Mugisha',
       email: 'david.t@gotrip.com',
       phone: '+250788777777',
@@ -582,10 +600,12 @@ export const seedData = {
       availability: {
         monday: true, tuesday: true, wednesday: true, thursday: true,
         friday: true, saturday: false, sunday: false
-      }
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'trans-sarah-u',
+      _id: '11',
       name: 'Sarah Uwimana',
       email: 'sarah@gotrip.com',
       phone: '+250788888888',
@@ -628,10 +648,12 @@ export const seedData = {
       availability: {
         monday: true, tuesday: true, wednesday: true, thursday: true,
         friday: true, saturday: true, sunday: false
-      }
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'trans-paul-k',
+      _id: '12',
       name: 'Paul Kalisa',
       email: 'paul@gotrip.com',
       phone: '+250788999999',
@@ -669,7 +691,9 @@ export const seedData = {
       availability: {
         monday: true, tuesday: true, wednesday: true, thursday: true,
         friday: true, saturday: false, sunday: false
-      }
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   ],
 
@@ -678,7 +702,7 @@ export const seedData = {
   // =====================
   accommodations: [
     {
-      _id: 'acc-kigali-marriott',
+      _id: '13',
       name: 'Kigali Marriott Hotel',
       location: 'Kigali, Rwanda',
       type: '5-Star Hotel',
@@ -723,10 +747,12 @@ export const seedData = {
         'Free cancellation 48 hours prior',
         'Children under 12 stay free'
       ],
-      coordinates: { lat: -1.9536, lng: 30.0605 }
+      coordinates: { lat: -1.9536, lng: 30.0605 },
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'acc-volcanoes-lodge',
+      _id: '14',
       name: 'Volcanoes Gorilla Lodge',
       location: 'Musanze, Rwanda',
       type: 'Eco-Lodge',
@@ -771,10 +797,12 @@ export const seedData = {
         'No single-use plastics',
         'Sustainable tourism practices'
       ],
-      coordinates: { lat: -1.5000, lng: 29.6333 }
+      coordinates: { lat: -1.5000, lng: 29.6333 },
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'acc-lake-kivu-resort',
+      _id: '15',
       name: 'Lake Kivu Serena Hotel',
       location: 'Gisenyi, Lake Kivu',
       type: 'Beach Resort',
@@ -819,10 +847,12 @@ export const seedData = {
         'Beach towels provided',
         'Water safety equipment included'
       ],
-      coordinates: { lat: -1.7000, lng: 29.2500 }
+      coordinates: { lat: -1.7000, lng: 29.2500 },
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'acc-nyungwe-forest',
+      _id: '16',
       name: 'Nyungwe Forest Lodge',
       location: 'Nyungwe National Park',
       type: 'Nature Lodge',
@@ -867,7 +897,9 @@ export const seedData = {
         'Quiet hours: 10 PM - 6 AM',
         'No feeding wildlife'
       ],
-      coordinates: { lat: -2.4944, lng: 29.3021 }
+      coordinates: { lat: -2.4944, lng: 29.3021 },
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   ],
 
@@ -876,7 +908,7 @@ export const seedData = {
   // =====================
   blogPosts: [
     {
-      _id: 'blog-gorilla-trekking',
+      _id: '17',
       title: 'Ultimate Guide to Gorilla Trekking in Rwanda: Everything You Need to Know',
       author: 'Jean de Dieu Nzabonimpa',
       content: `
@@ -900,99 +932,6 @@ export const seedData = {
           <li><strong>Altitude acclimatization:</strong> Spend 2 days in Kigali/Musanze</li>
           <li><strong>Strength training:</strong> Focus on legs and core</li>
         </ul>
-        
-        <h2>Essential Packing List</h2>
-        <div class="packing-list">
-          <div class="category">
-            <h3>Clothing</h3>
-            <ul>
-              <li>Waterproof hiking boots (broken in!)</li>
-              <li>Quick-dry pants (2 pairs)</li>
-              <li>Long-sleeved shirts</li>
-              <li>Waterproof jacket</li>
-              <li>Warm layers for mornings</li>
-            </ul>
-          </div>
-          <div class="category">
-            <h3>Equipment</h3>
-            <ul>
-              <li>Daypack (waterproof)</li>
-              <li>Walking poles (provided or bring)</li>
-              <li>Camera with zoom lens</li>
-              <li>Binoculars</li>
-              <li>Water bottles (2 liters)</li>
-            </ul>
-          </div>
-        </div>
-        
-        <h2>Gorilla Families of Volcanoes National Park</h2>
-        <p>Rwanda has 10 habituated gorilla families available for tracking:</p>
-        <table class="gorilla-families">
-          <thead>
-            <tr>
-              <th>Family Name</th>
-              <th>Size</th>
-              <th>Silverbacks</th>
-              <th>Location</th>
-              <th>Trek Difficulty</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Susa</td>
-              <td>31 members</td>
-              <td>3</td>
-              <td>High altitude</td>
-              <td>Challenging</td>
-            </tr>
-            <tr>
-              <td>Amahoro</td>
-              <td>17 members</td>
-              <td>1</td>
-              <td>Mid-range</td>
-              <td>Moderate</td>
-            </tr>
-            <tr>
-              <td>Kwitonda</td>
-              <td>25 members</td>
-              <td>2</td>
-              <td>Various</td>
-              <td>Moderate</td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <h2>Health & Safety Protocols</h2>
-        <ul>
-          <li><strong>COVID-19:</strong> Negative test required within 72 hours</li>
-          <li><strong>General Health:</strong> Report any illness to your guide</li>
-          <li><strong>Distance:</strong> Maintain 7 meters from gorillas</li>
-          <li><strong>Photography:</strong> No flash photography</li>
-          <li><strong>Waste:</strong> Pack out everything you bring in</li>
-        </ul>
-        
-        <h2>Conservation Impact</h2>
-        <p>Your $1,500 permit directly funds:</p>
-        <ul>
-          <li>Ranger salaries and training</li>
-          <li>Community development projects (10% of revenue)</li>
-          <li>Veterinary care for gorillas</li>
-          <li>Anti-poaching patrols</li>
-          <li>Research and monitoring</li>
-        </ul>
-        
-        <h2>Best Time to Visit</h2>
-        <p><strong>Dry Seasons (Best):</strong> June-September, December-February</p>
-        <p><strong>Wet Seasons:</strong> March-May, October-November (fewer tourists, lush vegetation)</p>
-        
-        <h2>Local Community Benefits</h2>
-        <p>The revenue sharing program ensures that 10% of park revenue goes to surrounding communities, funding:</p>
-        <ul>
-          <li>Schools and education programs</li>
-          <li>Healthcare facilities</li>
-          <li>Clean water projects</li>
-          <li>Small business development</li>
-        </ul>
       `,
       excerpt: 'Complete guide to planning your gorilla trekking adventure in Rwanda. Learn about permits, preparation, what to expect, and conservation impact.',
       featuredImage: 'https://images.unsplash.com/photo-1548013146-72479768bada?w=1200&h=800&fit=crop&q=80',
@@ -1009,10 +948,12 @@ export const seedData = {
       publishedDate: '2024-01-15',
       views: 1250,
       likes: 89,
-      comments: 24
+      comments: 24,
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'blog-rwanda-itinerary',
+      _id: '18',
       title: '7-Day Ultimate Rwanda Itinerary: Gorillas, Culture & Nature',
       author: 'Marie Claire Uwimana',
       content: `
@@ -1034,97 +975,6 @@ export const seedData = {
           <li><strong>Evening:</strong> Traditional dance performance</li>
           <li><strong>Food:</strong> Try local brochettes and ugali</li>
         </ul>
-        
-        <h2>Day 3: Transfer to Volcanoes National Park</h2>
-        <ul>
-          <li><strong>Morning:</strong> Scenic drive to Musanze (3 hours)</li>
-          <li><strong>Afternoon:</strong> Iby\'Iwacu Cultural Village visit</li>
-          <li><strong>Evening:</strong> Gorilla trekking briefing</li>
-          <li><strong>Accommodation:</strong> Volcanoes Gorilla Lodge</li>
-        </ul>
-        
-        <h2>Day 4: Gorilla Trekking Experience</h2>
-        <ul>
-          <li><strong>6:30 AM:</strong> Park headquarters registration</li>
-          <li><strong>7:30 AM:</strong> Begin gorilla trek</li>
-          <li><strong>Afternoon:</strong> Golden Monkey tracking (optional)</li>
-          <li><strong>Evening:</strong> Relax at lodge with volcano views</li>
-        </ul>
-        
-        <h2>Day 5: Lake Kivu Relaxation</h2>
-        <ul>
-          <li><strong>Morning:</strong> Drive to Gisenyi (4 hours)</li>
-          <li><strong>Afternoon:</strong> Boat trip to Napoleon Island</li>
-          <li><strong>Evening:</strong> Sunset kayaking on Lake Kivu</li>
-          <li><strong>Accommodation:</strong> Lake Kivu Serena Hotel</li>
-        </ul>
-        
-        <h2>Day 6: Nyungwe Forest Adventure</h2>
-        <ul>
-          <li><strong>Morning:</strong> Early drive to Nyungwe (5 hours)</li>
-          <li><strong>Afternoon:</strong> Canopy walkway experience</li>
-          <li><strong>Evening:</strong> Chimpanzee tracking briefing</li>
-          <li><strong>Accommodation:</strong> Nyungwe Forest Lodge</li>
-        </ul>
-        
-        <h2>Day 7: Chimpanzee Tracking & Departure</h2>
-        <ul>
-          <li><strong>Morning:</strong> Chimpanzee tracking adventure</li>
-          <li><strong>Afternoon:</strong> Return to Kigali (5 hours)</li>
-          <li><strong>Evening:</strong> Departure or extend your stay</li>
-        </ul>
-        
-        <h2>Budget Breakdown (Per Person)</h2>
-        <table class="budget-table">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Budget</th>
-              <th>Mid-Range</th>
-              <th>Luxury</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Accommodation</td>
-              <td>$700</td>
-              <td>$1,200</td>
-              <td>$2,500</td>
-            </tr>
-            <tr>
-              <td>Gorilla Permit</td>
-              <td>$1,500</td>
-              <td>$1,500</td>
-              <td>$1,500</td>
-            </tr>
-            <tr>
-              <td>Transport</td>
-              <td>$300</td>
-              <td>$500</td>
-              <td>$800</td>
-            </tr>
-            <tr>
-              <td>Activities</td>
-              <td>$200</td>
-              <td>$400</td>
-              <td>$600</td>
-            </tr>
-            <tr>
-              <td><strong>Total</strong></td>
-              <td><strong>$2,700</strong></td>
-              <td><strong>$3,600</strong></td>
-              <td><strong>$5,400</strong></td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <h2>Travel Tips</h2>
-        <ul>
-          <li><strong>Visa:</strong> Most nationalities get visa on arrival</li>
-          <li><strong>Health:</strong> Yellow fever vaccination required</li>
-          <li><strong>Money:</strong> Credit cards widely accepted, carry some cash</li>
-          <li><strong>Packing:</strong> Layers for varying altitudes</li>
-        </ul>
       `,
       excerpt: 'Comprehensive 7-day itinerary covering Rwanda\'s best attractions including gorilla trekking, cultural experiences, and lake relaxation.',
       featuredImage: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=1200&h=800&fit=crop&q=80',
@@ -1141,10 +991,12 @@ export const seedData = {
       publishedDate: '2024-01-20',
       views: 980,
       likes: 67,
-      comments: 18
+      comments: 18,
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'blog-rwandan-culture',
+      _id: '19',
       title: 'Exploring Rwandan Culture: Traditions, Dance, and Community Tourism',
       author: 'Alice Umutoni',
       content: `
@@ -1157,56 +1009,6 @@ export const seedData = {
           <li><strong>The Dance of Heroes:</strong> Warrior dance with spears and shields</li>
           <li><strong>The Dance of Elegance:</strong> Graceful movements celebrating beauty</li>
           <li><strong>The Dance of Cows:</strong> Celebrating Rwanda\'s pastoral heritage</li>
-        </ul>
-        
-        <h2>Community-Based Tourism</h2>
-        <p>Experience authentic Rwandan life through community tourism initiatives:</p>
-        <div class="community-projects">
-          <div class="project">
-            <h3>Iby\'Iwacu Cultural Village</h3>
-            <p>Former poachers now guide tourists through traditional activities:</p>
-            <ul>
-              <li>Traditional house building</li>
-              <li>Banana beer brewing</li>
-              <li>Warrior training</li>
-              <li>King\'s palace visit</li>
-            </ul>
-          </div>
-          <div class="project">
-            <h3>Women\'s Cooperatives</h3>
-            <p>Visit women\'s weaving and craft cooperatives:</p>
-            <ul>
-              <li>Agaseke basket weaving</li>
-              <li>Traditional pottery</li>
-              <li>Beadwork demonstrations</li>
-              <li>Direct purchase from artisans</li>
-            </ul>
-          </div>
-        </div>
-        
-        <h2>Traditional Cuisine</h2>
-        <p>Must-try Rwandan dishes:</p>
-        <ul>
-          <li><strong>Isombe:</strong> Cassava leaves with peanut sauce</li>
-          <li><strong>Ugali:</strong> Maize porridge staple</li>
-          <li><strong>Brochettes:</strong> Grilled meat skewers</li>
-          <li><strong>Ibihaza:</strong> Pumpkin and beans</li>
-          <li><strong>Urwagwa:</strong> Traditional banana beer</li>
-        </ul>
-        
-        <h2>Cultural Etiquette</h2>
-        <ul>
-          <li><strong>Greetings:</strong> Always greet people before conversations</li>
-          <li><strong>Respect:</strong> Use right hand for giving/receiving items</li>
-          <li><strong>Dress:</strong> Modest clothing appreciated, especially in rural areas</li>
-          <li><strong>Photography:</strong> Always ask permission before photographing people</li>
-        </ul>
-        
-        <h2>Festivals & Events</h2>
-        <ul>
-          <li><strong>Kwita Izina:</strong> Gorilla naming ceremony (September)</li>
-          <li><strong>Umuganura:</strong> Harvest festival (August)</li>
-          <li><strong>Hobe Rwanda:</strong> Arts and culture festival</li>
         </ul>
       `,
       excerpt: 'Discover the rich cultural heritage of Rwanda through traditional dance, community tourism, cuisine, and authentic cultural experiences.',
@@ -1224,10 +1026,12 @@ export const seedData = {
       publishedDate: '2024-02-01',
       views: 750,
       likes: 45,
-      comments: 12
+      comments: 12,
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
-      _id: 'blog-bird-watching',
+      _id: '20',
       title: 'Bird Watching Paradise: Rwanda\'s 700+ Bird Species Guide',
       author: 'Marie Claire Uwimana',
       content: `
@@ -1245,83 +1049,7 @@ export const seedData = {
               <li><strong>Specialty:</strong> Forest canopy species</li>
             </ul>
           </div>
-          <div class="spot">
-            <h3>Akagera National Park</h3>
-            <ul>
-              <li><strong>Star Species:</strong> Shoebill Stork, Papyrus Gonolek</li>
-              <li><strong>Total Species:</strong> 500+</li>
-              <li><strong>Best Time:</strong> Wet season</li>
-              <li><strong>Specialty:</strong> Wetland and savannah birds</li>
-            </ul>
-          </div>
-          <div class="spot">
-            <h3>Volcanoes National Park</h3>
-            <ul>
-              <li><strong>Star Species:</strong> Rwenzori Double-collared Sunbird</li>
-              <li><strong>Total Species:</strong> 200+</li>
-              <li><strong>Best Time:</strong> Dry season</li>
-              <li><strong>Specialty:</strong> Alpine and montane species</li>
-            </ul>
-          </div>
         </div>
-        
-        <h2>Essential Birding Equipment</h2>
-        <ul>
-          <li><strong>Binoculars:</strong> 8x42 or 10x42 recommended</li>
-          <li><strong>Field Guide:</strong> Birds of East Africa by Stevenson & Fanshawe</li>
-          <li><strong>Camera:</strong> DSLR with 300mm+ lens</li>
-          <li><strong>Clothing:</strong> Neutral colors, waterproof layer</li>
-          <li><strong>Notebook:</strong> For recording sightings</li>
-        </ul>
-        
-        <h2>Seasonal Birding Calendar</h2>
-        <table class="birding-calendar">
-          <thead>
-            <tr>
-              <th>Season</th>
-              <th>Best Locations</th>
-              <th>Key Species</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Dec-Feb (Dry)</td>
-              <td>All parks</td>
-              <td>Resident species, easier viewing</td>
-            </tr>
-            <tr>
-              <td>Mar-May (Wet)</td>
-              <td>Akagera, Nyungwe</td>
-              <td>Palearctic migrants, breeding plumage</td>
-            </tr>
-            <tr>
-              <td>Jun-Aug (Dry)</td>
-              <td>Volcanoes, Nyungwe</td>
-              <td>Alpine specialists</td>
-            </tr>
-            <tr>
-              <td>Sep-Nov (Wet)</td>
-              <td>All parks</td>
-              <td>Returning migrants</td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <h2>Birding Tours & Guides</h2>
-        <p>Recommended specialized birding guides:</p>
-        <ul>
-          <li><strong>Expert Guides:</strong> Certified by Rwanda Birding Association</li>
-          <li><strong>Private Tours:</strong> Customized itineraries available</li>
-          <li><strong>Photography Focus:</strong> Guides with photography expertise</li>
-        </ul>
-        
-        <h2>Conservation & Ethical Birding</h2>
-        <ul>
-          <li>Follow park rules and stay on trails</li>
-          <li>Use playback sparingly if at all</li>
-          <li>Keep respectful distance from nests</li>
-          <li>Support local conservation initiatives</li>
-        </ul>
       `,
       excerpt: 'Comprehensive guide to bird watching in Rwanda, covering top spots, equipment, seasonal calendar, and ethical birding practices.',
       featuredImage: 'https://images.unsplash.com/photo-1550358864-518f202c02ba?w=1200&h=800&fit=crop&q=80',
@@ -1338,210 +1066,9 @@ export const seedData = {
       publishedDate: '2024-02-10',
       views: 520,
       likes: 38,
-      comments: 8
-    }
-  ],
-
-  // =====================
-  // RWANDA TRAVEL TIPS
-  // =====================
-  travelTips: {
-    general: [
-      {
-        title: 'Best Time to Visit Rwanda',
-        content: 'Rwanda can be visited year-round. Dry seasons (June-September, December-February) are best for gorilla trekking and hiking. Wet seasons offer lush vegetation and fewer tourists.',
-        icon: 'fas fa-calendar-alt'
-      },
-      {
-        title: 'Visa Requirements',
-        content: 'Most nationalities can obtain visa on arrival. East African Tourist Visa ($100) allows travel to Rwanda, Uganda, and Kenya. Check latest requirements before travel.',
-        icon: 'fas fa-passport'
-      },
-      {
-        title: 'Health & Vaccinations',
-        content: 'Yellow fever vaccination required. Malaria prophylaxis recommended. COVID-19 regulations may apply. Travel insurance essential.',
-        icon: 'fas fa-shield-alt'
-      },
-      {
-        title: 'Currency & Money',
-        content: 'Rwandan Franc (RWF) is local currency. USD widely accepted. Credit cards accepted in cities. ATMs available in urban areas.',
-        icon: 'fas fa-money-bill-wave'
-      },
-      {
-        title: 'Safety & Security',
-        content: 'Rwanda is one of Africa\'s safest countries. Normal precautions apply. Keep valuables secure. Respect local laws and customs.',
-        icon: 'fas fa-user-shield'
-      }
-    ],
-    packing: [
-      {
-        category: 'Clothing',
-        items: [
-          'Lightweight, quick-dry clothing',
-          'Waterproof jacket',
-          'Warm layers for evenings',
-          'Comfortable hiking shoes',
-          'Hat and sunglasses'
-        ]
-      },
-      {
-        category: 'Equipment',
-        items: [
-          'Camera with zoom lens',
-          'Binoculars',
-          'Power adapter (Type C/J)',
-          'Portable charger',
-          'Headlamp/flashlight'
-        ]
-      },
-      {
-        category: 'Health',
-        items: [
-          'Malaria prophylaxis',
-          'Insect repellent',
-          'Sunscreen (high SPF)',
-          'Basic first aid kit',
-          'Hand sanitizer'
-        ]
-      }
-    ],
-    cultural: [
-      {
-        tip: 'Greetings are important. Always greet before starting conversation.',
-        explanation: 'Rwandans value polite greetings. Use "Muraho" (Hello) or "Amakuru?" (How are you?)'
-      },
-      {
-        tip: 'Use right hand for giving/receiving items.',
-        explanation: 'The left hand is considered unclean in some traditional contexts'
-      },
-      {
-        tip: 'Ask permission before photographing people.',
-        explanation: 'Always be respectful and ask first, especially in rural areas'
-      },
-      {
-        tip: 'Dress modestly, especially when visiting rural communities.',
-        explanation: 'Knee-length shorts/skirts and covered shoulders appreciated'
-      }
-    ]
-  },
-
-  // =====================
-  // POPULAR ITINERARIES
-  // =====================
-  popularItineraries: [
-    {
-      name: 'Rwanda Gorilla Express',
-      duration: '4 Days / 3 Nights',
-      price: '$2,500',
-      highlights: ['Gorilla Trekking', 'Kigali City Tour', 'Cultural Village'],
-      description: 'Short but intensive gorilla experience perfect for time-limited travelers.',
-      days: [
-        'Day 1: Arrive Kigali, city tour',
-        'Day 2: Transfer to Volcanoes, gorilla briefing',
-        'Day 3: Gorilla trekking experience',
-        'Day 4: Return to Kigali, departure'
-      ]
-    },
-    {
-      name: 'Rwanda Wildlife & Culture',
-      duration: '8 Days / 7 Nights',
-      price: '$4,200',
-      highlights: ['Gorillas', 'Big 5 Safari', 'Lake Kivu', 'Cultural Experiences'],
-      description: 'Comprehensive Rwanda experience covering wildlife, culture, and relaxation.',
-      days: [
-        'Day 1-2: Kigali & cultural experiences',
-        'Day 3-4: Gorilla trekking in Volcanoes',
-        'Day 5-6: Wildlife safari in Akagera',
-        'Day 7: Relax at Lake Kivu',
-        'Day 8: Departure'
-      ]
-    },
-    {
-      name: 'Rwanda Birding Special',
-      duration: '10 Days / 9 Nights',
-      price: '$5,800',
-      highlights: ['Bird Watching', 'Primate Tracking', 'Canopy Walk', 'Photography'],
-      description: 'Specialized birding tour covering all major habitats with expert guides.',
-      days: [
-        'Day 1-2: Kigali and nearby wetlands',
-        'Day 3-4: Nyungwe Forest birding',
-        'Day 5-6: Akagera wetland species',
-        'Day 7-8: Volcanoes alpine birds',
-        'Day 9-10: Lake Kivu and departure'
-      ]
-    }
-  ],
-
-  // =====================
-  // TESTIMONIALS
-  // =====================
-  testimonials: [
-    {
-      name: 'Michael & Sarah Johnson',
-      location: 'California, USA',
-      trip: 'Gorilla Trekking Adventure',
-      rating: 5,
-      comment: 'The gorilla trekking was beyond our expectations. Our guide Jean was incredibly knowledgeable and made the experience educational and magical. Rwanda is breathtaking!',
-      image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=200&h=200&fit=crop&q=80',
-      date: 'December 2023'
-    },
-    {
-      name: 'David Chen',
-      location: 'Singapore',
-      trip: 'Bird Watching Tour',
-      rating: 5,
-      comment: 'As a bird photographer, Rwanda exceeded all expectations. Marie found 45 species in one morning! The lodges were comfortable and the guides were true experts.',
-      image: 'https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?w=200&h=200&fit=crop&q=80',
-      date: 'January 2024'
-    },
-    {
-      name: 'The Miller Family',
-      location: 'London, UK',
-      trip: 'Family Safari Holiday',
-      rating: 5,
-      comment: 'Perfect family vacation! The kids loved the boat safari in Akagera, and we all cherished our time with the gorillas. Rwanda is safe, clean, and welcoming.',
-      image: 'https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=200&h=200&fit=crop&q=80',
-      date: 'February 2024'
-    },
-    {
-      name: 'Maria Rodriguez',
-      location: 'Madrid, Spain',
-      trip: 'Cultural Immersion Tour',
-      rating: 5,
-      comment: 'The cultural experiences were authentic and meaningful. Learning traditional dances, visiting communities, and understanding Rwanda\'s history was transformative.',
-      image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop&q=80',
-      date: 'March 2024'
-    }
-  ],
-
-  // =====================
-  // CONSERVATION FACTS
-  // =====================
-  conservationFacts: [
-    {
-      fact: 'Gorilla population increase',
-      detail: 'Mountain gorilla numbers have increased from 240 in 1981 to over 1,000 today',
-      icon: 'fas fa-chart-line'
-    },
-    {
-      fact: 'Revenue sharing',
-      detail: '10% of national park revenue goes to local communities',
-      icon: 'fas fa-handshake'
-    },
-      {
-      fact: 'Plastic bag ban',
-      detail: 'Rwanda was the first African country to ban plastic bags in 2008',
-      icon: 'fas fa-ban'
-    },
-    {
-      fact: 'Monthly community service',
-      detail: 'Umuganda: Last Saturday of every month, communities work together on projects',
-      icon: 'fas fa-users'
-    },
-    {
-      fact: 'Forest restoration',
-      detail: 'Rwanda aims for 30% forest cover by 2030 through restoration programs',
-      icon: 'fas fa-tree'
+      comments: 8,
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   ]
 };
@@ -1567,6 +1094,40 @@ export function getFeaturedItems(type) {
   }
   // For other types, return first few items
   return seedData[type].slice(0, 3);
+}
+
+// MongoDB insertion helper
+export async function seedToMongoDB(db) {
+  const collections = Object.keys(seedData);
+  
+  for (const collection of collections) {
+    if (db[collection]) {
+      try {
+        // Clear existing data
+        await db[collection].deleteMany({});
+        
+        // Insert new data
+        const result = await db[collection].insertMany(seedData[collection]);
+        console.log(`✅ Seeded ${result.insertedCount} documents into ${collection}`);
+      } catch (error) {
+        console.error(`❌ Error seeding ${collection}:`, error);
+      }
+    } else {
+      console.warn(`⚠️ Collection ${collection} not found in database`);
+    }
+  }
+}
+
+// Generate MongoDB import files
+export function generateMongoImportFiles() {
+  const collections = Object.keys(seedData);
+  const files = {};
+  
+  collections.forEach(collection => {
+    files[`${collection}.json`] = JSON.stringify(seedData[collection], null, 2);
+  });
+  
+  return files;
 }
 
 export default seedData;

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     
     <!-- Primary SEO Meta Tags -->
     <title>GoTrip | Gorilla Trekking & Rwanda Tours - Official Tour Operator</title>
@@ -24,30 +24,129 @@
         /* Critical CSS that must load immediately */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #333; background: #fff; }
-        .skip-to-content { position: absolute; top: -40px; left: 10px; background: #2E7D32; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; z-index: 1001; transition: top 0.3s; }
-        .skip-to-content:focus { top: 10px; }
-        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        .main-nav { position: fixed; top: 0; left: 0; right: 0; background: white; box-shadow: 0 2px 20px rgba(0,0,0,0.1); z-index: 1000; padding: 15px 0; }
-        .nav-container { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        .logo { font-size: 1.8rem; font-weight: 800; text-decoration: none; color: #2E7D32; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; 
+            color: #333; 
+            background: #fff; 
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+        .skip-to-content { 
+            position: absolute; 
+            top: -40px; 
+            left: 10px; 
+            background: #2E7D32; 
+            color: white; 
+            padding: 12px 20px; 
+            text-decoration: none; 
+            border-radius: 4px; 
+            z-index: 1001; 
+            transition: top 0.3s; 
+        }
+        .skip-to-content:focus { 
+            top: 10px; 
+        }
+        .container { 
+            width: 100%; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 15px; 
+        }
+        .main-nav { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1); 
+            z-index: 1000; 
+            padding: 12px 0;
+        }
+        .nav-container { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 15px; 
+        }
+        .logo { 
+            font-size: 1.8rem; 
+            font-weight: 800; 
+            text-decoration: none; 
+            color: #2E7D32; 
+            display: flex;
+            align-items: center;
+        }
         .logo span:first-child { color: #2E7D32; }
         .logo span:last-child { color: #FF9800; }
-        .main-content { margin-top: 80px; min-height: 60vh; }
-        .page { display: none; }
-        .page.active { display: block; }
-        .mobile-menu-btn { display: none; }
+        .main-content { 
+            margin-top: 70px; 
+            min-height: 60vh; 
+            width: 100%;
+        }
+        .page { 
+            display: none; 
+            width: 100%;
+        }
+        .page.active { 
+            display: block; 
+        }
+        .mobile-menu-btn { 
+            display: none; 
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #333;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 1002;
+        }
         
         /* Hero Background with eager loading */
         .hero-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), 
+            background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), 
                         url('https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767664105/ruanda-lake-kivu-aussicht_o95lpv.jpg') 
-                        center center / cover no-repeat fixed;
+                        center center / cover no-repeat;
             color: white;
-            padding: 140px 0;
+            padding: 100px 20px;
             text-align: center;
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 80px 15px;
+                min-height: 70vh;
+                background-attachment: scroll !important;
+            }
+            .main-nav {
+                padding: 10px 0;
+            }
+            .nav-container {
+                padding: 0 10px;
+            }
+            .main-content {
+                margin-top: 60px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-section {
+                padding: 60px 15px;
+                min-height: 60vh;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+        }
+
         /* Loading spinner */
         .spinner {
             width: 40px;
@@ -67,7 +166,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 300px;
+            min-height: 200px;
             width: 100%;
         }
     </style>
@@ -120,14 +219,14 @@
         <section id="home-page" class="page active" data-page="home">
             <div class="hero-section">
                 <div class="container">
-                    <h1>Discover Rwanda's Beauty</h1>
-                    <p class="hero-subtitle">Experience authentic Rwandan culture, gorilla trekking, and luxury accommodations with GoTrip - Rwanda's premier tour operator.</p>
+                    <h1>Beautiful Rwanda</h1>
+                    <p class="hero-subtitle">Experience authentic culture, gorilla trekking, and luxury stays with GoTrip - Rwanda's premier tour operator.</p>
                     <div class="hero-buttons">
                         <button class="btn btn-large plan-trip-hero-btn">
                             <i class="fas fa-map-marked-alt"></i> Plan Your Trip
                         </button>
                         <a href="#" class="btn btn-outline btn-large explore-destinations-btn" data-page="destinations">
-                            <i class="fas fa-compass"></i> Explore Destinations
+                            <i class="fas fa-compass"></i> Destinations
                         </a>
                     </div>
                 </div>
@@ -174,7 +273,7 @@
                 <div class="container">
                     <div class="section-header">
                         <h2>Popular Destinations</h2>
-                        <p>Discover Rwanda's most beautiful attractions</p>
+                        <p>Explore Rwanda's most beautiful attractions</p>
                     </div>
                     <div class="destinations-grid" id="destinations-section">
                         <div class="loading-container">
@@ -266,7 +365,7 @@
             <div class="page-header">
                 <div class="container">
                     <h1><i class="fas fa-newspaper"></i> Travel Blog</h1>
-                    <p>Latest travel tips, guides, and Rwanda tourism insights</p>
+                    <p>Latest travel tips, offers, and Rwanda tourism insights</p>
                 </div>
             </div>
             <div class="container">
@@ -297,7 +396,7 @@
                                 <i class="fas fa-map-marker-alt"></i>
                                 <div>
                                     <h3>Visit Our Office</h3>
-                                    <p>KG 7 Avenue, Kigali, Rwanda</p>
+                                    <p>Kigali, Rwanda</p>
                                 </div>
                             </div>
                             <div class="contact-item">
@@ -319,8 +418,8 @@
                                 <div>
                                     <h3>Business Hours</h3>
                                     <p>Monday-Friday: 8:00 AM - 6:00 PM<br>
-                                    Saturday: 9:00 AM - 4:00 PM<br>
-                                    Sunday: Closed</p>
+                                    Sunday: 9:00 AM - 4:00 PM<br>
+                                    Saturday: Closed</p>
                                 </div>
                             </div>
                             
@@ -336,7 +435,7 @@
                                 </a>
                                 <a href="https://x.com/0011111olen" class="social-icon twitter" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
                                     <i class="fab fa-twitter"></i>
-                                    <span>Twitter</span>
+                                    <span>X</span>
                                 </a>
                                 <a href="https://www.instagram.com/patierutayisire/" class="social-icon instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                                     <i class="fab fa-instagram"></i>
@@ -394,10 +493,10 @@
                     <p class="footer-description">Official tour operator specializing in gorilla trekking, Kigali tours, Lake Kivu resorts, and national park safaris.</p>
                     
                     <div class="footer-contact">
-                        <p><i class="fas fa-map-marker-alt"></i> KG 7 Avenue, Kigali, Rwanda</p>
+                        <p><i class="fas fa-map-marker-alt"></i>Kigali, Rwanda</p>
                         <p><i class="fas fa-phone"></i> +250 787 407 051 (24/7)</p>
                         <p><i class="fas fa-envelope"></i> info@gotrip.africa</p>
-                        <p><i class="fas fa-clock"></i> Mon-Fri 8am-6pm, Sat 9am-4pm (CAT)</p>
+                        <p><i class="fas fa-clock"></i> Mon-Fri 8am-6pm, Sun 9am-4pm (CAT)</p>
                     </div>
                     
                     <div class="footer-social">
@@ -428,33 +527,33 @@
                 <div class="footer-column">
                     <h4>Rwanda Destinations</h4>
                     <ul class="footer-links">
-                        <li><button data-page="destinations" aria-label="Gorilla Trekking"><i class="fas fa-mountain"></i> Gorilla Trekking</button></li>
-                        <li><button data-page="destinations" aria-label="Kigali City Tours"><i class="fas fa-city"></i> Kigali City Tours</button></li>
-                        <li><button data-page="destinations" aria-label="Lake Kivu Resorts"><i class="fas fa-water"></i> Lake Kivu Resorts</button></li>
-                        <li><button data-page="destinations" aria-label="Akagera Safari"><i class="fas fa-lion"></i> Akagera Safari</button></li>
-                        <li><button data-page="destinations" aria-label="Nyungwe Forest"><i class="fas fa-tree"></i> Nyungwe Forest</button></li>
+                        <li><a href="#" data-page="destinations" aria-label="Gorilla Trekking"><i class="fas fa-mountain"></i> Gorilla Trekking</a></li>
+                        <li><a href="#" data-page="destinations" aria-label="Kigali City Tours"><i class="fas fa-city"></i> Kigali City Tours</a></li>
+                        <li><a href="#" data-page="destinations" aria-label="Lake Kivu Resorts"><i class="fas fa-water"></i> Lake Kivu Resorts</a></li>
+                        <li><a href="#" data-page="destinations" aria-label="Akagera Safari"><i class="fas fa-lion"></i> Akagera Safari</a></li>
+                        <li><a href="#" data-page="destinations" aria-label="Nyungwe Forest"><i class="fas fa-tree"></i> Nyungwe Forest</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-column">
                     <h4>Our Services</h4>
                     <ul class="footer-links">
-                        <li><button data-page="destinations" aria-label="Destinations"><i class="fas fa-ticket-alt"></i> Destinations</button></li>
-                        <li><button data-page="guides" aria-label="Tour Guides"><i class="fas fa-user-tie"></i> Tour Guides</button></li>
-                        <li><button data-page="translators" aria-label="Translators"><i class="fas fa-language"></i> Translators</button></li>
-                        <li><button data-page="accommodations" aria-label="Accommodations"><i class="fas fa-hotel"></i> Accommodations</button></li>
-                        <li><button data-page="blog" aria-label="Blog"><i class="fas fa-newspaper"></i> Blog</button></li>
+                        <li><a href="#" data-page="destinations" aria-label="Destinations"><i class="fas fa-ticket-alt"></i> Destinations</a></li>
+                        <li><a href="#" data-page="guides" aria-label="Tour Guides"><i class="fas fa-user-tie"></i> Tour Guides</a></li>
+                        <li><a href="#" data-page="translators" aria-label="Translators"><i class="fas fa-language"></i> Translators</a></li>
+                        <li><a href="#" data-page="accommodations" aria-label="Accommodations"><i class="fas fa-hotel"></i> Accommodations</a></li>
+                        <li><a href="#" data-page="blog" aria-label="Blog"><i class="fas fa-newspaper"></i> Blog</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-column">
                     <h4>Travel Information</h4>
                     <ul class="footer-links">
-                        <li><button data-page="blog" aria-label="Best Time to Visit"><i class="fas fa-calendar-alt"></i> Best Time to Visit</button></li>
-                        <li><button data-page="blog" aria-label="What to Pack"><i class="fas fa-suitcase"></i> What to Pack</button></li>
-                        <li><button data-page="blog" aria-label="Health & Safety"><i class="fas fa-shield-alt"></i> Health & Safety</button></li>
-                        <li><button data-page="blog" aria-label="Rwanda Culture Guide"><i class="fas fa-theater-masks"></i> Rwanda Culture Guide</button></li>
-                        <li><button data-page="blog" aria-label="Travel Tips"><i class="fas fa-lightbulb"></i> Travel Tips</button></li>
+                        <li><a href="#" data-page="blog" aria-label="Best Time to Visit"><i class="fas fa-calendar-alt"></i> Best Time to Visit</a></li>
+                        <li><a href="#" data-page="blog" aria-label="What to Pack"><i class="fas fa-suitcase"></i> What to Pack</a></li>
+                        <li><a href="#" data-page="blog" aria-label="Health & Safety"><i class="fas fa-shield-alt"></i> Health & Safety</a></li>
+                        <li><a href="#" data-page="blog" aria-label="Rwanda Culture Guide"><i class="fas fa-theater-masks"></i> Rwanda Culture Guide</a></li>
+                        <li><a href="#" data-page="blog" aria-label="Travel Tips"><i class="fas fa-lightbulb"></i> Travel Tips</a></li>
                     </ul>
                 </div>
             </div>
@@ -462,10 +561,9 @@
             <div class="footer-bottom">
                 <p>&copy; <span id="current-year">2026</span> GoTrip. All rights reserved.</p>
                 <ul class="footer-legal">
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Cookie Policy</a></li>
-                    <li><a href="#">Sitemap</a></li>
+                    <li><a href="#" class="footer-link" data-action="privacy">Privacy Policy</a></li>
+                    <li><a href="#" class="footer-link" data-action="terms">Terms of Service</a></li>
+                    <li><a href="#" class="footer-link" data-action="sitemap">Sitemap</a></li>
                 </ul>
                 
                 <div class="footer-badges">                    
