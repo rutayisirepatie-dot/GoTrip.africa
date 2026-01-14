@@ -32,21 +32,6 @@
             width: 100%;
             position: relative;
         }
-        .skip-to-content { 
-            position: absolute; 
-            top: -40px; 
-            left: 10px; 
-            background: #2E7D32; 
-            color: white; 
-            padding: 12px 20px; 
-            text-decoration: none; 
-            border-radius: 4px; 
-            z-index: 1001; 
-            transition: top 0.3s; 
-        }
-        .skip-to-content:focus { 
-            top: 10px; 
-        }
         .container { 
             width: 100%; 
             max-width: 1200px; 
@@ -105,7 +90,15 @@
             z-index: 1002;
         }
         
-        /* Hero Background with eager loading */
+        /* Mobile Navigation Active State */
+        .nav-links.active {
+            display: flex !important;
+            transform: translateX(0) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        /* Hero Background */
         .hero-section {
             background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), 
                         url('https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767664105/ruanda-lake-kivu-aussicht_o95lpv.jpg') 
@@ -134,6 +127,70 @@
             }
             .main-content {
                 margin-top: 60px;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                padding: 80px 20px 20px;
+                transform: translateX(100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                z-index: 1001;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+            }
+            .nav-links ul {
+                flex-direction: column;
+                gap: 0;
+                width: 100%;
+                max-width: 300px;
+            }
+            .nav-links li {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            .nav-link {
+                padding: 15px 20px;
+                border-radius: 8px;
+                display: block;
+                width: 100%;
+                font-size: 1.1rem;
+                text-align: center;
+            }
+            .nav-link:hover,
+            .nav-link.active {
+                background: #F5F5F5;
+            }
+            .nav-button-text {
+                display: none;
+            }
+            .nav-buttons .btn {
+                padding: 10px 15px;
+                height: 44px;
+                font-size: 0.9rem;
+            }
+            .plan-trip-nav-btn {
+                width: 44px;
+                height: 44px;
+                padding: 0;
+                border-radius: 50%;
+                justify-content: center;
+            }
+            .plan-trip-nav-btn i {
+                margin: 0;
+                font-size: 1.2rem;
             }
         }
         
@@ -172,11 +229,6 @@
     </style>
 </head>
 <body>
-    <!-- Skip to main content -->
-    <a href="#main-content" class="skip-to-content">
-        <i class="fas fa-arrow-right"></i> Skip to Main Content
-    </a>
-    
     <!-- Navigation -->
     <header class="main-nav">
         <div class="nav-container">
@@ -186,8 +238,8 @@
             </a>
             
             <!-- Mobile Menu Toggle -->
-            <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Menu">
-                <i class="fas fa-bars"></i>
+            <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle navigation menu">
+                <i class="fas fa-bars" id="menu-icon"></i>
             </button>
             
             <!-- Navigation Links -->
@@ -214,7 +266,7 @@
     </header>
 
     <!-- Main Content -->
-    <main id="main-content" class="main-content">
+    <main class="main-content">
         <!-- Home Page -->
         <section id="home-page" class="page active" data-page="home">
             <div class="hero-section">

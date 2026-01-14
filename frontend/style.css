@@ -19,7 +19,6 @@
     
     /* GRADIENTS */
     --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    --gradient-hero: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
     
     /* SHADOWS */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -246,14 +245,15 @@ p {
 .btn-full {
     width: 100%;
 }
+
 .plan-trip-hero-btn {
-    background: var(--secondary-color); /* Orange: #FF9800 */
+    background: var(--secondary-color);
     color: var(--white);
     border: 2px solid var(--secondary-color);
 }
 
 .plan-trip-hero-btn:hover {
-    background: #F57C00; /* Darker orange */
+    background: #F57C00;
     border-color: #F57C00;
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
@@ -365,6 +365,92 @@ p {
     justify-content: center;
     padding: 0;
     z-index: 1002;
+}
+
+/* Mobile Navigation Styles */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    
+    .nav-links {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 80px 20px 20px;
+        transform: translateX(100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--transition-base);
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .nav-links.active {
+        transform: translateX(0);
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .nav-links ul {
+        flex-direction: column;
+        gap: 0;
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .nav-links li {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .nav-link {
+        padding: 15px 20px;
+        border-radius: var(--radius-md);
+        display: block;
+        width: 100%;
+        font-size: 1.1rem;
+        text-align: center;
+    }
+    
+    .nav-link:hover,
+    .nav-link.active {
+        background: #F5F5F5;
+    }
+    
+    .nav-link::after {
+        display: none;
+    }
+    
+    .nav-button-text {
+        display: none;
+    }
+    
+    .nav-buttons .btn {
+        padding: 10px 15px;
+        height: 44px;
+        font-size: 0.9rem;
+    }
+    
+    .plan-trip-nav-btn {
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+    }
+    
+    .plan-trip-nav-btn i {
+        margin: 0;
+        font-size: 1.2rem;
+    }
 }
 
 /* ===== MAIN CONTENT ===== */
@@ -1672,89 +1758,6 @@ p {
 
 /* Mobile Large */
 @media (max-width: 768px) {
-    .mobile-menu-btn {
-        display: flex;
-    }
-    
-    .nav-links {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        padding: 80px 20px 20px;
-        transform: translateX(100%);
-        opacity: 0;
-        visibility: hidden;
-        transition: all var(--transition-base);
-        z-index: 1001;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .nav-links.active {
-        transform: translateX(0);
-        opacity: 1;
-        visibility: visible;
-    }
-    
-    .nav-links ul {
-        flex-direction: column;
-        gap: 0;
-        width: 100%;
-        max-width: 300px;
-    }
-    
-    .nav-links li {
-        width: 100%;
-        margin-bottom: 5px;
-    }
-    
-    .nav-link {
-        padding: 15px 20px;
-        border-radius: var(--radius-md);
-        display: block;
-        width: 100%;
-        font-size: 1.1rem;
-        text-align: center;
-    }
-    
-    .nav-link:hover,
-    .nav-link.active {
-        background: #F5F5F5;
-    }
-    
-    .nav-link::after {
-        display: none;
-    }
-    
-    .nav-button-text {
-        display: none;
-    }
-    
-    .nav-buttons .btn {
-        padding: 10px 15px;
-        height: 44px;
-        font-size: 0.9rem;
-    }
-    
-    .plan-trip-nav-btn {
-        width: 44px;
-        height: 44px;
-        padding: 0;
-        border-radius: 50%;
-        justify-content: center;
-    }
-    
-    .plan-trip-nav-btn i {
-        margin: 0;
-        font-size: 1.2rem;
-    }
-    
     .hero-section {
         min-height: 60vh;
         padding: 80px 15px;
