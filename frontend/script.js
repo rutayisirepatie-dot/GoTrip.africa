@@ -1,4 +1,4 @@
-// Go Trip Frontend Application v5.3
+// Go Trip Frontend Application v6.0 - Optimized for SEO and Mobile
 (function() {
     'use strict';
     
@@ -555,8 +555,20 @@
         showTripPlanningModal();
     };
 
+    window.showPage = function(pageId) {
+        showPage(pageId);
+    };
+
+    window.showPrivacyModal = function() {
+        showNotification('Privacy Policy will be available soon.', 'info');
+    };
+
+    window.showTermsModal = function() {
+        showNotification('Terms of Service will be available soon.', 'info');
+    };
+
     // ===============================
-    // MOBILE MENU TOGGLE
+    // IMPROVED MOBILE MENU TOGGLE
     // ===============================
     function initializeMobileMenu() {
         const mobileMenuBtn = document.getElementById('mobile-menu-toggle');
@@ -1107,7 +1119,7 @@
                         <button class="btn btn-primary plan-full-trip">
                             <i class="fas fa-map-marked-alt"></i> Plan Your Trip
                         </button>
-                        <button class="btn btn-secondary explore-blog" data-page="blog">
+                        <button class="btn btn-secondary explore-blog">
                             <i class="fas fa-newspaper"></i> More Articles
                         </button>
                     </div>
@@ -1998,281 +2010,10 @@
     }
 
     // ===============================
-    // ADD SIMPLE CSS STYLES
-    // ===============================
-    function addSimpleStyles() {
-        const style = document.createElement('style');
-        style.textContent = `
-            /* Simple Bio Styles */
-            .bio-simple {
-                display: flex;
-                align-items: flex-start;
-                gap: 20px;
-                padding: 20px;
-                background: #f8fafc;
-                border-radius: 12px;
-                margin-bottom: 25px;
-            }
-            
-            @media (max-width: 768px) {
-                .bio-simple {
-                    flex-direction: column;
-                    text-align: center;
-                    gap: 15px;
-                }
-            }
-            
-            .bio-avatar-simple img {
-                width: 120px;
-                height: 120px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 3px solid white;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            }
-            
-            .bio-content-simple {
-                flex: 1;
-            }
-            
-            .bio-content-simple h3 {
-                margin-top: 0;
-                margin-bottom: 10px;
-                color: #1f2937;
-            }
-            
-            .bio-content-simple p {
-                color: #4b5563;
-                margin-bottom: 10px;
-                line-height: 1.6;
-            }
-            
-            .certifications-simple h4 {
-                margin-bottom: 8px;
-                color: #374151;
-                font-size: 16px;
-            }
-            
-            .cert-tags {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-            
-            .cert-tag {
-                background: #e0f2fe;
-                color: #0369a1;
-                padding: 4px 10px;
-                border-radius: 15px;
-                font-size: 12px;
-                font-weight: 500;
-            }
-            
-            /* Simple Modal Styles */
-            .modal-subtitle {
-                color: #666;
-                font-size: 0.95rem;
-                margin-top: 5px;
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                flex-wrap: wrap;
-            }
-            
-            .modal-subtitle span {
-                display: flex;
-                align-items: center;
-                gap: 5px;
-            }
-            
-            /* Activity Card Styles */
-            .activities-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 15px;
-                margin-top: 15px;
-            }
-            
-            @media (max-width: 768px) {
-                .activities-grid {
-                    grid-template-columns: 1fr;
-                }
-            }
-            
-            .activity-card {
-                display: flex;
-                align-items: flex-start;
-                gap: 12px;
-                padding: 15px;
-                background: white;
-                border-radius: 8px;
-                border: 1px solid #e2e8f0;
-                transition: transform 0.2s, box-shadow 0.2s;
-            }
-            
-            .activity-card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            }
-            
-            .activity-icon {
-                width: 40px;
-                height: 40px;
-                background: #2E7D32;
-                border-radius: 8px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-size: 18px;
-                flex-shrink: 0;
-            }
-            
-            .activity-content h4 {
-                font-size: 16px;
-                margin: 0 0 5px 0;
-                color: #1e293b;
-            }
-            
-            .activity-content p {
-                font-size: 14px;
-                color: #64748b;
-                margin: 0;
-            }
-            
-            /* Modal Content Styles */
-            .destination-hero,
-            .accommodation-hero,
-            .blog-hero {
-                width: 100%;
-                height: 250px;
-                overflow: hidden;
-                border-radius: 12px;
-                margin-bottom: 25px;
-            }
-            
-            .destination-hero img,
-            .accommodation-hero img,
-            .blog-hero img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-            
-            .content-sections {
-                margin-bottom: 25px;
-            }
-            
-            .content-section {
-                margin-bottom: 25px;
-            }
-            
-            .content-section h3 {
-                font-size: 18px;
-                font-weight: 600;
-                color: #1f2937;
-                margin-bottom: 15px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-            
-            .content-section h3 i {
-                color: #2E7D32;
-            }
-            
-            /* Quick Info Styles */
-            .quick-info {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 15px;
-                margin-top: 20px;
-            }
-            
-            @media (max-width: 480px) {
-                .quick-info {
-                    grid-template-columns: 1fr;
-                }
-            }
-            
-            .info-item {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 12px;
-                background: #f8fafc;
-                border-radius: 8px;
-                border: 1px solid #e2e8f0;
-            }
-            
-            .info-item i {
-                font-size: 20px;
-                color: #2E7D32;
-            }
-            
-            .info-label {
-                font-size: 12px;
-                color: #64748b;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-            
-            .info-value {
-                font-size: 14px;
-                font-weight: 600;
-                color: #1e293b;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    // ===============================
     // EVENT HANDLERS
     // ===============================
     
     function setupEventListeners() {
-        // Navigation
-        document.addEventListener('click', (e) => {
-            const target = e.target;
-            
-            if (target.matches('.nav-link') || target.closest('.nav-link')) {
-                e.preventDefault();
-                const navLink = target.matches('.nav-link') ? target : target.closest('.nav-link');
-                const page = navLink.dataset.page;
-                if (page) showPage(page);
-            }
-            
-            if (target.matches('.service-link') || target.closest('.service-link')) {
-                e.preventDefault();
-                const serviceLink = target.matches('.service-link') ? target : target.closest('.service-link');
-                const page = serviceLink.dataset.page;
-                if (page) showPage(page);
-            }
-            
-            if (target.matches('.explore-destinations-btn') || target.closest('.explore-destinations-btn')) {
-                e.preventDefault();
-                showPage('destinations');
-            }
-            
-            if (target.matches('.plan-trip-nav-btn, .plan-trip-hero-btn') || 
-                target.closest('.plan-trip-nav-btn, .plan-trip-hero-btn')) {
-                e.preventDefault();
-                showTripPlanningModal();
-            }
-            
-            if (target.matches('.logo')) {
-                e.preventDefault();
-                showPage('home');
-            }
-            
-            if (target.matches('.footer-links a[data-page]') || target.closest('.footer-links a[data-page]')) {
-                e.preventDefault();
-                const link = target.matches('a') ? target : target.closest('a');
-                const page = link.dataset.page;
-                if (page) showPage(page);
-            }
-        });
-        
         // Contact form
         const contactForm = document.getElementById('contact-form');
         if (contactForm) {
@@ -2333,7 +2074,8 @@
         // Update active nav link
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
-            if (link.dataset.page === pageId) {
+            if (link.getAttribute('href') === `#${pageId}-page` || 
+                (link.getAttribute('href') === 'index.html' && pageId === 'home')) {
                 link.classList.add('active');
             }
         });
@@ -2477,10 +2219,7 @@
     // ===============================
     
     async function initializeApp() {
-        console.log('🚀 Initializing Go Trip Application v5.3');
-        
-        // Add simple styles
-        addSimpleStyles();
+        console.log('🚀 Initializing Go Trip Application v6.0');
         
         // Set current year
         const yearElement = document.getElementById('current-year');
@@ -2494,8 +2233,14 @@
         // Initialize UI components
         setupEventListeners();
         
-        // Load initial page
-        showPage('home');
+        // Load initial page based on URL hash
+        const hash = window.location.hash.replace('#', '');
+        if (hash && hash.endsWith('-page')) {
+            const pageId = hash.replace('-page', '');
+            showPage(pageId);
+        } else {
+            showPage('home');
+        }
         
         // Show welcome message after delay
         setTimeout(() => {
