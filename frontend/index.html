@@ -4,24 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Primary SEO Meta Tags -->
-    <title>GoTrip Rwanda | Official Tour Operator for Gorilla Trekking & Rwanda Tours</title>
-    <meta name="description" content="Official Rwanda tour operator for gorilla trekking, Kigali city tours, Lake Kivu resorts, Akagera safaris. Book authentic Rwandan cultural experiences.">
-    <meta name="keywords" content="Rwanda gorilla trekking, Rwanda tours, Kigali travel, Lake Kivu resorts, Akagera National Park, Nyungwe Forest, Rwanda safari, Volcanoes National Park">
+    <!-- Enhanced SEO Meta Tags -->
+    <title>GoTrip | Official Rwanda Tour Operator - Gorilla Trekking & Luxury Safaris</title>
+    <meta name="description" content="Official Rwanda tour operator for gorilla trekking, Kigali city tours, Lake Kivu resorts, Akagera safaris. Book authentic Rwandan cultural experiences with expert guides and translators.">
+    <meta name="keywords" content="Rwanda gorilla trekking, Rwanda tours, Kigali travel, Lake Kivu resorts, Akagera National Park, Nyungwe Forest, Rwanda safari, Volcanoes National Park, Rwanda tour guides, translators Rwanda">
     <meta name="author" content="GoTrip Rwanda">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://gotrip.africa/">
-    <meta property="og:title" content="GoTrip Rwanda | Official Tour Operator">
-    <meta property="og:description" content="Official Rwanda tour operator for gorilla trekking, Kigali city tours, Lake Kivu resorts, Akagera safaris.">
+    <meta property="og:title" content="GoTrip | Premium Rwanda Tour Operator">
+    <meta property="og:description" content="Official Rwanda tour operator for gorilla trekking, Kigali city tours, Lake Kivu resorts, Akagera safaris with expert guides and translators.">
     <meta property="og:image" content="https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767664105/ruanda-lake-kivu-aussicht_o95lpv.jpg">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://gotrip.africa/">
-    <meta property="twitter:title" content="GoTrip Rwanda | Official Tour Operator">
-    <meta property="twitter:description" content="Official Rwanda tour operator for gorilla trekking, Kigali city tours, Lake Kivu resorts, Akagera safaris.">
+    <meta property="twitter:title" content="GoTrip | Premium Rwanda Tour Operator">
+    <meta property="twitter:description" content="Official Rwanda tour operator for gorilla trekking, Kigali city tours, Lake Kivu resorts, Akagera safaris with expert guides and translators.">
     <meta property="twitter:image" content="https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767664105/ruanda-lake-kivu-aussicht_o95lpv.jpg">
     
     <!-- Canonical URL -->
@@ -33,23 +39,30 @@
         "@context": "https://schema.org",
         "@type": "TravelAgency",
         "name": "GoTrip Rwanda",
-        "description": "Official Rwanda tour operator for gorilla trekking, Kigali city tours, Lake Kivu resorts, Akagera safaris.",
+        "description": "Official Rwanda tour operator specializing in gorilla trekking, cultural tours, and luxury safaris with expert multilingual guides and translators.",
         "url": "https://gotrip.africa",
         "logo": "https://gotrip.africa/logo.png",
         "address": {
             "@type": "PostalAddress",
             "addressLocality": "Kigali",
-            "addressCountry": "RW"
+            "addressCountry": "RW",
+            "streetAddress": "KN 5 Rd"
         },
         "telephone": "+250-787-407-051",
         "email": "info@gotrip.africa",
+        "openingHours": "Mo-Fr 08:00-18:00, Su 09:00-16:00",
+        "priceRange": "$$$",
         "sameAs": [
-            "https://www.linkedin.com/in/patience-rutayisire/",
-            "https://web.facebook.com/patience.rutayisire/",
-            "https://x.com/0011111olen"
+            "https://www.linkedin.com/company/gotrip-rwanda",
+            "https://www.facebook.com/gotriprwanda",
+            "https://twitter.com/gotriprwanda",
+            "https://www.instagram.com/gotriprwanda/"
         ]
     }
     </script>
+    
+    <!-- Sitemap reference -->
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -62,7 +75,7 @@
     
     <!-- Critical CSS (inline for faster load) -->
     <style>
-        /* Critical CSS that must load immediately */
+        /* Critical CSS */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body { 
@@ -105,23 +118,17 @@
             color: #2E7D32; 
             display: flex;
             align-items: center;
+            z-index: 1002;
         }
         .logo span:first-child { color: #2E7D32; }
         .logo span:last-child { color: #FF9800; }
         .main-content { 
             margin-top: 70px; 
-            min-height: 60vh; 
             width: 100%;
-        }
-        .page { 
-            display: none; 
-            width: 100%;
-        }
-        .page.active { 
-            display: block; 
+            min-height: calc(100vh - 300px);
         }
         
-        /* Improved Mobile Menu Toggle */
+        /* Professional Mobile Menu Toggle */
         .mobile-menu-btn { 
             display: none; 
             background: none;
@@ -131,37 +138,81 @@
             cursor: pointer;
             padding: 8px;
             z-index: 1002;
-        }
-        
-        /* Enhanced Mobile Navigation */
-        .nav-links.active {
-            display: flex !important;
-            transform: translateX(0) !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-            background: #1B5E20; /* Dark green background */
-        }
-        
-        /* Hero Background */
-        .hero-section {
-            background: 
-                        url('https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767664105/ruanda-lake-kivu-aussicht_o95lpv.jpg') 
-                        center center / cover no-repeat;
-            color: white;
-            padding: 100px 20px;
-            text-align: center;
-            min-height: 80vh;
-            display: flex;
+            width: 44px;
+            height: 44px;
             align-items: center;
             justify-content: center;
         }
         
-        /* Mobile Optimization */
+        /* Hero Section - Enhanced Clarity */
+        .hero-section {
+            background: url('https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767664105/ruanda-lake-kivu-aussicht_o95lpv.jpg') center center/cover no-repeat;
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(255, 152, 0, 0.1));
+            z-index: 1;
+        }
+        
+        .hero-section .container {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Page System */
+        .page { 
+            display: none; 
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+        .page.active { 
+            display: block; 
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Mobile Navigation - Production Ready */
         @media (max-width: 768px) {
             .hero-section {
                 padding: 80px 15px;
                 min-height: 70vh;
-                background-attachment: scroll !important;
+                background-attachment: scroll;
             }
             .main-nav {
                 padding: 10px 0;
@@ -173,72 +224,120 @@
                 margin-top: 60px;
             }
             .mobile-menu-btn {
-                display: block;
+                display: flex;
+                background: #2E7D32;
+                color: white;
+                border-radius: 8px;
+                border: none;
             }
+            
+            /* FIXED: Mobile Navigation - Professional */
             .nav-links {
                 position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: #1B5E20; /* Dark green background */
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
-                padding: 80px 20px 20px;
-                transform: translateX(100%);
+                background: linear-gradient(135deg, #1B5E20, #0d3b1a);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                padding: 100px 20px 40px;
+                transform: translateX(-100%);
                 opacity: 0;
                 visibility: hidden;
-                transition: all 0.3s ease;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 z-index: 1001;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 flex-direction: column;
+                overflow-y: auto;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             }
+            
+            .nav-links.active {
+                transform: translateX(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            
             .nav-links ul {
                 flex-direction: column;
                 gap: 0;
                 width: 100%;
-                max-width: 300px;
+                max-width: 320px;
+                padding: 0;
+                margin: 0;
             }
+            
             .nav-links li {
                 width: 100%;
-                margin-bottom: 5px;
+                margin: 0;
             }
+            
             .nav-link {
-                padding: 15px 20px;
-                border-radius: 8px;
-                display: block;
+                padding: 18px 24px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
                 width: 100%;
                 font-size: 1.1rem;
-                text-align: center;
-                color: white; /* White text */
-                transition: all 0.3s ease;
+                font-weight: 600;
+                text-align: left;
+                color: rgba(255, 255, 255, 0.95);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                gap: 16px;
+                text-decoration: none;
+                margin-bottom: 8px;
+                position: relative;
+                z-index: 1002;
             }
+            
+            .nav-link i {
+                font-size: 1.2rem;
+                width: 24px;
+                text-align: center;
+                color: #FF9800;
+                opacity: 0.9;
+            }
+            
             .nav-link:hover,
             .nav-link.active {
-                background: rgba(255, 255, 255, 0.1);
-                color: white;
-                transform: translateX(5px);
+                background: rgba(255, 255, 255, 0.15);
+                color: #fff;
+                border-color: rgba(255, 152, 0, 0.3);
+                transform: translateX(12px);
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             }
+            
+            .nav-link.active {
+                background: linear-gradient(135deg, #FF9800, #ff5722);
+                border-color: #FF9800;
+                color: white;
+                box-shadow: 0 4px 20px rgba(255, 152, 0, 0.4);
+            }
+            
+            /* Mobile menu animation delay for each item */
+            .nav-links.active li:nth-child(1) .nav-link { transition-delay: 0.1s; }
+            .nav-links.active li:nth-child(2) .nav-link { transition-delay: 0.15s; }
+            .nav-links.active li:nth-child(3) .nav-link { transition-delay: 0.2s; }
+            .nav-links.active li:nth-child(4) .nav-link { transition-delay: 0.25s; }
+            .nav-links.active li:nth-child(5) .nav-link { transition-delay: 0.3s; }
+            .nav-links.active li:nth-child(6) .nav-link { transition-delay: 0.35s; }
+            .nav-links.active li:nth-child(7) .nav-link { transition-delay: 0.4s; }
+            
             .nav-button-text {
                 display: none;
             }
+            
             .nav-buttons .btn {
                 padding: 10px 15px;
                 height: 44px;
                 font-size: 0.9rem;
-            }
-            .plan-trip-nav-btn {
-                width: 44px;
-                height: 44px;
-                padding: 0;
-                border-radius: 50%;
-                justify-content: center;
-            }
-            .plan-trip-nav-btn i {
-                margin: 0;
-                font-size: 1.2rem;
             }
         }
         
@@ -249,6 +348,16 @@
             }
             .logo {
                 font-size: 1.5rem;
+            }
+            .nav-links {
+                padding: 90px 15px 30px;
+            }
+            .nav-links ul {
+                max-width: 280px;
+            }
+            .nav-link {
+                padding: 16px 20px;
+                font-size: 1rem;
             }
         }
 
@@ -273,6 +382,9 @@
             align-items: center;
             min-height: 200px;
             width: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            grid-column: 1 / -1;
         }
     </style>
 </head>
@@ -281,33 +393,33 @@
     <header class="main-nav">
         <div class="nav-container">
             <!-- Logo -->
-            <a href="index.html" class="logo">
+            <a href="/" class="logo" onclick="GoTrip.navigateTo('home'); return false;">
                 <span>Go</span><span>Trip</span>
             </a>
             
-            <!-- Mobile Menu Toggle -->
-            <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle navigation menu">
+            <!-- Professional Mobile Menu Toggle -->
+            <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
                 <i class="fas fa-bars" id="menu-icon"></i>
             </button>
             
             <!-- Navigation Links -->
             <nav class="nav-links" id="nav-links">
                 <ul>
-                    <li><a href="index.html" class="nav-link active">Home</a></li>
-                    <li><a href="#destinations-page" class="nav-link" onclick="showPage('destinations'); return false;">Destinations</a></li>
-                    <li><a href="#guides-page" class="nav-link" onclick="showPage('guides'); return false;">Tour Guides</a></li>
-                    <li><a href="#translators-page" class="nav-link" onclick="showPage('translators'); return false;">Translators</a></li>
-                    <li><a href="#accommodations-page" class="nav-link" onclick="showPage('accommodations'); return false;">Accommodations</a></li>
-                    <li><a href="#blog-page" class="nav-link" onclick="showPage('blog'); return false;">Blog</a></li>
-                    <li><a href="#contact-page" class="nav-link" onclick="showPage('contact'); return false;">Contact</a></li>
+                    <li><a href="/" class="nav-link active" onclick="GoTrip.navigateTo('home'); return false;">Home</a></li>
+                    <li><a href="/destinations" class="nav-link" onclick="GoTrip.navigateTo('destinations'); return false;">Destinations</a></li>
+                    <li><a href="/guides" class="nav-link" onclick="GoTrip.navigateTo('guides'); return false;">Tour Guides</a></li>
+                    <li><a href="/translators" class="nav-link" onclick="GoTrip.navigateTo('translators'); return false;">Translators</a></li>
+                    <li><a href="/accommodations" class="nav-link" onclick="GoTrip.navigateTo('accommodations'); return false;">Accommodations</a></li>
+                    <li><a href="/blog" class="nav-link" onclick="GoTrip.navigateTo('blog'); return false;">Travel Insights</a></li>
+                    <li><a href="/contact" class="nav-link" onclick="GoTrip.navigateTo('contact'); return false;">Contact</a></li>
                 </ul>
             </nav>
             
             <!-- Desktop Navigation Buttons -->
             <div class="nav-buttons">
-                <button class="btn btn-primary plan-trip-nav-btn" onclick="showTripPlanningModal()">
+                <button class="btn btn-primary plan-trip-nav-btn" onclick="GoTrip.showTripPlanningModal()">
                     <i class="fas fa-map-marked-alt"></i>
-                    <span class="nav-button-text">Book Now</span>
+                    <span class="nav-button-text">Plan Your Trip</span>
                 </button>
             </div>
         </div>
@@ -319,49 +431,57 @@
         <section id="home-page" class="page active">
             <div class="hero-section">
                 <div class="container">
-                    <h1>Beautiful Rwanda</h1>
-                    <p class="hero-subtitle">Experience authentic culture, gorilla trekking, and luxury stays with GoTrip - Rwanda's premier tour operator.</p>
+                    <h1>Wonders of Rwanda</h1>
+                    <p class="hero-subtitle">Experience authentic culture, gorilla trekking, and luxury stays with Rwanda's premier tour operator. Expert guides, professional translators, and seamless travel planning.</p>
                     <div class="hero-buttons">
-                        <button class="btn btn-large plan-trip-hero-btn" onclick="showTripPlanningModal()">
-                            <i class="fas fa-map-marked-alt"></i> Plan Your Trip
+                        <button class="btn btn-large plan-trip-hero-btn" onclick="GoTrip.showTripPlanningModal()">
+                            <i class="fas fa-map-marked-alt"></i> Plan Your Rwanda Adventure
                         </button>
-                        <button class="btn btn-outline btn-large explore-destinations-btn" onclick="showPage('destinations')">
-                            <i class="fas fa-compass"></i> Destinations
+                        <button class="btn btn-outline btn-large explore-destinations-btn" onclick="GoTrip.navigateTo('destinations'); return false;">
+                            <i class="fas fa-compass"></i> Explore Destinations
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Features Section -->
+            <!-- Enhanced Features Section -->
             <div class="section">
                 <div class="container">
                     <div class="section-header">
-                        <h2>Why Choose GoTrip?</h2>
-                        <p>Experience Rwanda like never before with our premium services</p>
+                        <h2>Why Travel with GoTrip?</h2>
+                        <p>Experience Rwanda with premium services tailored to international travelers</p>
                     </div>
                     <div class="services-grid">
                         <div class="service-card">
                             <i class="fas fa-mountain service-icon"></i>
                             <h3>Gorilla Trekking</h3>
-                            <p>Experience the thrill of gorilla trekking in Volcanoes National Park with expert guides.</p>
-                            <button class="service-link" onclick="showPage('destinations')">
-                                Explore <i class="fas fa-arrow-right"></i>
+                            <p>Premium gorilla trekking experiences in Volcanoes National Park with guaranteed permits, expert trackers, and conservation-focused tours.</p>
+                            <button class="service-link" onclick="GoTrip.navigateTo('destinations'); return false;">
+                                Explore Gorilla Tours <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div class="service-card">
+                            <i class="fas fa-language service-icon"></i>
+                            <h3>Expert Translators</h3>
+                            <p>Professional multilingual translators for business meetings, cultural exchanges, medical consultations, and diplomatic engagements.</p>
+                            <button class="service-link" onclick="GoTrip.navigateTo('translators'); return false;">
+                                Meet Translators <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
                         <div class="service-card">
                             <i class="fas fa-user-tie service-icon"></i>
-                            <h3>Expert Guides</h3>
-                            <p>Knowledgeable local guides fluent in multiple languages for the best experience.</p>
-                            <button class="service-link" onclick="showPage('guides')">
+                            <h3>Tour Guides</h3>
+                            <p>Knowledgeable local guides fluent in multiple languages with specialized training in wildlife, history, and cultural interpretation.</p>
+                            <button class="service-link" onclick="GoTrip.navigateTo('guides'); return false;">
                                 Meet Guides <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
                         <div class="service-card">
                             <i class="fas fa-hotel service-icon"></i>
                             <h3>Luxury Stays</h3>
-                            <p>Comfortable accommodations from budget to luxury across Rwanda.</p>
-                            <button class="service-link" onclick="showPage('accommodations')">
-                                View Stays <i class="fas fa-arrow-right"></i>
+                            <p>Curated accommodations from boutique lodges to luxury resorts, vetted for quality, sustainability, and authentic Rwandan hospitality.</p>
+                            <button class="service-link" onclick="GoTrip.navigateTo('accommodations'); return false;">
+                                View Accommodations <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
                     </div>
@@ -372,12 +492,13 @@
             <div class="section bg-light">
                 <div class="container">
                     <div class="section-header">
-                        <h2>Popular Destinations</h2>
-                        <p>Explore Rwanda's most beautiful attractions</p>
+                        <h2>Featured Destinations</h2>
+                        <p>Explore Rwanda's most breathtaking attractions and experiences</p>
                     </div>
                     <div class="destinations-grid" id="destinations-section">
                         <div class="loading-container">
                             <div class="spinner"></div>
+                            <p class="loading-text">Loading destinations...</p>
                         </div>
                     </div>
                 </div>
@@ -389,7 +510,7 @@
             <div class="page-header">
                 <div class="container">
                     <h1><i class="fas fa-map-marked-alt"></i> Rwanda Destinations</h1>
-                    <p>Discover the breathtaking beauty of Rwanda's top attractions</p>
+                    <p>Discover the breathtaking beauty of Rwanda's national parks, cities, and cultural sites</p>
                 </div>
             </div>
             <div class="container">
@@ -397,6 +518,7 @@
                     <div class="destinations-grid-full" id="destinations-section-full">
                         <div class="loading-container">
                             <div class="spinner"></div>
+                            <p class="loading-text">Loading all destinations...</p>
                         </div>
                     </div>
                 </div>
@@ -407,8 +529,8 @@
         <section id="guides-page" class="page">
             <div class="page-header">
                 <div class="container">
-                    <h1><i class="fas fa-user-tie"></i> Expert Tour Guides</h1>
-                    <p>Meet our experienced guides for the perfect Rwanda experience</p>
+                    <h1><i class="fas fa-user-tie"></i> Professional Tour Guides</h1>
+                    <p>Meet our guides with deep knowledge of Rwanda's wildlife, culture, and history</p>
                 </div>
             </div>
             <div class="container">
@@ -416,6 +538,7 @@
                     <div class="guides-grid-full" id="guides-section-full">
                         <div class="loading-container">
                             <div class="spinner"></div>
+                            <p class="loading-text">Loading tour guides...</p>
                         </div>
                     </div>
                 </div>
@@ -427,7 +550,7 @@
             <div class="page-header">
                 <div class="container">
                     <h1><i class="fas fa-language"></i> Professional Translators</h1>
-                    <p>Connect with multilingual translators for seamless communication</p>
+                    <p>Connect with certified multilingual translators for business, medical, and cultural needs</p>
                 </div>
             </div>
             <div class="container">
@@ -435,6 +558,7 @@
                     <div class="translators-grid-full" id="translators-section-full">
                         <div class="loading-container">
                             <div class="spinner"></div>
+                            <p class="loading-text">Loading translators...</p>
                         </div>
                     </div>
                 </div>
@@ -445,8 +569,8 @@
         <section id="accommodations-page" class="page">
             <div class="page-header">
                 <div class="container">
-                    <h1><i class="fas fa-hotel"></i> Luxury Accommodations</h1>
-                    <p>Find the perfect place to stay across Rwanda</p>
+                    <h1><i class="fas fa-hotel"></i> Curated Accommodations</h1>
+                    <p>Find the perfect stay across Rwanda, from luxury lodges to sustainable eco-retreats</p>
                 </div>
             </div>
             <div class="container">
@@ -454,6 +578,7 @@
                     <div class="accommodations-grid-full" id="accommodations-section-full">
                         <div class="loading-container">
                             <div class="spinner"></div>
+                            <p class="loading-text">Loading accommodations...</p>
                         </div>
                     </div>
                 </div>
@@ -464,8 +589,8 @@
         <section id="blog-page" class="page">
             <div class="page-header">
                 <div class="container">
-                    <h1><i class="fas fa-newspaper"></i> Travel Blog</h1>
-                    <p>Latest travel tips, offers, and Rwanda tourism insights</p>
+                    <h1><i class="fas fa-newspaper"></i> Travel Insights</h1>
+                    <p>Expert advice, travel tips, and insights into Rwanda's tourism and culture</p>
                 </div>
             </div>
             <div class="container">
@@ -473,6 +598,7 @@
                     <div class="blog-grid-full" id="blog-section-full">
                         <div class="loading-container">
                             <div class="spinner"></div>
+                            <p class="loading-text">Loading blog posts...</p>
                         </div>
                     </div>
                 </div>
@@ -484,26 +610,26 @@
             <div class="page-header">
                 <div class="container">
                     <h1><i class="fas fa-envelope"></i> Contact Us</h1>
-                    <p>Get in touch with our travel experts for personalized assistance</p>
+                    <p>Get personalized assistance for your Rwanda travel plans</p>
                 </div>
             </div>
             <div class="container">
                 <div class="section">
                     <div class="contact-container">
                         <div class="contact-info">
-                            <h2>Get In Touch</h2>
+                            <h2>Contact Information</h2>
                             <div class="contact-item">
                                 <i class="fas fa-map-marker-alt"></i>
                                 <div>
-                                    <h3>Visit Our Office</h3>
-                                    <p>Kigali, Rwanda</p>
+                                    <h3>Head Office</h3>
+                                    <p>KN 5 Rd, Kigali, Rwanda</p>
                                 </div>
                             </div>
                             <div class="contact-item">
                                 <i class="fas fa-phone"></i>
                                 <div>
-                                    <h3>Call Us</h3>
-                                    <p>+250 787 407 051 (24/7 Support)</p>
+                                    <h3>24/7 Support</h3>
+                                    <p>+250 787 407 051 (Call/WhatsApp)</p>
                                 </div>
                             </div>
                             <div class="contact-item">
@@ -517,62 +643,72 @@
                                 <i class="fas fa-clock"></i>
                                 <div>
                                     <h3>Business Hours</h3>
-                                    <p>Monday-Friday: 8:00 AM - 6:00 PM<br>
-                                    Sunday: 9:00 AM - 4:00 PM<br>
-                                    Saturday: Closed</p>
+                                    <p>Monday-Friday: 8:00 AM - 6:00 PM CAT<br>
+                                    Sunday: 9:00 AM - 4:00 PM CAT<br>
+                                    Saturday: Emergency Support Only</p>
                                 </div>
                             </div>
                             
-                            <h3 class="social-title">Follow Us</h3>
+                            <h3 class="social-title">Follow Our Journey</h3>
                             <div class="contact-social">
-                                <a href="https://www.linkedin.com/in/patience-rutayisire/" class="social-icon linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                                <a href="https://www.linkedin.com/company/gotrip-rwanda" class="social-icon linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                                     <i class="fab fa-linkedin-in"></i>
-                                    <span>LinkedIn</span>
+                                    <span>Professional Network</span>
                                 </a>
-                                <a href="https://web.facebook.com/patience.rutayisire/" class="social-icon facebook" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                <a href="https://www.facebook.com/gotriprwanda" class="social-icon facebook" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                                     <i class="fab fa-facebook-f"></i>
-                                    <span>Facebook</span>
+                                    <span>Community</span>
                                 </a>
-                                <a href="https://x.com/0011111olen" class="social-icon twitter" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                                <a href="https://twitter.com/gotriprwanda" class="social-icon twitter" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
                                     <i class="fab fa-twitter"></i>
-                                    <span>X</span>
+                                    <span>Updates</span>
                                 </a>
-                                <a href="https://www.instagram.com/patierutayisire/" class="social-icon instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                                <a href="https://www.instagram.com/gotriprwanda" class="social-icon instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                                     <i class="fab fa-instagram"></i>
-                                    <span>Instagram</span>
+                                    <span>Visual Stories</span>
                                 </a>
-                                <a href="https://www.youtube.com/@adventurehillbound" class="social-icon youtube" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                                <a href="https://www.youtube.com/@gotriprwanda" class="social-icon youtube" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
                                     <i class="fab fa-youtube"></i>
-                                    <span>YouTube</span>
+                                    <span>Video Content</span>
                                 </a>
                                 <a href="https://wa.me/+250787407051" class="social-icon whatsapp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
                                     <i class="fab fa-whatsapp"></i>
-                                    <span>WhatsApp</span>
+                                    <span>Quick Chat</span>
                                 </a>
                             </div>
                         </div>
                         
                         <div class="contact-form-wrapper">
-                            <h2>Send Us a Message</h2>
+                            <h2>Send Inquiry</h2>
                             <form id="contact-form" class="contact-form">
                                 <div class="form-group">
                                     <label for="contact-name">Full Name *</label>
-                                    <input type="text" id="contact-name" name="name" required placeholder="Your full name">
+                                    <input type="text" id="contact-name" name="name" required placeholder="Enter your full name">
                                 </div>
                                 <div class="form-group">
                                     <label for="contact-email">Email Address *</label>
-                                    <input type="email" id="contact-email" name="email" required placeholder="Your email address">
+                                    <input type="email" id="contact-email" name="email" required placeholder="your.email@example.com">
                                 </div>
                                 <div class="form-group">
-                                    <label for="contact-subject">Subject *</label>
-                                    <input type="text" id="contact-subject" name="subject" required placeholder="Message subject">
+                                    <label for="contact-subject">Inquiry Type *</label>
+                                    <select id="contact-subject" name="subject" required>
+                                        <option value="">Select inquiry type</option>
+                                        <option value="Gorilla Trekking">Gorilla Trekking</option>
+                                        <option value="Safari Tours">Safari Tours</option>
+                                        <option value="Cultural Tours">Cultural Tours</option>
+                                        <option value="Guide Services">Guide Services</option>
+                                        <option value="Translation Services">Translation Services</option>
+                                        <option value="Accommodation">Accommodation</option>
+                                        <option value="Custom Itinerary">Custom Itinerary</option>
+                                        <option value="Other">Other</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="contact-message">Message *</label>
-                                    <textarea id="contact-message" name="message" required placeholder="Tell us how we can help you..." rows="6"></textarea>
+                                    <label for="contact-message">Your Inquiry *</label>
+                                    <textarea id="contact-message" name="message" required placeholder="Please provide details about your travel plans, dates, and any specific requirements..." rows="6"></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-large">
-                                    <i class="fas fa-paper-plane"></i> Send Message
+                                    <i class="fas fa-paper-plane"></i> Submit Inquiry
                                 </button>
                             </form>
                         </div>
@@ -582,78 +718,72 @@
         </section>
     </main>
 
-    <!-- Footer -->
+    <!-- Professional Footer -->
     <footer class="main-footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
                     <h3 class="footer-logo">
-                        <span>Go</span> <span class="logo-rwanda">Trip</span>
+                        <span>Go</span><span>Trip</span>
                     </h3>
-                    <p class="footer-description">Official tour operator specializing in gorilla trekking, Kigali tours, Lake Kivu resorts, and national park safaris.</p>
+                    <p class="footer-description">Rwanda's premier tour operator specializing in gorilla trekking, cultural experiences, luxury safaris, and professional translation services.</p>
                     
                     <div class="footer-contact">
-                        <p><i class="fas fa-map-marker-alt"></i>Kigali, Rwanda</p>
-                        <p><i class="fas fa-phone"></i> +250 787 407 051 (24/7)</p>
+                        <p><i class="fas fa-map-marker-alt"></i> KN 5 Rd, Kigali, Rwanda</p>
+                        <p><i class="fas fa-phone"></i> +250 787 407 051</p>
                         <p><i class="fas fa-envelope"></i> info@gotrip.africa</p>
-                        <p><i class="fas fa-clock"></i> Mon-Fri 8am-6pm, Sun 9am-4pm (CAT)</p>
+                        <p><i class="fas fa-clock"></i> Mon-Fri 8am-6pm CAT</p>
                     </div>
                     
                     <div class="footer-social">
-                        <h4>Connect With Us</h4>
+                        <h4>Connect</h4>
                         <div class="social-links">
-                            <a href="https://www.linkedin.com/in/patience-rutayisire/" class="social-link linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                            <a href="https://www.linkedin.com/company/gotrip-rwanda" class="social-link linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                                 <i class="fab fa-linkedin-in"></i>
                             </a>
-                            <a href="https://web.facebook.com/patience.rutayisire/" class="social-link facebook" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                            <a href="https://www.facebook.com/gotriprwanda" class="social-link facebook" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
-                            <a href="https://x.com/0011111olen" class="social-link twitter" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                            <a href="https://twitter.com/gotriprwanda" class="social-link twitter" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
                                 <i class="fab fa-twitter"></i>
                             </a>
-                            <a href="https://www.instagram.com/patierutayisire/" class="social-link instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                            <a href="https://www.instagram.com/gotriprwanda" class="social-link instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                                 <i class="fab fa-instagram"></i>
-                            </a>
-                            <a href="https://www.youtube.com/@adventurehillbound" class="social-link youtube" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-                                <i class="fab fa-youtube"></i>
-                            </a>
-                            <a href="https://wa.me/+250787407051" class="social-link whatsapp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-                                <i class="fab fa-whatsapp"></i>
                             </a>
                         </div>
                     </div>
                 </div>
                 
                 <div class="footer-column">
-                    <h4>Rwanda Destinations</h4>
+                    <h4>Destinations</h4>
                     <ul class="footer-links">
-                        <li><a href="#destinations-page" onclick="showPage('destinations'); return false;" aria-label="Gorilla Trekking"><i class="fas fa-mountain"></i> Gorilla Trekking</a></li>
-                        <li><a href="#destinations-page" onclick="showPage('destinations'); return false;" aria-label="Kigali City Tours"><i class="fas fa-city"></i> Kigali City Tours</a></li>
-                        <li><a href="#destinations-page" onclick="showPage('destinations'); return false;" aria-label="Lake Kivu Resorts"><i class="fas fa-water"></i> Lake Kivu Resorts</a></li>
-                        <li><a href="#destinations-page" onclick="showPage('destinations'); return false;" aria-label="Akagera Safari"><i class="fas fa-lion"></i> Akagera Safari</a></li>
-                        <li><a href="#destinations-page" onclick="showPage('destinations'); return false;" aria-label="Nyungwe Forest"><i class="fas fa-tree"></i> Nyungwe Forest</a></li>
+                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-mountain"></i> Volcanoes National Park</a></li>
+                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-tree"></i> Nyungwe Forest</a></li>
+                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-lion"></i> Akagera National Park</a></li>
+                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-water"></i> Lake Kivu</a></li>
+                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-city"></i> Kigali City</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-column">
-                    <h4>Our Services</h4>
+                    <h4>Services</h4>
                     <ul class="footer-links">
-                        <li><a href="#destinations-page" onclick="showPage('destinations'); return false;" aria-label="Destinations"><i class="fas fa-ticket-alt"></i> Destinations</a></li>
-                        <li><a href="#guides-page" onclick="showPage('guides'); return false;" aria-label="Tour Guides"><i class="fas fa-user-tie"></i> Tour Guides</a></li>
-                        <li><a href="#translators-page" onclick="showPage('translators'); return false;" aria-label="Translators"><i class="fas fa-language"></i> Translators</a></li>
-                        <li><a href="#accommodations-page" onclick="showPage('accommodations'); return false;" aria-label="Accommodations"><i class="fas fa-hotel"></i> Accommodations</a></li>
-                        <li><a href="#blog-page" onclick="showPage('blog'); return false;" aria-label="Blog"><i class="fas fa-newspaper"></i> Blog</a></li>
+                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-safari"></i> Gorilla Trekking</a></li>
+                        <li><a href="/guides" class="footer-link" onclick="GoTrip.navigateTo('guides'); return false;"><i class="fas fa-user-tie"></i> Tour Guides</a></li>
+                        <li><a href="/translators" class="footer-link" onclick="GoTrip.navigateTo('translators'); return false;"><i class="fas fa-language"></i> Translators</a></li>
+                        <li><a href="/accommodations" class="footer-link" onclick="GoTrip.navigateTo('accommodations'); return false;"><i class="fas fa-hotel"></i> Accommodations</a></li>
+                        <li><a href="/blog" class="footer-link" onclick="GoTrip.navigateTo('blog'); return false;"><i class="fas fa-newspaper"></i> Travel Resources</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-column">
-                    <h4>Travel Information</h4>
+                    <h4>Information</h4>
                     <ul class="footer-links">
-                        <li><a href="#blog-page" onclick="showPage('blog'); return false;" aria-label="Best Time to Visit"><i class="fas fa-calendar-alt"></i> Best Time to Visit</a></li>
-                        <li><a href="#blog-page" onclick="showPage('blog'); return false;" aria-label="What to Pack"><i class="fas fa-suitcase"></i> What to Pack</a></li>
-                        <li><a href="#blog-page" onclick="showPage('blog'); return false;" aria-label="Health & Safety"><i class="fas fa-shield-alt"></i> Health & Safety</a></li>
-                        <li><a href="#blog-page" onclick="showPage('blog'); return false;" aria-label="Rwanda Culture Guide"><i class="fas fa-theater-masks"></i> Rwanda Culture Guide</a></li>
-                        <li><a href="#blog-page" onclick="showPage('blog'); return false;" aria-label="Travel Tips"><i class="fas fa-lightbulb"></i> Travel Tips</a></li>
+                        <li><a href="/blog" class="footer-link" onclick="GoTrip.navigateTo('blog'); return false;"><i class="fas fa-calendar-alt"></i> Best Time to Visit</a></li>
+                        <li><a href="/blog" class="footer-link" onclick="GoTrip.navigateTo('blog'); return false;"><i class="fas fa-passport"></i> Visa Requirements</a></li>
+                        <li><a href="/blog" class="footer-link" onclick="GoTrip.navigateTo('blog'); return false;"><i class="fas fa-syringe"></i> Health & Safety</a></li>
+                        <li><a href="/blog" class="footer-link" onclick="GoTrip.navigateTo('blog'); return false;"><i class="fas fa-dollar-sign"></i> Pricing Guide</a></li>
+                        <li><a href="/blog" class="footer-link" onclick="GoTrip.navigateTo('blog'); return false;"><i class="fas fa-question-circle"></i> FAQ</a></li>
                     </ul>
                 </div>
             </div>
@@ -661,14 +791,10 @@
             <div class="footer-bottom">
                 <p>&copy; <span id="current-year">2026</span> GoTrip. All rights reserved.</p>
                 <ul class="footer-legal">
-                    <li><button class="footer-link" onclick="showPrivacyModal()">Privacy Policy</button></li>
-                    <li><button class="footer-link" onclick="showTermsModal()">Terms of Service</button></li>
-                    <li><a href="sitemap.xml" class="footer-link">Sitemap</a></li>
-                </ul>
-                
-                <div class="footer-badges">                    
-                    <span class="badge">24/7 Customer Support</span>
-                </div>
+                    <li><button class="footer-link" onclick="GoTrip.showNotification('Privacy Policy document is being updated. Will be available soon.', 'info')">Privacy Policy</button></li>
+                    <li><button class="footer-link" onclick="GoTrip.showNotification('Terms of Service document is being updated. Will be available soon.', 'info')">Terms of Service</button></li>
+                    <li><button class="footer-link" onclick="GoTrip.showNotification('Cookie Policy information will be available soon.', 'info')">Cookie Policy</button></li>
+                </ul>             
             </div>
         </div>
     </footer>
