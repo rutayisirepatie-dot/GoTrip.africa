@@ -156,7 +156,6 @@
             justify-content: center;
             position: relative;
         }
-        
         .hero-section::before {
             content: '';
             position: absolute;
@@ -167,14 +166,12 @@
             background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(255, 152, 0, 0.1));
             z-index: 1;
         }
-        
         .hero-section .container {
             position: relative;
             z-index: 2;
             max-width: 900px;
             animation: fadeInUp 1s ease-out;
         }
-        
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -186,6 +183,24 @@
             }
         }
         
+        /* Hero Text Separation */
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 3.75rem);
+            margin-bottom: 1rem;
+            color: white;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+        .hero-subtitle {
+            font-size: clamp(1.125rem, 2vw, 1.5rem);
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
         /* Page System */
         .page { 
             display: none; 
@@ -195,7 +210,6 @@
         .page.active { 
             display: block; 
         }
-        
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -231,7 +245,7 @@
                 border: none;
             }
             
-            /* FIXED: Mobile Navigation - Professional */
+            /* Fixed Mobile Navigation */
             .nav-links {
                 position: fixed;
                 top: 0;
@@ -254,13 +268,11 @@
                 overflow-y: auto;
                 box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             }
-            
             .nav-links.active {
                 transform: translateX(0);
                 opacity: 1;
                 visibility: visible;
             }
-            
             .nav-links ul {
                 flex-direction: column;
                 gap: 0;
@@ -269,12 +281,10 @@
                 padding: 0;
                 margin: 0;
             }
-            
             .nav-links li {
                 width: 100%;
                 margin: 0;
             }
-            
             .nav-link {
                 padding: 18px 24px;
                 border-radius: 12px;
@@ -296,7 +306,6 @@
                 position: relative;
                 z-index: 1002;
             }
-            
             .nav-link i {
                 font-size: 1.2rem;
                 width: 24px;
@@ -304,7 +313,6 @@
                 color: #FF9800;
                 opacity: 0.9;
             }
-            
             .nav-link:hover,
             .nav-link.active {
                 background: rgba(255, 255, 255, 0.15);
@@ -313,7 +321,6 @@
                 transform: translateX(12px);
                 box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             }
-            
             .nav-link.active {
                 background: linear-gradient(135deg, #FF9800, #ff5722);
                 border-color: #FF9800;
@@ -333,7 +340,6 @@
             .nav-button-text {
                 display: none;
             }
-            
             .nav-buttons .btn {
                 padding: 10px 15px;
                 height: 44px;
@@ -370,12 +376,10 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
         .loading-container {
             display: flex;
             justify-content: center;
@@ -431,7 +435,7 @@
         <section id="home-page" class="page active">
             <div class="hero-section">
                 <div class="container">
-                    <h1>Wonders of Rwanda</h1>
+                    <h1 class="hero-title">Wonders of Rwanda</h1>
                     <p class="hero-subtitle">Experience authentic culture, gorilla trekking, and luxury stays with Rwanda's premier tour operator. Expert guides, professional translators, and seamless travel planning.</p>
                     <div class="hero-buttons">
                         <button class="btn btn-large plan-trip-hero-btn" onclick="GoTrip.showTripPlanningModal()">

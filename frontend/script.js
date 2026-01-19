@@ -239,7 +239,7 @@
                 mainImage: 'https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767654351/one-and-only-kinigi_sgleyo.jpg',
                 available: true,
                 contactPhone: '+250787407051',
-                contactEmail: 'reservations@oneandonlygorillasnest.com',
+                contactEmail: 'info@gotrip.africa',
                 maxGuests: 2,
                 sustainability: 'Carbon-neutral operations, solar-powered, supports local communities'
             },
@@ -263,7 +263,7 @@
                 mainImage: 'https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767664108/Marriott-Hotel-Kigali-Rwanda-Safaris_8__Tett-Safaris_v78edy.webp',
                 available: true,
                 contactPhone: '+250787407051',
-                contactEmail: 'reservations@marriottkigali.com',
+                contactEmail: 'info@gotrip.africa',
                 maxGuests: 4,
                 sustainability: 'LEED-certified building, water recycling system, local employment focus'
             },
@@ -287,7 +287,7 @@
                 mainImage: 'https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767654350/one-only-nyungwe-house_oezq87.jpg',
                 available: true,
                 contactPhone: '+250787407051',
-                contactEmail: 'stay@nyungwehouse.com',
+                contactEmail: 'info@gotrip.africa',
                 maxGuests: 3,
                 sustainability: 'Solar-powered, rainwater harvesting, supports forest conservation'
             },
@@ -311,7 +311,7 @@
                 mainImage: 'https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767654353/aeriel-view-serena_cuohuj.jpg',
                 available: true,
                 contactPhone: '+250787407051',
-                contactEmail: 'reservations@serenakivu.com',
+                contactEmail: 'info@gotrip.africa',
                 maxGuests: 4,
                 sustainability: 'Waste management program, local community engagement, eco-friendly practices'
             },
@@ -335,7 +335,7 @@
                 mainImage: 'https://res.cloudinary.com/dxbmyqrtn/image/upload/v1768349192/Akagera-Game-Lodge-Terrasse-upstairs-113-min_rofnsc.jpg',
                 available: true,
                 contactPhone: '+250787407051',
-                contactEmail: 'bookings@akageralodge.com',
+                contactEmail: 'info@gotrip.africa',
                 maxGuests: 3,
                 sustainability: 'Supports park conservation, employs local guides, eco-friendly operations'
             },
@@ -359,7 +359,7 @@
                 mainImage: 'https://res.cloudinary.com/dxbmyqrtn/image/upload/v1768349335/facade_fc6shj.jpg',
                 available: true,
                 contactPhone: '+250787407051',
-                contactEmail: 'reservations@ubumwegrande.com',
+                contactEmail: 'info@gotrip.africa',
                 maxGuests: 2,
                 sustainability: 'Energy-efficient systems, local procurement policy, community partnerships'
             }
