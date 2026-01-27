@@ -1,109 +1,150 @@
 import mongoose from 'mongoose';
 
-const bookingSchema = new mongoose.Schema(
-  {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: [true, "User is required"]
+const bookingSchema = new mongoose.Schema({
+  bookingId: {
+    type: String,
+    required: [true, 'Booking ID is required'],
+    unique: true,
+    index: true
+  },
+  customer: {
+    fullName: {
+      type: String,
+      required: [true, 'Full name is required']
     },
-    destination: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Destination',
-      required: [true, "Destination is required"]
+    email: {
+      type: String,
+      required: [true, 'Email is required'],
+      lowercase: true
     },
-    guide: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Guide',
-      required: [true, "Guide is required"]
+    phone: {
+      type: String,
+      required: [true, 'Phone is required']
     },
-    checkIn: {
+    country: String,
+    address: String
+  },
+  bookingType: {
+    type: String,
+    required: [true, 'Booking type is required'],
+    enum: ['destination', 'accommodation', 'guide', 'translator', 'package']
+  },
+  itemId: {
+    type: String,
+    required: [true, 'Item ID is required']
+  },
+  itemName: {
+    type: String,
+    required: [true, 'Item name is required']
+  },
+  dates: {
+    startDate: {
       type: Date,
-      required: [true, "Check-in date is required"]
+      required: [true, 'Start date is required']
     },
-    checkOut: {
+    endDate: {
       type: Date,
-      required: [true, "Check-out date is required"]
+      required: [true, 'End date is required']
     },
-    numberOfPeople: {
+    duration: Number
+  },
+  guests: {
+    adults: {
       type: Number,
-      required: [true, "Number of people is required"],
-      min: [1, "At least 1 person is required"],
-      max: [20, "Maximum 20 people allowed"]
+      required: true,
+      min: 1
     },
+    children: {
+      type: Number,
+      default: 0
+    },
+    infants: {
+      type: Number,
+      default: 0
+    },
+    total: Number
+  },
+  services: [{
+    name: String,
+    price: Number,
+    quantity: Number,
+    total: Number
+  }],
+  pricing: {
+    subtotal: Number,
+    taxes: Number,
+    fees: Number,
+    discount: Number,
     totalAmount: {
       type: Number,
-      required: [true, "Total amount is required"],
-      min: [0, "Amount cannot be negative"]
+      required: true
     },
-    status: {
+    currency: {
       type: String,
-      enum: ["pending", "confirmed", "cancelled", "completed"],
-      default: "pending"
+      default: 'USD'
     },
-    paymentStatus: {
-      type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
-      default: "pending"
-    },
-    specialRequests: {
-      type: String,
-      maxlength: [500, "Special requests cannot exceed 500 characters"]
-    },
-    bookingDate: {
-      type: Date,
-      default: Date.now
-    },
-    paymentMethod: {
-      type: String,
-      enum: ["credit_card", "paypal", "bank_transfer", "mobile_money"],
-      default: "credit_card"
-    },
-    transactionId: {
-      type: String
-    },
-    isActive: {
+    depositAmount: Number,
+    depositPaid: {
       type: Boolean,
-      default: true
+      default: false
     }
   },
-  {
-    timestamps: true,
-    collection: 'bookings',
-    toJSON: {
-      virtuals: true,
-      transform: function (doc, ret) {
-        delete ret._id;
-        delete ret.__v;
-        ret.id = doc._id.toString();
-        return ret;
-      }
-    }
+  payment: {
+    method: String,
+    status: {
+      type: String,
+      default: 'pending',
+      enum: ['pending', 'processing', 'completed', 'failed', 'refunded']
+    },
+    transactionId: String,
+    paymentDate: Date
+  },
+  status: {
+    type: String,
+    default: 'pending',
+    enum: ['pending', 'confirmed', 'completed', 'cancelled', 'refunded'],
+    index: true
+  },
+  specialRequests: String,
+  notes: String,
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    index: true
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
-);
-
-// Virtual for duration in days
-bookingSchema.virtual('durationDays').get(function () {
-  if (!this.checkIn || !this.checkOut) return 0;
-  const diffTime = Math.abs(this.checkOut - this.checkIn);
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}, {
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
-// Virtual for formatted amount
-bookingSchema.virtual('formattedAmount').get(function () {
-  return `$${this.totalAmount?.toFixed(2) || '0.00'}`;
+// Generate booking ID before saving
+bookingSchema.pre('save', function(next) {
+  if (!this.bookingId) {
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).substr(2, 5);
+    this.bookingId = `GT${timestamp}${random}`.toUpperCase();
+  }
+  
+  // Calculate total guests
+  if (this.guests) {
+    this.guests.total = (this.guests.adults || 0) + (this.guests.children || 0) + (this.guests.infants || 0);
+  }
+  
+  next();
 });
 
 // Indexes
-bookingSchema.index({ user: 1 });
-bookingSchema.index({ destination: 1 });
-bookingSchema.index({ guide: 1 });
-bookingSchema.index({ status: 1 });
-bookingSchema.index({ paymentStatus: 1 });
-bookingSchema.index({ bookingDate: -1 });
-bookingSchema.index({ checkIn: 1 });
-bookingSchema.index({ checkOut: 1 });
+bookingSchema.index({ bookingId: 1 });
+bookingSchema.index({ 'customer.email': 1 });
+bookingSchema.index({ status: 1, createdAt: -1 });
+bookingSchema.index({ 'dates.startDate': 1 });
+bookingSchema.index({ bookingType: 1, itemId: 1 });
 
-const Booking = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
+const Booking = mongoose.model('Booking', bookingSchema);
 
 export default Booking;

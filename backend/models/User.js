@@ -1,96 +1,61 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const userSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, "Name is required"],
-      trim: true
-    },
-    email: {
-      type: String,
-      required: [true, "Email is required"],
-      unique: true,
-      lowercase: true,
-      validate: {
-        validator: function (v) {
-          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-        },
-        message: "Invalid email address"
-      }
-    },
-    password: {
-      type: String,
-      required: [true, "Password is required"],
-      minlength: [6, "Password must be at least 6 characters"]
-    },
-    phone: {
-      type: String,
-      required: [true, "Phone number is required"]
-    },
-    country: {
-      type: String,
-      required: [true, "Country is required"]
-    },
-    city: {
-      type: String
-    },
-    role: {
-      type: String,
-      enum: ["user", "premium", "admin"], // Fixed enum values
-      default: "user"
-    },
-    preferences: {
-      language: {
-        type: String,
-        enum: ["en", "fr", "rw", "sw"], // Language codes instead of full names
-        default: "en"
-      },
-      notifications: {
-        type: Boolean,
-        default: true
-      },
-      currency: {
-        type: String,
-        enum: ["USD", "EUR", "GBP", "RWF"],
-        default: "USD"
-      }
-    },
-    profileImage: {
-      type: String,
-      default: ""
-    },
-    isVerified: {
-      type: Boolean,
-      default: false
-    },
-    isActive: {
-      type: Boolean,
-      default: true
-    },
-    lastLogin: {
-      type: Date
-    }
+const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: [true, 'Username is required'],
+    unique: true,
+    trim: true,
+    lowercase: true
   },
-  {
-    timestamps: true,
-    collection: 'users',
-    toJSON: {
-      virtuals: true,
-      transform: function (doc, ret) {
-        delete ret._id;
-        delete ret.__v;
-        delete ret.password;
-        ret.id = doc._id.toString();
-        return ret;
-      }
+  email: {
+    type: String,
+    required: [true, 'Email is required'],
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    minlength: [6, 'Password must be at least 6 characters']
+  },
+  role: {
+    type: String,
+    default: 'admin',
+    enum: ['admin', 'editor', 'viewer']
+  },
+  name: {
+    type: String,
+    required: [true, 'Name is required']
+  },
+  avatar: String,
+  lastLogin: Date,
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
+}, {
+  timestamps: true,
+  toJSON: {
+    transform: function(doc, ret) {
+      delete ret.password;
+      return ret;
     }
   }
-);
+});
 
 // Hash password before saving
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
   try {
@@ -103,21 +68,15 @@ userSchema.pre('save', async function (next) {
 });
 
 // Method to compare password
-userSchema.methods.comparePassword = async function (candidatePassword) {
+userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Virtual for formatted name
-userSchema.virtual('displayName').get(function () {
-  return this.name;
-});
-
 // Indexes
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ role: 1 });
-userSchema.index({ country: 1 });
-userSchema.index({ isActive: 1 });
+userSchema.index({ username: 1 });
+userSchema.index({ email: 1 });
+userSchema.index({ role: 1, isActive: 1 });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
 
 export default User;

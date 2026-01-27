@@ -1,74 +1,191 @@
 import mongoose from 'mongoose';
 
-const languageDetailSchema = new mongoose.Schema({
-  language: { type: String, required: true },
-  level: { type: String, enum: ['Native', 'Fluent', 'Advanced', 'Intermediate', 'Basic'] },
-  fluency: { type: Number, min: 0, max: 100 }
-});
-
-const availabilitySchema = new mongoose.Schema({
-  monday: { type: Boolean, default: true },
-  tuesday: { type: Boolean, default: true },
-  wednesday: { type: Boolean, default: true },
-  thursday: { type: Boolean, default: true },
-  friday: { type: Boolean, default: true },
-  saturday: { type: Boolean, default: false },
-  sunday: { type: Boolean, default: false }
-});
-
 const translatorSchema = new mongoose.Schema({
-  _id: { type: String, required: true },
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  phone: { type: String, required: true },
-  country: { type: String, default: 'Rwanda' },
-  city: { type: String },
-  languages: [{ type: String }],
-  dailyRate: { type: Number, required: true },
-  experienceYears: { type: Number, min: 0 },
-  bio: { type: String },
-  description: { type: String, required: true },
-  rating: { type: Number, min: 0, max: 5, default: 0 },
-  available: { type: Boolean, default: true },
-  specializations: [{ type: String }],
-  image: { type: String },
-  certifications: [{ type: String }],
-  services: [{ type: String }],
-  equipment: [{ type: String }],
-  education: [{ type: String }],
-  languagesDetail: [languageDetailSchema],
-  industries: [{ type: String }],
-  availability: availabilitySchema,
-  createdAt: { type: Date, default: Date.now }
+  name: {
+    type: String,
+    required: [true, 'Translator name is required'],
+    trim: true,
+    index: true
+  },
+  slug: {
+    type: String,
+    unique: true,
+    lowercase: true,
+    index: true
+  },
+  title: {
+    type: String,
+    required: [true, 'Title is required']
+  },
+  email: {
+    type: String,
+    required: [true, 'Email is required'],
+    unique: true,
+    lowercase: true
+  },
+  phone: {
+    type: String,
+    required: [true, 'Phone is required']
+  },
+  whatsapp: String,
+  country: {
+    type: String,
+    default: 'Rwanda'
+  },
+  city: {
+    type: String,
+    default: 'Kigali'
+  },
+  address: String,
+  biography: {
+    type: String,
+    required: [true, 'Biography is required']
+  },
+  detailedBio: String,
+  languages: [{
+    language: String,
+    level: String,
+    flag: String,
+    certification: String,
+    speaking: Number,
+    reading: Number,
+    writing: Number,
+    translation: String,
+    interpretation: String,
+    years: mongoose.Schema.Types.Mixed
+  }],
+  experienceYears: {
+    type: Number,
+    required: [true, 'Experience years is required']
+  },
+  totalProjects: {
+    type: Number,
+    default: 0
+  },
+  rating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5
+  },
+  totalReviews: {
+    type: Number,
+    default: 0
+  },
+  dailyRate: {
+    type: Number,
+    required: [true, 'Daily rate is required']
+  },
+  currency: {
+    type: String,
+    default: 'USD'
+  },
+  hourlyRate: Number,
+  minimumHours: {
+    type: Number,
+    default: 4
+  },
+  image: {
+    type: String,
+    required: [true, 'Image is required']
+  },
+  gallery: [String],
+  certifications: [{
+    name: String,
+    issuingAuthority: String,
+    year: Number,
+    validUntil: String
+  }],
+  education: [{
+    degree: String,
+    institution: String,
+    year: Number,
+    field: String
+  }],
+  specialties: [{
+    name: String,
+    level: String,
+    years: Number,
+    description: String
+  }],
+  translationServices: [String],
+  industriesServed: [String],
+  notableProjects: [{
+    name: String,
+    year: Number,
+    client: String,
+    description: String
+  }],
+  available: {
+    type: Boolean,
+    default: true,
+    index: true
+  },
+  featured: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  instantBooking: {
+    type: Boolean,
+    default: false
+  },
+  responseRate: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
+  },
+  responseTime: String,
+  workingHours: mongoose.Schema.Types.Mixed,
+  equipment: [String],
+  serviceAreas: [String],
+  pricing: mongoose.Schema.Types.Mixed,
+  reviewSummary: mongoose.Schema.Types.Mixed,
+  recentReviews: [{
+    clientName: String,
+    country: String,
+    rating: Number,
+    date: Date,
+    comment: String,
+    service: String
+  }],
+  socialMedia: mongoose.Schema.Types.Mixed,
+  tags: [String],
+  metaTitle: String,
+  metaDescription: String,
+  metaKeywords: [String],
+  views: {
+    type: Number,
+    default: 0
+  },
+  bookings: {
+    type: Number,
+    default: 0
+  },
+  availability: mongoose.Schema.Types.Mixed,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
 }, {
   timestamps: true,
-  toJSON: { virtuals: true }
-});
-
-// Virtual for total languages
-translatorSchema.virtual('totalLanguages').get(function() {
-  return this.languages.length;
-});
-
-// Virtual for formatted rate
-translatorSchema.virtual('formattedRate').get(function() {
-  return `$${this.dailyRate}/day`;
-});
-
-// Virtual for experience level
-translatorSchema.virtual('experienceLevel').get(function() {
-  if (this.experienceYears >= 10) return 'Expert';
-  if (this.experienceYears >= 5) return 'Senior';
-  if (this.experienceYears >= 2) return 'Intermediate';
-  return 'Junior';
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 // Indexes
+translatorSchema.index({ slug: 1, available: 1 });
+translatorSchema.index({ available: 1, featured: 1 });
 translatorSchema.index({ rating: -1 });
-translatorSchema.index({ dailyRate: 1 });
-translatorSchema.index({ specializations: 1 });
-translatorSchema.index({ languages: 1 });
-translatorSchema.index({ available: 1 });
+translatorSchema.index({ 'languages.language': 1 });
+translatorSchema.index({ translationServices: 1 });
+translatorSchema.index({ tags: 1 });
 
 const Translator = mongoose.model('Translator', translatorSchema);
+
 export default Translator;

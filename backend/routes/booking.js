@@ -1,199 +1,112 @@
-// backend/routes/booking.js
 import express from 'express';
-import { Booking } from '../models/index.js';
-import { authenticateToken, authorizeAdmin } from '../middleware/auth.js';
+import Booking from '../models/Booking.js';
 
 const router = express.Router();
 
-// ======================
-// CREATE BOOKING (any authenticated user)
-// ======================
-router.post('/', authenticateToken, async (req, res) => {
+// POST create booking
+router.post('/', async (req, res) => {
   try {
-    const {
-      service_type,
-      service_id,
-      service_name,
-      date,
-      duration,
-      travelers,
-      total_amount,
-      notes
-    } = req.body;
-
+    const bookingData = req.body;
+    
     // Validate required fields
-    if (!service_type || !service_name) {
+    if (!bookingData.customer || !bookingData.customer.fullName || !bookingData.customer.email) {
       return res.status(400).json({
         success: false,
-        message: 'service_type and service_name are required'
+        message: 'Customer name and email are required'
       });
     }
 
-    const bookingDate = new Date(date);
-    if (isNaN(bookingDate.getTime())) {
-      return res.status(400).json({ success: false, message: 'Invalid date' });
+    if (!bookingData.dates || !bookingData.dates.startDate || !bookingData.dates.endDate) {
+      return res.status(400).json({
+        success: false,
+        message: 'Start and end dates are required'
+      });
     }
 
-    const durationNum = parseInt(duration);
-    if (isNaN(durationNum) || durationNum <= 0) {
-      return res.status(400).json({ success: false, message: 'Invalid duration' });
+    if (!bookingData.pricing || !bookingData.pricing.totalAmount) {
+      return res.status(400).json({
+        success: false,
+        message: 'Pricing information is required'
+      });
     }
 
-    const travelersNum = parseInt(travelers);
-    if (isNaN(travelersNum) || travelersNum <= 0) {
-      return res.status(400).json({ success: false, message: 'Invalid travelers number' });
+    // Calculate duration if not provided
+    if (!bookingData.dates.duration) {
+      const start = new Date(bookingData.dates.startDate);
+      const end = new Date(bookingData.dates.endDate);
+      const duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+      bookingData.dates.duration = duration;
     }
 
-    const totalAmountNum = parseFloat(total_amount);
-    if (isNaN(totalAmountNum) || totalAmountNum <= 0) {
-      return res.status(400).json({ success: false, message: 'Invalid totalAmount' });
-    }
-
-    // Generate booking reference
-    const bookingReference = `BOOK-${Date.now().toString().slice(-6)}`;
-
-    const booking = new Booking({
-      user: req.user._id,
-      userName: req.user.name,
-      userEmail: req.user.email,
-      serviceType: service_type,
-      serviceId: service_id,
-      serviceName: service_name,
-      bookingReference,
-      date: bookingDate,
-      duration: durationNum,
-      travelers: travelersNum,
-      totalAmount: totalAmountNum,
-      notes,
-      status: 'pending',
-      paymentStatus: 'pending'
-    });
-
+    const booking = new Booking(bookingData);
     await booking.save();
 
     res.status(201).json({
       success: true,
       message: 'Booking created successfully',
+      data: {
+        bookingId: booking.bookingId,
+        customer: booking.customer,
+        dates: booking.dates,
+        pricing: booking.pricing,
+        status: booking.status
+      }
+    });
+  } catch (error) {
+    console.error('❌ Create booking error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create booking'
+    });
+  }
+});
+
+// GET booking by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const booking = await Booking.findOne({ bookingId: req.params.id });
+    
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+
+    res.json({
+      success: true,
       data: booking
     });
   } catch (error) {
-    console.error('Create booking error:', error);
+    console.error('❌ Get booking error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create booking',
-      error: error.message
+      message: 'Failed to fetch booking'
     });
   }
 });
 
-// ======================
-// GET ALL BOOKINGS (ADMIN ONLY)
-// ======================
-router.get('/', authenticateToken, authorizeAdmin, async (req, res) => {
+// GET bookings by email
+router.get('/customer/:email', async (req, res) => {
   try {
-    const bookings = await Booking.find().sort({ date: -1 });
-    res.json({ success: true, data: bookings });
-  } catch (error) {
-    console.error('Get bookings error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch bookings', error: error.message });
-  }
-});
+    const bookings = await Booking.find({ 
+      'customer.email': req.params.email 
+    })
+    .sort('-createdAt')
+    .select('-__v')
+    .lean();
 
-// ======================
-// GET USER BOOKINGS
-// ======================
-router.get('/my', authenticateToken, async (req, res) => {
-  try {
-    const bookings = await Booking.find({ user: req.user._id }).sort({ date: -1 });
-    res.json({ success: true, data: bookings });
-  } catch (error) {
-    console.error('Get user bookings error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch bookings', error: error.message });
-  }
-});
-
-// ======================
-// UPDATE BOOKING STATUS (ADMIN ONLY)
-// ======================
-router.put('/:id/status', authenticateToken, authorizeAdmin, async (req, res) => {
-  try {
-    const { status } = req.body;
-    const booking = await Booking.findById(req.params.id);
-
-    if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
-
-    booking.status = status;
-    await booking.save();
-
-    res.json({ success: true, message: 'Booking status updated', data: booking });
-  } catch (error) {
-    console.error('Update booking status error:', error);
-    res.status(500).json({ success: false, message: 'Failed to update booking', error: error.message });
-  }
-});
-
-// ======================
-// UPDATE BOOKING (USER OR ADMIN)
-// ======================
-router.put('/:id', authenticateToken, async (req, res) => {
-  try {
-    const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
-
-    // Allow admin or booking owner to update
-    if (booking.user.toString() !== req.user._id.toString() && !req.user.isAdmin) {
-      return res.status(403).json({ success: false, message: 'Not authorized to update this booking' });
-    }
-
-    // Validate and update allowed fields
-    const allowedFields = ['serviceType', 'serviceId', 'serviceName', 'date', 'duration', 'travelers', 'totalAmount', 'notes', 'status', 'paymentStatus'];
-    allowedFields.forEach(field => {
-      if (req.body[field] !== undefined) {
-        // Additional validation
-        if (field === 'date') {
-          const dateValue = new Date(req.body[field]);
-          if (isNaN(dateValue.getTime())) throw new Error('Invalid date');
-          booking[field] = dateValue;
-        } else if (field === 'duration' || field === 'travelers') {
-          const num = parseInt(req.body[field]);
-          if (isNaN(num) || num <= 0) throw new Error(`Invalid ${field}`);
-          booking[field] = num;
-        } else if (field === 'totalAmount') {
-          const num = parseFloat(req.body[field]);
-          if (isNaN(num) || num <= 0) throw new Error('Invalid totalAmount');
-          booking[field] = num;
-        } else {
-          booking[field] = req.body[field];
-        }
-      }
+    res.json({
+      success: true,
+      count: bookings.length,
+      data: bookings
     });
-
-    await booking.save();
-    res.json({ success: true, message: 'Booking updated successfully', data: booking });
   } catch (error) {
-    console.error('Update booking error:', error);
-    res.status(500).json({ success: false, message: 'Failed to update booking', error: error.message });
-  }
-});
-
-// ======================
-// DELETE BOOKING (USER OR ADMIN)
-// ======================
-router.delete('/:id', authenticateToken, async (req, res) => {
-  try {
-    const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
-
-    // Allow admin or booking owner to delete
-    if (booking.user.toString() !== req.user._id.toString() && !req.user.isAdmin) {
-      return res.status(403).json({ success: false, message: 'Not authorized to delete this booking' });
-    }
-
-    await booking.remove();
-    res.json({ success: true, message: 'Booking deleted successfully' });
-  } catch (error) {
-    console.error('Delete booking error:', error);
-    res.status(500).json({ success: false, message: 'Failed to delete booking', error: error.message });
+    console.error('❌ Get bookings by email error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch bookings'
+    });
   }
 });
 

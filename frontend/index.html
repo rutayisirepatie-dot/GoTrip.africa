@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Enhanced SEO Meta Tags -->
-    <title>GoTrip | Official Rwanda Tour Operator - Gorilla Trekking & Luxury Safaris</title>
+    <title>GoTrip | Official Tour Operator - Gorilla Trekking & Luxury Safaris</title>
     <meta name="description" content="Official Rwanda tour operator for gorilla trekking, Kigali city tours, Lake Kivu resorts, Akagera safaris. Book authentic Rwandan cultural experiences with expert guides and translators.">
     <meta name="keywords" content="Rwanda gorilla trekking, Rwanda tours, Kigali travel, Lake Kivu resorts, Akagera National Park, Nyungwe Forest, Rwanda safari, Volcanoes National Park, Rwanda tour guides, translators Rwanda">
     <meta name="author" content="GoTrip Rwanda">
@@ -19,16 +19,16 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://gotrip.africa/">
-    <meta property="og:title" content="GoTrip | Premium Rwanda Tour Operator">
-    <meta property="og:description" content="Official Rwanda tour operator for gorilla trekking, Kigali city tours, Lake Kivu resorts, Akagera safaris with expert guides and translators.">
-    <meta property="og:image" content="https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767664105/ruanda-lake-kivu-aussicht_o95lpv.jpg">
+    <meta property="og:title" content="GoTrip | Premium Tour Operator">
+    <meta property="og:description" content="Official tour operator for gorilla trekking, city tours, Lake resorts, safaris with expert guides and translators.">
+    <meta property="og:image" content="https://res.cloudinary.com/dxbmyqrtn/image/upload/v1769521228/banner_pro1_z4lkbz.png">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://gotrip.africa/">
-    <meta property="twitter:title" content="GoTrip | Premium Rwanda Tour Operator">
-    <meta property="twitter:description" content="Official Rwanda tour operator for gorilla trekking, Kigali city tours, Lake Kivu resorts, Akagera safaris with expert guides and translators.">
-    <meta property="twitter:image" content="https://res.cloudinary.com/dxbmyqrtn/image/upload/v1767664105/ruanda-lake-kivu-aussicht_o95lpv.jpg">
+    <meta property="twitter:title" content="GoTrip | Premium Tour Operator">
+    <meta property="twitter:description" content="Official tour operator for gorilla trekking, city tours, Lake resorts, safaris with expert guides and translators.">
+    <meta property="twitter:image" content="https://res.cloudinary.com/dxbmyqrtn/image/upload/v1769521228/banner_pro1_z4lkbz.png">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://gotrip.africa/">
@@ -38,8 +38,8 @@
     {
         "@context": "https://schema.org",
         "@type": "TravelAgency",
-        "name": "GoTrip Rwanda",
-        "description": "Official Rwanda tour operator specializing in gorilla trekking, cultural tours, and luxury safaris with expert multilingual guides and translators.",
+        "name": "GoTrip",
+        "description": "Official tour operator specializing in gorilla trekking, cultural tours, and luxury safaris with expert multilingual guides and translators.",
         "url": "https://gotrip.africa",
         "logo": "https://gotrip.africa/logo.png",
         "address": {
@@ -128,20 +128,22 @@
             min-height: calc(100vh - 300px);
         }
         
-        /* Professional Mobile Menu Toggle */
+        /* Professional Mobile Menu Toggle - FIXED */
         .mobile-menu-btn { 
             display: none; 
-            background: none;
+            background: #2E7D32;
             border: none;
-            font-size: 1.5rem;
-            color: #333;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            color: white;
             cursor: pointer;
-            padding: 8px;
+            padding: 0;
             z-index: 1002;
             width: 44px;
             height: 44px;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
         }
         
         /* Hero Section - Enhanced Clarity */
@@ -239,10 +241,6 @@
             }
             .mobile-menu-btn {
                 display: flex;
-                background: #2E7D32;
-                color: white;
-                border-radius: 8px;
-                border: none;
             }
             
             /* Fixed Mobile Navigation */
@@ -390,9 +388,32 @@
             border-radius: 12px;
             grid-column: 1 / -1;
         }
+        
+        /* Mobile Overlay - ADD THIS */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .mobile-overlay.active {
+            display: block;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+    
     <!-- Navigation -->
     <header class="main-nav">
         <div class="nav-container">
@@ -414,7 +435,7 @@
                     <li><a href="/guides" class="nav-link" onclick="GoTrip.navigateTo('guides'); return false;">Tour Guides</a></li>
                     <li><a href="/translators" class="nav-link" onclick="GoTrip.navigateTo('translators'); return false;">Translators</a></li>
                     <li><a href="/accommodations" class="nav-link" onclick="GoTrip.navigateTo('accommodations'); return false;">Accommodations</a></li>
-                    <li><a href="/blog" class="nav-link" onclick="GoTrip.navigateTo('blog'); return false;">Travel Insights</a></li>
+                    <li><a href="/blog" class="nav-link" onclick="GoTrip.navigateTo('blog'); return false;">News</a></li>
                     <li><a href="/contact" class="nav-link" onclick="GoTrip.navigateTo('contact'); return false;">Contact</a></li>
                 </ul>
             </nav>
@@ -439,10 +460,10 @@
                     <p class="hero-subtitle">Experience authentic culture, gorilla trekking, and luxury stays with Rwanda's premier tour operator. Expert guides, professional translators, and seamless travel planning.</p>
                     <div class="hero-buttons">
                         <button class="btn btn-large plan-trip-hero-btn" onclick="GoTrip.showTripPlanningModal()">
-                            <i class="fas fa-map-marked-alt"></i> Plan Your Rwanda Adventure
+                            <i class="fas fa-map-marked-alt"></i> Plan Your Adventure
                         </button>
                         <button class="btn btn-outline btn-large explore-destinations-btn" onclick="GoTrip.navigateTo('destinations'); return false;">
-                            <i class="fas fa-compass"></i> Explore Destinations
+                            <i class="fas fa-compass"></i> Destinations
                         </button>
                     </div>
                 </div>
@@ -461,7 +482,7 @@
                             <h3>Gorilla Trekking</h3>
                             <p>Premium gorilla trekking experiences in Volcanoes National Park with guaranteed permits, expert trackers, and conservation-focused tours.</p>
                             <button class="service-link" onclick="GoTrip.navigateTo('destinations'); return false;">
-                                Explore Gorilla Tours <i class="fas fa-arrow-right"></i>
+                                Gorilla Tours <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
                         <div class="service-card">
@@ -483,7 +504,7 @@
                         <div class="service-card">
                             <i class="fas fa-hotel service-icon"></i>
                             <h3>Luxury Stays</h3>
-                            <p>Curated accommodations from boutique lodges to luxury resorts, vetted for quality, sustainability, and authentic Rwandan hospitality.</p>
+                            <p>Curated accommodations from boutique lodges to luxury resorts, vetted for quality, sustainability, and authentic hospitality.</p>
                             <button class="service-link" onclick="GoTrip.navigateTo('accommodations'); return false;">
                                 View Accommodations <i class="fas fa-arrow-right"></i>
                             </button>
@@ -593,7 +614,7 @@
         <section id="blog-page" class="page">
             <div class="page-header">
                 <div class="container">
-                    <h1><i class="fas fa-newspaper"></i> Travel Insights</h1>
+                    <h1><i class="fas fa-newspaper"></i> News</h1>
                     <p>Expert advice, travel tips, and insights into Rwanda's tourism and culture</p>
                 </div>
             </div>
@@ -730,7 +751,7 @@
                     <h3 class="footer-logo">
                         <span>Go</span><span>Trip</span>
                     </h3>
-                    <p class="footer-description">Rwanda's premier tour operator specializing in gorilla trekking, cultural experiences, luxury safaris, and professional translation services.</p>
+                    <p class="footer-description">Premier tour operator specializing in gorilla trekking, cultural experiences, luxury safaris, and professional translation services.</p>
                     
                     <div class="footer-contact">
                         <p><i class="fas fa-map-marker-alt"></i> KN 5 Rd, Kigali, Rwanda</p>
@@ -761,11 +782,11 @@
                 <div class="footer-column">
                     <h4>Destinations</h4>
                     <ul class="footer-links">
-                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-mountain"></i> Volcanoes National Park</a></li>
-                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-tree"></i> Nyungwe Forest</a></li>
-                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-lion"></i> Akagera National Park</a></li>
-                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-water"></i> Lake Kivu</a></li>
-                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-city"></i> Kigali City</a></li>
+                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-mountain"></i> Volcanoes National Parks</a></li>
+                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-tree"></i> Forest</a></li>
+                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-lion"></i> National Parks</a></li>
+                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-water"></i> Lakes</a></li>
+                        <li><a href="/destinations" class="footer-link" onclick="GoTrip.navigateTo('destinations'); return false;"><i class="fas fa-city"></i> Cities</a></li>
                     </ul>
                 </div>
                 
@@ -808,5 +829,109 @@
 
     <!-- Main JavaScript -->
     <script src="script.js"></script>
+    
+    <!-- Mobile Menu JavaScript -->
+    <script>
+        // Mobile menu functionality - run immediately
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const navLinks = document.getElementById('nav-links');
+            const menuIcon = document.getElementById('menu-icon');
+            const mobileOverlay = document.getElementById('mobile-overlay');
+            
+            if (mobileMenuToggle && navLinks && menuIcon) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isActive = navLinks.classList.contains('active');
+                    
+                    // Toggle menu visibility
+                    navLinks.classList.toggle('active');
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileMenuToggle.setAttribute('aria-expanded', !isActive);
+                    
+                    // Toggle overlay
+                    if (mobileOverlay) {
+                        mobileOverlay.classList.toggle('active');
+                    }
+                    
+                    // Change icon from bars to X and vice versa
+                    if (isActive) {
+                        menuIcon.classList.remove('fa-times');
+                        menuIcon.classList.add('fa-bars');
+                    } else {
+                        menuIcon.classList.remove('fa-bars');
+                        menuIcon.classList.add('fa-times');
+                    }
+                });
+
+                // Close menu when clicking on a nav link
+                const navLinksList = navLinks.querySelectorAll('.nav-link');
+                navLinksList.forEach(link => {
+                    link.addEventListener('click', () => {
+                        navLinks.classList.remove('active');
+                        mobileMenuToggle.classList.remove('active');
+                        mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                        menuIcon.classList.remove('fa-times');
+                        menuIcon.classList.add('fa-bars');
+                        
+                        if (mobileOverlay) {
+                            mobileOverlay.classList.remove('active');
+                        }
+                    });
+                });
+
+                // Close menu when clicking on overlay
+                if (mobileOverlay) {
+                    mobileOverlay.addEventListener('click', () => {
+                        navLinks.classList.remove('active');
+                        mobileMenuToggle.classList.remove('active');
+                        mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                        menuIcon.classList.remove('fa-times');
+                        menuIcon.classList.add('fa-bars');
+                        mobileOverlay.classList.remove('active');
+                    });
+                }
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!navLinks.contains(e.target) && 
+                        !mobileMenuToggle.contains(e.target) && 
+                        navLinks.classList.contains('active')) {
+                        
+                        navLinks.classList.remove('active');
+                        mobileMenuToggle.classList.remove('active');
+                        mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                        menuIcon.classList.remove('fa-times');
+                        menuIcon.classList.add('fa-bars');
+                        
+                        if (mobileOverlay) {
+                            mobileOverlay.classList.remove('active');
+                        }
+                    }
+                });
+
+                // Close menu on escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+                        navLinks.classList.remove('active');
+                        mobileMenuToggle.classList.remove('active');
+                        mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                        menuIcon.classList.remove('fa-times');
+                        menuIcon.classList.add('fa-bars');
+                        
+                        if (mobileOverlay) {
+                            mobileOverlay.classList.remove('active');
+                        }
+                    }
+                });
+            }
+            
+            // Set current year in footer
+            const currentYearElement = document.getElementById('current-year');
+            if (currentYearElement) {
+                currentYearElement.textContent = new Date().getFullYear();
+            }
+        });
+    </script>
 </body>
 </html>

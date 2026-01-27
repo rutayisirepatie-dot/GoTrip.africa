@@ -13,7 +13,7 @@
         
         // Company information
         companyInfo: {
-            name: 'GoTrip Rwanda',
+            name: 'GoTrip',
             email: 'info@gotrip.africa',
             phone: '+250787407051',
             address: 'KN 5 Rd, Kigali, Rwanda',
@@ -31,7 +31,7 @@
         
         // Currency settings
         currency: {
-            symbol: '$',
+            symbol: '',
             code: 'USD'
         }
     };
@@ -2676,7 +2676,7 @@
         
         // Currency settings
         currency: {
-            symbol: '$',
+            symbol: '',
             code: 'USD'
         }
     };
@@ -5243,10 +5243,10 @@
         // Show welcome notification
         setTimeout(() => {
             showNotification(
-                'Welcome to GoTrip! Discover Rwanda with expert guides and professional translators.',
+                'Travel Rwanda with expert guides and professional translators.',
                 'info',
                 5000,
-                'Welcome to Rwanda'
+                'Welcome to GoTrip'
             );
         }, 1500);
         

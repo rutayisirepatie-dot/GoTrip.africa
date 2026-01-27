@@ -1,67 +1,146 @@
 import mongoose from 'mongoose';
 
-const activitySchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  icon: { type: String },
-  description: { type: String },
-  duration: { type: String },
-  difficulty: { type: String, enum: ['Easy', 'Moderate', 'Challenging'] }
-});
-
-const featureSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  description: { type: String }
-});
-
-const coordinateSchema = new mongoose.Schema({
-  lat: { type: Number, required: true },
-  lng: { type: Number, required: true }
-});
-
 const destinationSchema = new mongoose.Schema({
-  _id: { type: String, required: true },
-  name: { type: String, required: true },
-  location: { type: String, required: true },
-  country: { type: String, default: 'Rwanda' },
-  description: { type: String, required: true },
-  mainImage: { type: String, required: true },
-  images: [{ type: String }],
-  rating: { type: Number, min: 0, max: 5, default: 0 },
-  basePrice: { type: Number, required: true },
-  duration: { type: String },
-  difficulty: { type: String },
-  bestSeason: { type: String },
-  activities: [activitySchema],
-  features: [featureSchema],
-  highlights: [{ type: String }],
-  includes: [{ type: String }],
-  excludes: [{ type: String }],
-  travelTips: [{ type: String }],
-  coordinates: coordinateSchema,
-  tags: [{ type: String }],
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  name: {
+    type: String,
+    required: [true, 'Destination name is required'],
+    trim: true,
+    index: true
+  },
+  slug: {
+    type: String,
+    unique: true,
+    lowercase: true,
+    index: true
+  },
+  shortDescription: {
+    type: String,
+    required: [true, 'Short description is required']
+  },
+  location: {
+    type: String,
+    required: [true, 'Location is required']
+  },
+  coordinates: {
+    lat: { type: Number },
+    lng: { type: Number }
+  },
+  description: {
+    type: String,
+    required: [true, 'Description is required']
+  },
+  detailedDescription: String,
+  mainImage: {
+    type: String,
+    required: [true, 'Main image is required']
+  },
+  gallery: [String],
+  videoUrl: String,
+  rating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5
+  },
+  totalReviews: {
+    type: Number,
+    default: 0
+  },
+  basePrice: {
+    type: Number,
+    required: [true, 'Base price is required']
+  },
+  currency: {
+    type: String,
+    default: 'USD',
+    enum: ['USD', 'EUR', 'GBP', 'RWF']
+  },
+  duration: String,
+  difficulty: String,
+  altitude: String,
+  bestSeason: String,
+  permitsRequired: {
+    type: Boolean,
+    default: false
+  },
+  permitPrice: Number,
+  groupSize: String,
+  minimumAge: mongoose.Schema.Types.Mixed,
+  available: {
+    type: Boolean,
+    default: true,
+    index: true
+  },
+  featured: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  trending: {
+    type: Boolean,
+    default: false
+  },
+  specialOffer: {
+    type: Boolean,
+    default: false
+  },
+  specialOfferText: String,
+  highlights: [String],
+  activities: [{
+    name: String,
+    icon: String,
+    description: String,
+    duration: String,
+    difficulty: String,
+    priceIncluded: Boolean,
+    additionalCost: Number
+  }],
+  includedServices: [String],
+  excludedServices: [String],
+  conservationInfo: String,
+  conservationImpact: mongoose.Schema.Types.Mixed,
+  tags: [String],
+  metaTitle: String,
+  metaDescription: String,
+  metaKeywords: [String],
+  views: {
+    type: Number,
+    default: 0
+  },
+  bookings: {
+    type: Number,
+    default: 0
+  },
+  safetyRating: Number,
+  accessibility: mongoose.Schema.Types.Mixed,
+  statistics: mongoose.Schema.Types.Mixed,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
 
-// Virtual for formatted price
-destinationSchema.virtual('formattedPrice').get(function() {
-  return `$${this.basePrice}`;
-});
-
-// Virtual for rating percentage
-destinationSchema.virtual('ratingPercentage').get(function() {
-  return (this.rating / 5) * 100;
-});
-
-// Indexes for better query performance
+// Indexes for performance
+destinationSchema.index({ slug: 1, available: 1 });
+destinationSchema.index({ featured: 1, available: 1 });
 destinationSchema.index({ rating: -1 });
-destinationSchema.index({ country: 1 });
+destinationSchema.index({ basePrice: 1 });
 destinationSchema.index({ tags: 1 });
-destinationSchema.index({ 'coordinates': '2dsphere' });
+destinationSchema.index({ location: 'text', name: 'text', description: 'text' });
+
+// Virtual for average rating
+destinationSchema.virtual('averageRating').get(function() {
+  return this.totalReviews > 0 ? (this.rating / this.totalReviews).toFixed(1) : 0;
+});
 
 const Destination = mongoose.model('Destination', destinationSchema);
+
 export default Destination;
